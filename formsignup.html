@@ -4,82 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <style>
-    * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-        }
-         .switch a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #signup {
-            display: none;
-        }
-        </style>
 </head>
 <body>
-    <!-- Signup Form -->
-        <div id="signup">
-            <h2>Sign Up</h2>
-
-            <form>
-                <div class="input-box">
-                    <label>Full Name</label>
-                    <input type="text" placeholder="Enter your name" required>
-                </div>
-
-                <div class="input-box">
-                    <label>Email</label>
-                    <input type="email" placeholder="Enter your email" required>
-                </div>
-
-                <div class="input-box">
-                    <label>Password</label>
-                    <input type="password" placeholder="Create password" required>
-                </div>
-
-                <div class="input-box">
-                    <label>Confirm Password</label>
-                    <input type="password" placeholder="Confirm password" required>
-                </div>
-
-                <button class="btn" type="submit">Create Account</button>
-            </form>
-
-            <div class="switch">
-                Already have an account?
-                <a onclick="showLogin()">Login</a>
-            </div>
-        </div>
-
-    </div>
-
-
-    <script>
-        function showSignup() {
-            document.getElementById("login").style.display = "none";
-            document.getElementById("signup").style.display = "block";
-        }
-
-        function showLogin() {
-            document.getElementById("signup").style.display = "none";
-            document.getElementById("login").style.display = "block";
-        }
-    </script>
+    
     
 </body>
 </html>
