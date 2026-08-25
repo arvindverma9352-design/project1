@@ -1,106 +1,212 @@
-#continer{
-    border: 2px solid black;height: 1000px;width: 1500px;
-    background-color: rgb(230, 141, 144);
+*{
+    box-sizing: border-box;
+}
+body{
+    background-color: darkcyan;
+    gap: 100px;
+    padding: 20px;
+    
+    
+}
+.products{
+    display: grid;
+    grid-template-columns: repeat(auto-fill,200px);
+    gap: 100px;
+    justify-content: start;
+    align-items: start;
+}
+.product{
+    width: 200px;
+}
+
+/* PATATO */
+.patato{
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(patato.png);
     background-repeat: no-repeat;
     background-size: cover;
-}
-/* patato */
-.con1{
-     border: 2px solid black;
-     height: 250px;
-     width: 800px;
-     margin-left: 15px;
-     margin-top: 20px;
-     background-image: url(patato.png);
-     background-size: 350px 100%;
-     background-repeat: no-repeat;
-     position: relative;
 
 }
-.A{
-    border: 2px solid black;
-    height: 250px;
-    width: calc(100% - 350px);
-    display: flex;
-    flex-direction: column;
-    margin-left: 350px;
-    margin-top: 0px;
-    font-size: 20px;
-    box-sizing: border-box;
-    background-color: bisque;
-    
-    overflow: hidden;
-    overflow-wrap: break-word;
-}
-.button{
-    display: flex;
-    gap: 20px;
-  margin-left:2px; 
-  margin-top: 28px;   
-}
-.button button{
-    width: 100px;
-    height: 30px;
-    font-size: 10px;
-    cursor: pointer;
-}
-.price{
-    position: absolute;
-    right: 10px;
-    bottom: 10px;
-    color: black;
-    background: white;
-    padding: 5px 10px;
-    font-size: 25px;
-    font-weight: bold;
+
+/* TOMATO */
+.tomato{
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(tomato.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 
-/* tomato */
-.con2{
-     border: 2px solid black;
-     height: 250px;
-     width: 800px;
-     margin-left: 15px;
-     margin-top: 20px;
-     background-image: url(tomato.png);
-     background-size: 350px 100%;
-     background-repeat: no-repeat;
-     position: relative;
-}
-.price2{
-    position: absolute;
-    right: 10px;
-    bottom: 10px;
-    color: black;
-    background: white;
-    padding: 5px 10px;
-    font-size: 25px;
-    font-weight: bold;
-}
-.B{
-    border: 2px solid black;
-    height: 250px;
-    width: calc(100% - 350px);
+.buttons{
+    width: 200px;
     display: flex;
-    flex-direction: column;
-    margin-left: 350px;
-    margin-top: 0px;
-    font-size: 20px;
-    box-sizing: border-box;
-    background-color: bisque;
-    
-    overflow: hidden;
-    overflow-wrap: break-word;
 }
-.button2{
-    display: flex;
-    gap: 20px;
-  margin-left:2px; 
-  margin-top: 24px;   
-}
-.button2 button{
+.buttons button{
     width: 100px;
-    height: 30px;
-    font-size: 10px;
+    height: 60px;
+    background-color: white;
+    border: 1px solid gray;
+    font-size: 15px;
     cursor: pointer;
 }
+
+.buttons button:hover{
+    background-color: lightgray;
+}
+
+/* BROWN ONION */
+.brownonion{
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(brown-onion.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* RED ONION */
+.rednonion{
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(red-onion.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* LADY-FINGER */
+.ladyfinger{
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(lady-finger.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* GREEN-CHILLI */
+.greenchilli{
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(greenchilli.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* SPINCH */
+.spinch{
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(spinch.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* LAUKI */
+.lauki{
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(lauki.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* GREEN-CUCUMBER */
+.greencucumber{
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(greencucumber.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+.cucumber{
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(cucumber.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* Bitter Gourd */
+.bittergourd{
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(bitter-gourd.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* CARROT */
+.carrot{
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(carrot.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* PUMKIN */
+.pumkin{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(pumkin.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* cauliflower */
+.cauliflower{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(cauliflower.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* cabbage */
+.cabbage{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(cabbage.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* Brinjal */
+.brinjal{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(brinjal.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+
+
+
+

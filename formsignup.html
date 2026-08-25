@@ -21,12 +21,26 @@
             background-repeat: no-repeat;
             background-size: cover;
         }
+        #z{
+            border: 2px dashed darkblue;
+            height: 320px;
+            width: 300px;
+            padding: 30px;
+            background-color: rgb(31, 211, 103);
+        }
+        .container{
+            margin-top: 180px;
+        }
+        #btn{
+            font-size: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <!--Signup-->
         <h2>Signup</h2>
+        <fieldset id="z">
         <form action="">
         <label for="Name">Name:</label><br>
         <input type="text" placeholder="Enter your name" required><br><br>
@@ -36,8 +50,10 @@
         <input type="tel" placeholder="Enter your Mobile Number" required><br><br>
         <label for="password">Password:</label><br>
         <input type="password" placeholder="Enter Your Password" required><br><br>
-        <button class="btn" type="submit">Signup</button>
+        <button id="btn" type="submit">Signup</button>
+        <p>If you have an account /<a href="formlogin.html">Login</a> </p>
         </form>
+        </fieldset>
 
 
     </div>

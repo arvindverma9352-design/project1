@@ -21,6 +21,22 @@
             background-repeat: no-repeat;
             background-size: cover;
         }
+        .x{
+            border: 2px dashed darkblue;
+            height: 290px;
+            width: 270px;
+            padding: 30px;
+            background-color: rgb(31, 211, 103);
+        }
+        .z{
+            font-size: 15px;
+        }
+        .container{
+            margin-top: 170px;
+        }
+        #btn{
+            font-size: 20px;
+        }
 
 
     </style>
@@ -31,15 +47,19 @@
         <div id="login">
             <h2>Login</h2>
             <form>
-                <div class="input-box">
+                <fieldset class="x">
                     <label for="email">Email:</label><br>
-                    <input type="email" placeholder="enter your email" required><br>
-                </div><br>
-                <div>
+                    <input type="email" placeholder="enter your email" required><br><br>
+                    <label for="mobile number">Mobile Number:</label><br>
+                    <input type="tel" placeholder="Enter your Mobile Number" required><br><br>
+                
+                
                     <label for="password">Password:</label><br>
-                    <input type="password" placeholder="enter your password" required>
-                </div><br>
-               <button class="btn" type="submit">Login</button> 
+                    <input type="password" placeholder="enter your password" required><br><br>
+               <button id="btn" type="submit">Login</button><br>
+
+               <p class="z">If You Not Have an Account / <a href="formsignup.html">Signup</a></p>
+               </fieldset> 
             </form>
         </div>
     </div>
