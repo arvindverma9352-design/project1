@@ -2,7 +2,7 @@
     box-sizing: border-box;
 }
 body{
-    background-color: darkcyan;
+    background-color: rgb(107, 199, 15);
     gap: 100px;
     padding: 20px;
     
@@ -205,6 +205,100 @@ body{
     background-size: cover;
      background-position: center;
 }
+
+/* Fenugreek Leaves-मेथी  */
+.fenugreekleaves{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(Fenugreek\ Leaves-मेथी.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* Mustard Greens */
+.mustardgreens{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(mustardgreens.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/*  Coriander Leaves*/
+.corianderleaves{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(corianderleaves.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* Mint */
+.mint{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(mint.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* Bathua */
+.bathua{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(bathua.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* Radish */
+.radish{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(radish.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* Beetroot */
+.beetroot{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(beetroot.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* Sweet Potato */
+.sweetpatato{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(sweetpatato.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* Garlic */
+.garlic{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(garlic.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+
+
+
 
 
 
