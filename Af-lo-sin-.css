@@ -19,6 +19,63 @@ body{
     width: 200px;
 }
 
+.cart-box{
+    position: fixed;
+    top: 20px;
+    right: 25px;
+
+    background: white;
+    padding: 12px 20px;
+
+    border-radius: 25px;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+
+    z-index: 9999;
+    cursor: pointer;
+}
+.cart-box:hover{
+    transform: scale(1.05);
+}
+.cart-item{
+    background: white;
+    padding: 20px;
+    margin: 15px;
+    border-radius: 10px;
+}
+
+#cart-count{
+    background: red;
+    color: white;
+
+    padding: 3px 8px;
+
+    border-radius: 50%;
+    font-size: 14px;
+}
+.continue-shopping{
+    display: inline-block;
+    padding: 12px 22px;
+    border: 2px solid #222;
+    border-radius: 8px;
+
+    background-color: #f5f5f5;
+    color: #222;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    text-decoration: none;
+    margin-top: 20px;
+    cursor: pointer;
+}
+.continue-shopping:hover{
+    background-color: #222;
+    color: white;
+}
 /* PATATO */
 .patato{
     border: 2px solid blue;
@@ -296,6 +353,25 @@ body{
      background-position: center;
 }
 
+/* Pointed Gourd-परवल*/
+.pointgourd{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(pointgourd-परवल.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
+
+/* Tinda */
+.tinda{border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-image: url(tinda.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+     background-position: center;
+}
 
 
 

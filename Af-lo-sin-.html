@@ -6,13 +6,61 @@
     <title>VEGETABLE MART</title>
     <link rel="stylesheet" href="Af-lo-sin-.css">
 </head>
+<script>
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function addToCart(name, price, image) {
+
+    let existingProduct = cart.find(item => item.name === name);
+
+    if (existingProduct) {
+        existingProduct.quantity++;
+    } else {
+        cart.push({
+            name: name,
+            price: price,
+            image: image,
+            quantity: 1
+        });
+    }
+
+    saveCart();
+    updateCartCount();
+
+    alert(name + " Cart me add ho gaya 🛒");
+}
+
+
+function saveCart() {
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+
+function updateCartCount() {
+
+    let count = 0;
+
+    cart.forEach(item => {
+        count += item.quantity;
+    });
+
+    document.getElementById("cart-count").innerText = count;
+}
+
+
+updateCartCount();
+</script>
 <body>
+  <div class="cart-box">
+    <a href="cart.html" class="cart-box">
+    🛒cart: <span id="cart-count">0</span></a>
+  </div>
     <div class="products">
       <!-- patato -->
       <div class="product">
          <div class="patato"></div>
          <div class="buttons">
-             <button>Add To Cart</button>
+             <button onclick="addToCart('patato',40)">Add To Cart</button>
              <button>More info</button>
          </div>
         </div>
@@ -20,7 +68,7 @@
         <div class="product">
            <div class="tomato"></div>
           <div class="buttons">
-             <button>Add To Cart</button>
+             <button onclick="addToCart('tomato',40)">Add To Cart</button>
              <button>More info</button>
             </div>
         </div>
@@ -29,7 +77,7 @@
          <div class="product">
           <div class="brownonion"></div>
           <div class="buttons">
-             <button>Add To Cart</button>
+             <button onclick="addToCart('brownonion', 40)">Add To Cart</button>
              <button>More info</button>
             </div>
         </div>
@@ -38,7 +86,7 @@
           <div class="product">
           <div class="rednonion"></div>
           <div class="buttons">
-             <button>Add To Cart</button>
+             <button onclick="addToCart('redonion',40,)">Add To Cart</button>
              <button>More info</button>
             </div>
         </div>
@@ -47,7 +95,7 @@
      <div class="product">
           <div class="ladyfinger"></div>
           <div class="buttons">
-             <button>Add To Cart</button>
+             <button onclick="addToCart('ladyfinger',60)">Add To Cart</button>
              <button>More info</button>
             </div>
      </div>
@@ -56,7 +104,7 @@
      <div class="product">
              <div class="greenchilli"></div>
           <div class="buttons">
-                <button>Add To Cart</button>
+                <button onclick="addToCart('greenchilli',80)">Add To Cart</button>
                  <button>More info</button>
          </div>
      </div>
@@ -65,7 +113,7 @@
              <div class="product">
                <div class="spinch"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('spinch',30)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -230,7 +278,25 @@
                  <button>Add To Cart</button>
                  <button>More info</button>
                </div>
+               </div>
 
+               <!-- Pointed Gourd-परवल -->
+               <div class="product">
+               <div class="pointgourd"></div>
+               <div class="buttons">
+                 <button>Add To Cart</button>
+                 <button>More info</button>
+               </div>
+               </div>
+
+               <!-- Tinda -->
+                <div class="product">
+               <div class="tinda"></div>
+               <div class="buttons">
+                 <button>Add To Cart</button>
+                 <button>More info</button>
+               </div>
+               </div>
 
 
 
