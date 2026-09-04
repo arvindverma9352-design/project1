@@ -4,39 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vegetable Mart</title>
-    <link rel="icon" href="logo.png">
+    <link rel="icon" href="images/logo.png">
     <style>
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-        body{
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-image: url(vegback.png);
-            background-repeat: no-repeat;
-            background-size: cover;
-        }
-        .x{
-            border: 2px dashed darkblue;
-            height: 290px;
-            width: 270px;
-            padding: 30px;
-            background-color: rgb(31, 211, 103);
-        }
-        .z{
-            font-size: 15px;
-        }
-        .container{
-            margin-top: 170px;
-        }
-        #btn{
-            font-size: 20px;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+        * { box-sizing: border-box; }
+        body { min-height: 100vh; margin: 0; display: grid; place-items: center; overflow: hidden; position: relative; color: #17231d; font-family: 'DM Sans', sans-serif; background: linear-gradient(115deg, rgba(13,72,45,.88), rgba(62,139,61,.55) 48%, rgba(244,191,91,.44)), url(images/vegback.png) center / cover; }
+        body:before { content: ''; position: fixed; inset: 0; pointer-events: none; background-image: linear-gradient(120deg, rgba(255,255,255,.12) 1px, transparent 1px), linear-gradient(30deg, rgba(255,255,255,.08) 1px, transparent 1px); background-size: 42px 42px; opacity: .55; animation: texture-drift 18s linear infinite; }
+        body:after { content: ''; position: fixed; width: 360px; height: 360px; right: -125px; bottom: -170px; border: 2px solid rgba(255,255,255,.42); border-radius: 50%; box-shadow: 0 0 0 28px rgba(255,255,255,.08), 0 0 0 58px rgba(255,255,255,.05); animation: orbit 16s linear infinite reverse; }
+        .container { width: min(410px, calc(100% - 32px)); animation: form-rise .7s ease both; }
+        #login { padding: 34px; border: 1px solid rgba(255,255,255,.72); border-radius: 22px; background: rgba(255,255,255,.9); box-shadow: 0 24px 60px rgba(22,77,45,.2); backdrop-filter: blur(10px); }
+        #login h2 { margin: 0 0 22px; color: #155c3b; font: 700 34px 'Space Grotesk', sans-serif; text-align: center; }
+        .x { margin: 0; padding: 0; border: 0; }
+        .x label { display: block; margin: 0 0 7px; color: #41604d; font-size: 13px; font-weight: 700; }
+        .x input { width: 100%; margin: 0 0 17px; padding: 13px 14px; border: 1px solid #d5e4d1; border-radius: 10px; outline: none; color: #17231d; background: #f8fcf5; font: inherit; transition: .25s ease; }
+        .x input:focus { border-color: #26925b; background: white; box-shadow: 0 0 0 4px rgba(38,146,91,.12); transform: translateY(-2px); }
+        #btn { width: 100%; margin: 3px 0 18px; padding: 13px; border: 0; border-radius: 10px; color: white; background: #1e7a4b; font: 700 16px 'DM Sans', sans-serif; cursor: pointer; transition: .25s ease; }
+        #btn:hover { background: #125d38; transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 20px rgba(30,122,75,.25); }
+        .z { color: #6a776f; font-size: 13px; text-align: center; }
+        .z a { color: #c45d42; font-weight: 700; }
+        @keyframes form-rise { from { opacity: 0; transform: translateY(25px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes orbit { to { transform: rotate(360deg); } }
+        @keyframes texture-drift { to { background-position: 42px 42px, -42px 42px; } }
+        @media (prefers-reduced-motion: reduce) { *, *:before, *:after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 
 
     </style>

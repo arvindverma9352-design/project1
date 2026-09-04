@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Vegetable Mart</title>
+    <link rel="stylesheet" href="profile.css">
+</head>
+<body>
+    <header class="profile-nav">
+        <a class="brand" href="Af-lo-sin-.html"><span>🥬</span> VEGETABLE MART</a>
+        <nav aria-label="Main navigation">
+            <a href="Af-lo-sin-.html">Home</a>
+            <a href="cart.html">🛒 Cart</a>
+            <a class="active" href="profile.html">👤 Profile</a>
+        </nav>
+    </header>
+
+    <main class="profile-shell">
+        <section class="profile-hero" aria-labelledby="profile-title">
+            <div class="hero-copy">
+                <p class="eyebrow">Your personal space</p>
+                <h1 id="profile-title">Hello, Arvind</h1>
+                <p class="hero-text">Keep your account details, orders and favourites close at hand.</p>
+            </div>
+            <div class="hero-spark" aria-hidden="true">✦</div>
+        </section>
+
+        <section class="profile-grid" aria-label="Profile overview">
+            <article class="profile-card identity-card">
+                <div class="photo-wrap">
+                    <img src="images/logo.png" alt="Arvind profile photo">
+                    <span class="online-dot" title="Online"></span>
+                </div>
+                <div class="identity-copy">
+                    <h2>Arvind Kumar</h2>
+                    <p>Fresh food enthusiast</p>
+                    <button class="outline-button" type="button">Change photo</button>
+                </div>
+                <div class="member-label">Member since 2026</div>
+            </article>
+
+            <article class="profile-card details-card">
+                <div class="card-heading">
+                    <div>
+                        <p class="eyebrow">Account details</p>
+                        <h2>Personal information</h2>
+                    </div>
+                    <span class="heading-icon">✎</span>
+                </div>
+                <div class="details-list">
+                    <div class="detail-row"><span class="detail-icon">✉</span><div><small>Email</small><strong>arvind@example.com</strong></div></div>
+                    <div class="detail-row"><span class="detail-icon">☎</span><div><small>Mobile number</small><strong>+91 98765 43210</strong></div></div>
+                    <div class="detail-row"><span class="detail-icon">⌂</span><div><small>Address</small><strong>New Delhi, India</strong></div></div>
+                </div>
+                <button class="primary-button" type="button">Edit profile <span>→</span></button>
+            </article>
+        </section>
+
+        <section class="quick-actions" aria-label="Profile options">
+            <a class="action-card orders-card" href="cart.html">
+                <span class="action-icon">▣</span><span class="action-content"><small>Shopping history</small><strong>My Orders</strong><em>View your recent orders</em></span><span class="arrow">→</span>
+            </a>
+            <a class="action-card wishlist-card" href="wishlist.html">
+                <span class="action-icon">♥</span><span class="action-content"><small>Saved for later</small><strong>Wishlist</strong><em>See your favourite vegetables</em></span><span class="arrow">→</span>
+            </a>
+            <a class="action-card settings-card" href="#settings">
+                <span class="action-icon">⚙</span><span class="action-content"><small>Make it yours</small><strong>Account Settings</strong><em>Manage preferences and privacy</em></span><span class="arrow">→</span>
+            </a>
+            <button class="action-card logout-card" type="button" onclick="logout()">
+                <span class="action-icon">↪</span><span class="action-content"><small>See you soon</small><strong>Logout</strong><em>Sign out of your account</em></span><span class="arrow">→</span>
+            </button>
+        </section>
+
+        <p id="logout-message" class="logout-message" role="status" aria-live="polite"></p>
+    </main>
+
+    <script>
+        function logout() {
+            const message = document.getElementById("logout-message");
+            message.textContent = "You have been logged out. See you again soon!";
+        }
+    </script>
+</body>
+</html>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VEGETABLE MART</title>
     <link rel="stylesheet" href="Af-lo-sin-.css">
+    <link rel="icon" href="logo.png">
 </head>
 <script>
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -35,6 +36,18 @@ function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
 }
 
+function addToWishlist(name, price, image) {
+  const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+  if (!wishlist.some(item => item.name === name)) {
+    wishlist.push({ name: name, price: price, image: image });
+    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+    alert(name + " Wishlist me add ho gaya ♥");
+  } else {
+    alert(name + " pehle se Wishlist me hai ♥");
+  }
+}
+
 
 function updateCartCount() {
 
@@ -44,18 +57,89 @@ function updateCartCount() {
         count += item.quantity;
     });
 
-    document.getElementById("cart-count").innerText = count;
+    document.getElementById("nav-cart-count").innerText = count;
 }
 
 
-updateCartCount();
+document.addEventListener("DOMContentLoaded", () => {
+  updateCartCount();
+
+  document.querySelectorAll(".product").forEach(product => {
+    const cartButton = product.querySelector("button[onclick^=\"addToCart\"]");
+    if (!cartButton) return;
+
+    const match = cartButton.getAttribute("onclick").match(/addToCart\('([^']+)',\s*([\d]+)/);
+    if (!match) return;
+
+    const wishlistButton = document.createElement("button");
+    wishlistButton.type = "button";
+    wishlistButton.className = "wishlist-button";
+    wishlistButton.textContent = "♥ Wishlist";
+    wishlistButton.onclick = () => addToWishlist(match[1], Number(match[2]), "images/" + match[1] + ".png");
+    product.querySelector(".buttons").appendChild(wishlistButton);
+  });
+});
 </script>
 <body>
-  <div class="cart-box">
-    <a href="cart.html" class="cart-box">
-    🛒cart: <span id="cart-count">0</span></a>
+
+  <!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+      🥬 VEGETABLE MART
+    </div>
+
+    <div class="nav-links">
+
+        <a href="Af-lo-sin-.html">Home</a>
+
+        <a href="#products">Vegetables</a>
+
+        <a href="cart.html">
+            🛒 Cart
+            <span id="nav-cart-count">0</span>
+        </a>
+
+        <a href="wishlist.html">
+            ❤️ Wishlist
+        </a>
+
+        <a href="profile.html">
+            👤 Profile
+        </a>
+
+    </div>
+
+</nav>
+
+<main class="home-main">
+  <section class="home-hero">
+    <div class="hero-content">
+      <p class="hero-kicker">Freshness, delivered daily</p>
+      <h1>Good food starts<br><span>with good greens.</span></h1>
+      <p class="hero-description">Pick farm-fresh vegetables for a brighter, healthier kitchen.</p>
+      <a class="hero-button" href="#products">Explore vegetables <span>↓</span></a>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-orbit orbit-one"></div>
+      <div class="hero-orbit orbit-two"></div>
+      <div class="hero-leaf">🥬</div>
+      <div class="floating-veg veg-one">🥕</div>
+      <div class="floating-veg veg-two">🍅</div>
+    </div>
+  </section>
+
+  <div class="products-heading">
+    <div>
+      <p class="section-kicker">From our farm to you</p>
+      <h2>Shop fresh picks</h2>
+    </div>
+    <span class="product-count">27 fresh choices</span>
   </div>
-    <div class="products">
+
+    <div class="products" id="products">
+      
       <!-- patato -->
       <div class="product">
          <div class="patato"></div>
@@ -122,7 +206,7 @@ updateCartCount();
              <div class="product">
                <div class="lauki"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('lauki', 40)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -131,7 +215,7 @@ updateCartCount();
              <div class="product">
                <div class="greencucumber"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('greencucumber', 40)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -140,7 +224,7 @@ updateCartCount();
              <div class="product">
                <div class="cucumber"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('cucumber', 40)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -149,7 +233,7 @@ updateCartCount();
              <div class="product">
                <div class="bittergourd"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('bittergourd', 50)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -158,7 +242,7 @@ updateCartCount();
             <div class="product">
                <div class="carrot"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('carrot', 30)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -167,7 +251,7 @@ updateCartCount();
              <div class="product">
                <div class="pumkin"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('pumkin', 40)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -176,7 +260,7 @@ updateCartCount();
              <div class="product">
                <div class="cauliflower"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('cauliflower', 50)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -185,7 +269,7 @@ updateCartCount();
              <div class="product">
                <div class="cabbage"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('cabbage', 30)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -194,7 +278,7 @@ updateCartCount();
              <div class="product">
                <div class="brinjal"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('brinjal', 40)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -203,7 +287,7 @@ updateCartCount();
              <div class="product">
                <div class="fenugreekleaves"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('fenugreekleaves', 30)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -212,7 +296,7 @@ updateCartCount();
              <div class="product">
                <div class="mustardgreens"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('mustardgreens', 30)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -221,7 +305,7 @@ updateCartCount();
              <div class="product">
                <div class="corianderleaves"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('corianderleaves', 20)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -230,7 +314,7 @@ updateCartCount();
              <div class="product">
                <div class="mint"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('mint', 10)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -239,7 +323,7 @@ updateCartCount();
               <div class="product">
                <div class="bathua"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('bathua', 25)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -248,7 +332,7 @@ updateCartCount();
             <div class="product">
                <div class="radish"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('radish', 20)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -257,7 +341,7 @@ updateCartCount();
               <div class="product">
                <div class="beetroot"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('beetroot', 30)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -266,7 +350,7 @@ updateCartCount();
              <div class="product">
                <div class="sweetpatato"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('sweetpotato', 40)">Add To Cart</button>
                  <button>More info</button>
                </div>
             </div>
@@ -275,7 +359,7 @@ updateCartCount();
              <div class="product">
                <div class="garlic"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('garlic', 25)">Add To Cart</button>
                  <button>More info</button>
                </div>
                </div>
@@ -284,7 +368,7 @@ updateCartCount();
                <div class="product">
                <div class="pointgourd"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('pointgourd', 35)">Add To Cart</button>
                  <button>More info</button>
                </div>
                </div>
@@ -293,7 +377,7 @@ updateCartCount();
                 <div class="product">
                <div class="tinda"></div>
                <div class="buttons">
-                 <button>Add To Cart</button>
+                 <button onclick="addToCart('tinda', 40)">Add To Cart</button>
                  <button>More info</button>
                </div>
                </div>
@@ -301,6 +385,7 @@ updateCartCount();
 
 
     </div>
+  </main>
         
 </body>
 </html>
