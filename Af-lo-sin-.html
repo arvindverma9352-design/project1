@@ -9,6 +9,44 @@
 </head>
 <script>
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
+const productImages = {
+  patato: "images/patato.png",
+  tomato: "images/tomato.png",
+  brownonion: "images/brown-onion.png",
+  redonion: "images/red-onion.png",
+  ladyfinger: "images/lady-finger.png",
+  greenchilli: "images/greenchilli.png",
+  spinch: "images/spinch.png",
+  lauki: "images/lauki.png",
+  greencucumber: "images/greencucumber.png",
+  cucumber: "images/cucumber.png",
+  bittergourd: "images/bitter-gourd.png",
+  carrot: "images/carrot.png",
+  pumkin: "images/pumkin.png",
+  cauliflower: "images/cauliflower.png",
+  cabbage: "images/cabbage.png",
+  brinjal: "images/brinjal.png",
+  fenugreekleaves: "images/Fenugreek Leaves-मेथी.png",
+  mustardgreens: "images/mustardgreens.png",
+  corianderleaves: "images/corianderleaves.png",
+  mint: "images/mint.png",
+  bathua: "images/bathua.png",
+  radish: "images/radish.png",
+  beetroot: "images/beetroot.png",
+  sweetpotato: "images/sweetpatato.png",
+  garlic: "images/garlic.png",
+  pointgourd: "images/pointgourd-परवल.png",
+  tinda: "images/tinda.png"
+};
+const productLabels = {
+  patato: "Potato", tomato: "Tomato", brownonion: "Brown Onion", redonion: "Red Onion",
+  ladyfinger: "Lady Finger", greenchilli: "Green Chilli", spinch: "Spinach", lauki: "Lauki",
+  greencucumber: "Green Cucumber", cucumber: "Cucumber", bittergourd: "Bitter Gourd", carrot: "Carrot",
+  pumkin: "Pumpkin", cauliflower: "Cauliflower", cabbage: "Cabbage", brinjal: "Brinjal",
+  fenugreekleaves: "Fenugreek Leaves", mustardgreens: "Mustard Greens", corianderleaves: "Coriander Leaves",
+  mint: "Mint", bathua: "Bathua", radish: "Radish", beetroot: "Beetroot", sweetpotato: "Sweet Potato",
+  garlic: "Garlic", pointgourd: "Pointed Gourd", tinda: "Tinda"
+};
 
 function addToCart(name, price, image) {
 
@@ -16,11 +54,12 @@ function addToCart(name, price, image) {
 
     if (existingProduct) {
         existingProduct.quantity++;
+      existingProduct.image = existingProduct.image || image || productImages[name];
     } else {
         cart.push({
             name: name,
             price: price,
-            image: image,
+        image: image || productImages[name],
             quantity: 1
         });
     }
@@ -28,7 +67,20 @@ function addToCart(name, price, image) {
     saveCart();
     updateCartCount();
 
-    alert(name + " Cart me add ho gaya 🛒");
+    showCartToast(name);
+}
+
+function showCartToast(name) {
+  const toast = document.getElementById("cart-toast");
+  toast.innerHTML = `<span class="toast-check">✓</span><span><strong>${name}</strong> cart me add ho gaya</span>`;
+  toast.classList.remove("toast-hide");
+  toast.classList.add("toast-show");
+
+  clearTimeout(window.cartToastTimer);
+  window.cartToastTimer = setTimeout(() => {
+    toast.classList.remove("toast-show");
+    toast.classList.add("toast-hide");
+  }, 2600);
 }
 
 
@@ -71,6 +123,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const match = cartButton.getAttribute("onclick").match(/addToCart\('([^']+)',\s*([\d]+)/);
     if (!match) return;
 
+    const productName = document.createElement("h3");
+    productName.className = "product-name";
+    productName.textContent = productLabels[match[1]] || match[1];
+    product.insertBefore(productName, product.querySelector(".buttons"));
+
     const wishlistButton = document.createElement("button");
     wishlistButton.type = "button";
     wishlistButton.className = "wishlist-button";
@@ -82,12 +139,15 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 <body>
 
+  <div id="cart-toast" class="cart-toast" role="status" aria-live="polite"></div>
+
   <!-- ================= NAVBAR ================= -->
 
 <nav class="navbar">
 
     <div class="logo">
-      🥬 VEGETABLE MART
+      <img src="logo.png" alt="Vegetable Mart logo" class="brand-logo">
+      <span>VEGETABLE MART</span>
     </div>
 
     <div class="nav-links">

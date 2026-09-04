@@ -3,20 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vegetable Mart</title>
+    <title>Your Cart | Vegetable Mart</title>
     <link rel="stylesheet" href="Af-lo-sin-.css">
     <link rel="icon" href="logo.png">
 </head>
-<body>
-     <h1>🛒 My Cart</h1>
+<body class="cart-page">
+    <header class="cart-header">
+        <a href="Af-lo-sin-.html" class="cart-brand"><img src="logo.png" alt="Vegetable Mart logo" class="page-brand-logo"><span>Vegetable Mart</span></a>
+        <span class="cart-status"><span class="status-dot"></span> Fresh picks, ready to go</span>
+    </header>
 
-    <div id="cart-items"></div>
+    <main class="cart-shell">
+        <section class="cart-intro">
+            <p class="cart-kicker">Your harvest</p>
+            <h1>My Cart <span>🛒</span></h1>
+            <p>Almost there. Review your fresh picks before they leave for your kitchen.</p>
+        </section>
 
-    <h2>
-        Total: ₹<span id="total-price">0</span>
-    </h2>
+        <div class="cart-layout">
+            <section class="cart-list-panel">
+                <div class="cart-list-heading">
+                    <h2>Selected vegetables</h2>
+                    <span id="item-count">0 items</span>
+                </div>
+                <div id="cart-items" aria-live="polite"></div>
+            </section>
 
-    <a href="Af-lo-sin-.html" class="continue-shopping">← Continue Shopping</a>
+            <aside class="cart-summary">
+                <div class="summary-leaf">✦</div>
+                <p class="cart-kicker">Order summary</p>
+                <h2>Freshness on its way</h2>
+                <div class="summary-row"><span>Items total</span><strong>₹<span id="total-price">0</span></strong></div>
+                <div class="summary-row"><span>Delivery</span><strong class="free-delivery">FREE</strong></div>
+                <div class="summary-divider"></div>
+                <div class="summary-row summary-total"><span>To pay</span><strong>₹<span id="payable-price">0</span></strong></div>
+                <button class="place-order" id="place-order" type="button" onclick="placeOrder()">
+                    <span>Place Order</span><span class="order-arrow">→</span>
+                </button>
+                <p class="secure-note">🔒 Simple, secure checkout</p>
+                <a href="Af-lo-sin-.html" class="continue-shopping">← Continue shopping</a>
+            </aside>
+        </div>
+        <div id="order-message" class="order-message" role="status" aria-live="polite"></div>
+    </main>
 
 
     <script src="cart.js"></script>

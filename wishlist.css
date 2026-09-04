@@ -41,12 +41,18 @@ a {
 }
 
 .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     color: var(--green);
     font: 700 20px 'Space Grotesk', sans-serif;
 }
 
-.brand span {
-    margin-right: 7px;
+.page-brand-logo {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    border-radius: 10px;
 }
 
 .wishlist-nav nav {
