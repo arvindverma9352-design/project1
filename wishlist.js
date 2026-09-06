@@ -1,4 +1,13 @@
 const wishlistItems = document.getElementById("wishlist-items");
+const productLabels = {
+    patato: "Potato (आलू)", tomato: "Tomato (टमाटर)", brownonion: "Brown Onion (सफेद प्याज़)", redonion: "Red Onion (लाल प्याज़)",
+    ladyfinger: "Lady Finger (भिंडी)", greenchilli: "Green Chilli (हरी मिर्च)", spinch: "Spinach (पालक)", lauki: "Lauki (लौकी)",
+    greencucumber: "Green Cucumber (हरा खीरा)", cucumber: "Cucumber (खीरा)", bittergourd: "Bitter Gourd (करेला)", carrot: "Carrot (गाजर)",
+    pumkin: "Pumpkin (कद्दू)", cauliflower: "Cauliflower (फूलगोभी)", cabbage: "Cabbage (पत्तागोभी)", brinjal: "Brinjal (बैंगन)",
+    fenugreekleaves: "Fenugreek Leaves (मेथी)", mustardgreens: "Mustard Greens (सरसों का साग)", corianderleaves: "Coriander Leaves (धनिया पत्ती)",
+    mint: "Mint (पुदीना)", bathua: "Bathua (बथुआ)", radish: "Radish (मूली)", beetroot: "Beetroot (चुकंदर)", sweetpotato: "Sweet Potato (शकरकंद)",
+    garlic: "Garlic (लहसुन)", pointgourd: "Pointed Gourd (परवल)", tinda: "Tinda (टिंडा)", ginger: "Ginger (अदरक)"
+};
 
 function getWishlist() {
     return JSON.parse(localStorage.getItem("wishlist")) || [];
@@ -30,7 +39,7 @@ function renderWishlist() {
             </div>
             <div class="wishlist-info">
                 <p class="item-label">Fresh pick</p>
-                <h2>${item.name}</h2>
+                <h2>${productLabels[item.name] || item.name}</h2>
                 <strong>₹${item.price}</strong>
             </div>
             <button class="remove-button" type="button" onclick="removeFromWishlist(${index})">Remove <span>×</span></button>

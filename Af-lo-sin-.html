@@ -36,16 +36,26 @@ const productImages = {
   sweetpotato: "images/sweetpatato.png",
   garlic: "images/garlic.png",
   pointgourd: "images/pointgourd-परवल.png",
-  tinda: "images/tinda.png"
+  tinda: "images/tinda.png",
+  ginger: "images/ginger.png"
 };
 const productLabels = {
-  patato: "Potato", tomato: "Tomato", brownonion: "Brown Onion", redonion: "Red Onion",
-  ladyfinger: "Lady Finger", greenchilli: "Green Chilli", spinch: "Spinach", lauki: "Lauki",
-  greencucumber: "Green Cucumber", cucumber: "Cucumber", bittergourd: "Bitter Gourd", carrot: "Carrot",
-  pumkin: "Pumpkin", cauliflower: "Cauliflower", cabbage: "Cabbage", brinjal: "Brinjal",
-  fenugreekleaves: "Fenugreek Leaves", mustardgreens: "Mustard Greens", corianderleaves: "Coriander Leaves",
-  mint: "Mint", bathua: "Bathua", radish: "Radish", beetroot: "Beetroot", sweetpotato: "Sweet Potato",
-  garlic: "Garlic", pointgourd: "Pointed Gourd", tinda: "Tinda"
+  patato: "Potato (आलू)", tomato: "Tomato (टमाटर)", brownonion: "Brown Onion (सफेद प्याज़)", redonion: "Red Onion (लाल प्याज़)",
+  ladyfinger: "Lady Finger (भिंडी)", greenchilli: "Green Chilli (हरी मिर्च)", spinch: "Spinach (पालक)", lauki: "Lauki (लौकी)",
+  greencucumber: "Green Cucumber (हरा खीरा)", cucumber: "Cucumber (खीरा)", bittergourd: "Bitter Gourd (करेला)", carrot: "Carrot (गाजर)",
+  pumkin: "Pumpkin (कद्दू)", cauliflower: "Cauliflower (फूलगोभी)", cabbage: "Cabbage (पत्तागोभी)", brinjal: "Brinjal (बैंगन)",
+  fenugreekleaves: "Fenugreek Leaves (मेथी)", mustardgreens: "Mustard Greens (सरसों का साग)", corianderleaves: "Coriander Leaves (धनिया पत्ती)",
+  mint: "Mint (पुदीना)", bathua: "Bathua (बथुआ)", radish: "Radish (मूली)", beetroot: "Beetroot (चुकंदर)", sweetpotato: "Sweet Potato (शकरकंद)",
+  garlic: "Garlic (लहसुन)", pointgourd: "Pointed Gourd (परवल)", tinda: "Tinda (टिंडा)", ginger: "Ginger (अदरक)"
+};
+const productHinglish = {
+  patato: "aloo aaloo aalu", tomato: "tamatar", brownonion: "safed pyaz safed pyaaz", redonion: "lal pyaz lal pyaaz",
+  ladyfinger: "bhindi", greenchilli: "hari mirch", spinch: "palak", lauki: "lauki",
+  greencucumber: "hara kheera", cucumber: "kheera", bittergourd: "karela", carrot: "gajar",
+  pumkin: "kaddu", cauliflower: "phool gobhi", cabbage: "patta gobhi", brinjal: "baingan",
+  fenugreekleaves: "methi", mustardgreens: "sarson ka saag", corianderleaves: "dhaniya patti",
+  mint: "pudina", bathua: "bathua", radish: "mooli", beetroot: "chukandar", sweetpotato: "shakarkand",
+  garlic: "lahsun lehsun", pointgourd: "parwal", tinda: "tinda", ginger: "adrak"
 };
 
 function addToCart(name, price, image) {
@@ -71,8 +81,12 @@ function addToCart(name, price, image) {
 }
 
 function showCartToast(name) {
+  showToast(`${productLabels[name] || name} cart me add ho gaya`);
+}
+
+function showToast(message) {
   const toast = document.getElementById("cart-toast");
-  toast.innerHTML = `<span class="toast-check">✓</span><span><strong>${name}</strong> cart me add ho gaya</span>`;
+  toast.innerHTML = `<span class="toast-check">✓</span><span>${message}</span>`;
   toast.classList.remove("toast-hide");
   toast.classList.add("toast-show");
 
@@ -94,9 +108,9 @@ function addToWishlist(name, price, image) {
   if (!wishlist.some(item => item.name === name)) {
     wishlist.push({ name: name, price: price, image: image });
     localStorage.setItem("wishlist", JSON.stringify(wishlist));
-    alert(name + " Wishlist me add ho gaya ♥");
+    showToast(`${productLabels[name] || name} wishlist me add ho gaya ♥`);
   } else {
-    alert(name + " pehle se Wishlist me hai ♥");
+    showToast(`${productLabels[name] || name} pehle se wishlist me hai`);
   }
 }
 
@@ -110,6 +124,22 @@ function updateCartCount() {
     });
 
     document.getElementById("nav-cart-count").innerText = count;
+}
+
+function filterProducts(searchTerm) {
+  const normalizedTerm = searchTerm.trim().toLowerCase();
+  const products = document.querySelectorAll(".product");
+  let visibleCount = 0;
+
+  products.forEach(product => {
+    const searchableName = product.dataset.searchName || product.querySelector(".product-name").textContent.toLowerCase();
+    const isMatch = searchableName.includes(normalizedTerm);
+    product.hidden = !isMatch;
+    if (isMatch) visibleCount++;
+  });
+
+  document.getElementById("no-products-message").hidden = visibleCount > 0;
+  document.querySelector(".product-count").textContent = `${visibleCount} fresh choice${visibleCount === 1 ? "" : "s"}`;
 }
 
 
@@ -127,6 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
     productName.className = "product-name";
     productName.textContent = productLabels[match[1]] || match[1];
     product.insertBefore(productName, product.querySelector(".buttons"));
+    product.dataset.searchName = `${productName.textContent} ${productHinglish[match[1]] || ""}`.toLowerCase();
 
     const wishlistButton = document.createElement("button");
     wishlistButton.type = "button";
@@ -135,6 +166,9 @@ document.addEventListener("DOMContentLoaded", () => {
     wishlistButton.onclick = () => addToWishlist(match[1], Number(match[2]), "images/" + match[1] + ".png");
     product.querySelector(".buttons").appendChild(wishlistButton);
   });
+
+  const searchInput = document.getElementById("product-search");
+  searchInput.addEventListener("input", event => filterProducts(event.target.value));
 });
 </script>
 <body>
@@ -151,6 +185,11 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
 
     <div class="nav-links">
+
+      <label class="search-box" for="product-search">
+        <span aria-hidden="true">⌕</span>
+        <input id="product-search" type="search" placeholder="Search vegetables" autocomplete="off">
+      </label>
 
         <a href="Af-lo-sin-.html">Home</a>
 
@@ -182,11 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <a class="hero-button" href="#products">Explore vegetables <span>↓</span></a>
     </div>
     <div class="hero-visual" aria-hidden="true">
-      <div class="hero-orbit orbit-one"></div>
-      <div class="hero-orbit orbit-two"></div>
-      <div class="hero-leaf">🥬</div>
-      <div class="floating-veg veg-one">🥕</div>
-      <div class="floating-veg veg-two">🍅</div>
+      <img src="logo.png" alt="" class="hero-logo">
     </div>
   </section>
 
@@ -195,7 +230,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <p class="section-kicker">From our farm to you</p>
       <h2>Shop fresh picks</h2>
     </div>
-    <span class="product-count">27 fresh choices</span>
+    <span class="product-count">28 fresh choices</span>
   </div>
 
     <div class="products" id="products">
@@ -379,6 +414,15 @@ document.addEventListener("DOMContentLoaded", () => {
                </div>
             </div>
 
+               <!-- Ginger -->
+                <div class="product">
+               <div class="ginger"></div>
+               <div class="buttons">
+                 <button onclick="addToCart('ginger', 50)">Add To Cart</button>
+                 <button>More info</button>
+               </div>
+               </div>
+
             <!-- Bathua -->
               <div class="product">
                <div class="bathua"></div>
@@ -445,6 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     </div>
+    <p class="no-products-message" id="no-products-message" hidden>No vegetables found. Try another search.</p>
   </main>
         
 </body>

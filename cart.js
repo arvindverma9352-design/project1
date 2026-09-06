@@ -9,7 +9,16 @@ const productImages = {
     mustardgreens: "images/mustardgreens.png", corianderleaves: "images/corianderleaves.png",
     mint: "images/mint.png", bathua: "images/bathua.png", radish: "images/radish.png",
     beetroot: "images/beetroot.png", sweetpotato: "images/sweetpatato.png", garlic: "images/garlic.png",
-    pointgourd: "images/pointgourd-परवल.png", tinda: "images/tinda.png"
+    pointgourd: "images/pointgourd-परवल.png", tinda: "images/tinda.png", ginger: "images/ginger.png"
+};
+const productLabels = {
+    patato: "Potato (आलू)", tomato: "Tomato (टमाटर)", brownonion: "Brown Onion (सफेद प्याज़)", redonion: "Red Onion (लाल प्याज़)",
+    ladyfinger: "Lady Finger (भिंडी)", greenchilli: "Green Chilli (हरी मिर्च)", spinch: "Spinach (पालक)", lauki: "Lauki (लौकी)",
+    greencucumber: "Green Cucumber (हरा खीरा)", cucumber: "Cucumber (खीरा)", bittergourd: "Bitter Gourd (करेला)", carrot: "Carrot (गाजर)",
+    pumkin: "Pumpkin (कद्दू)", cauliflower: "Cauliflower (फूलगोभी)", cabbage: "Cabbage (पत्तागोभी)", brinjal: "Brinjal (बैंगन)",
+    fenugreekleaves: "Fenugreek Leaves (मेथी)", mustardgreens: "Mustard Greens (सरसों का साग)", corianderleaves: "Coriander Leaves (धनिया पत्ती)",
+    mint: "Mint (पुदीना)", bathua: "Bathua (बथुआ)", radish: "Radish (मूली)", beetroot: "Beetroot (चुकंदर)", sweetpotato: "Sweet Potato (शकरकंद)",
+    garlic: "Garlic (लहसुन)", pointgourd: "Pointed Gourd (परवल)", tinda: "Tinda (टिंडा)", ginger: "Ginger (अदरक)"
 };
 
 function displayCart() {
@@ -51,7 +60,7 @@ function displayCart() {
                 <div class="item-visual"><img src="${image}" alt="${item.name}" onerror="this.style.display='none'; this.parentElement.classList.add('emoji-fallback'); this.parentElement.innerText='🥬'"></div>
                 <div class="item-details">
                     <p class="item-label">Farm fresh</p>
-                    <h3>${item.name.replace(/-/g, " ")}</h3>
+                    <h3>${productLabels[item.name] || item.name.replace(/-/g, " ")}</h3>
                     <p class="item-price">₹${item.price} <span>per unit</span></p>
                 </div>
                 <div class="item-actions">
@@ -116,6 +125,23 @@ function saveCart() {
 
 }
 
+function showCartToast(message) {
+    const toast = document.getElementById("cart-toast");
+    toast.innerHTML = `<span class="toast-check">✓</span><span>${message}</span>`;
+    toast.classList.remove("toast-hide");
+    toast.classList.add("toast-show");
+
+    clearTimeout(window.cartToastTimer);
+    window.cartToastTimer = setTimeout(() => {
+        toast.classList.remove("toast-show");
+        toast.classList.add("toast-hide");
+    }, 2600);
+}
+
+function showToast(message) {
+    showCartToast(message);
+}
+
 function placeOrder() {
     if (cart.length === 0) return;
 
@@ -123,6 +149,7 @@ function placeOrder() {
     const orderNumber = Math.floor(1000 + Math.random() * 9000);
     orderMessage.innerText = `Order #VM${orderNumber} placed successfully! Your fresh picks are being packed.`;
     orderMessage.classList.add("is-visible");
+    showToast(`Order #VM${orderNumber} successfully placed`);
     cart = [];
     saveCart();
     displayCart();
