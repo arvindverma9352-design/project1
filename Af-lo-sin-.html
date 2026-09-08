@@ -37,7 +37,13 @@ const productImages = {
   garlic: "images/garlic.png",
   pointgourd: "images/pointgourd-परवल.png",
   tinda: "images/tinda.png",
-  ginger: "images/ginger.png"
+  ginger: "images/ginger.png",
+  broccli: "images/broccli.png",
+  capsicum: "images/capsicum.png",
+  corn: "images/corn.png",
+  jackfruit: "images/jackfruit.png",
+  masroom: "images/masroom.png",
+  peas: "images/peas.png"
 };
 const productLabels = {
   patato: "Potato (आलू)", tomato: "Tomato (टमाटर)", brownonion: "Brown Onion (सफेद प्याज़)", redonion: "Red Onion (लाल प्याज़)",
@@ -46,7 +52,8 @@ const productLabels = {
   pumkin: "Pumpkin (कद्दू)", cauliflower: "Cauliflower (फूलगोभी)", cabbage: "Cabbage (पत्तागोभी)", brinjal: "Brinjal (बैंगन)",
   fenugreekleaves: "Fenugreek Leaves (मेथी)", mustardgreens: "Mustard Greens (सरसों का साग)", corianderleaves: "Coriander Leaves (धनिया पत्ती)",
   mint: "Mint (पुदीना)", bathua: "Bathua (बथुआ)", radish: "Radish (मूली)", beetroot: "Beetroot (चुकंदर)", sweetpotato: "Sweet Potato (शकरकंद)",
-  garlic: "Garlic (लहसुन)", pointgourd: "Pointed Gourd (परवल)", tinda: "Tinda (टिंडा)", ginger: "Ginger (अदरक)"
+  garlic: "Garlic (लहसुन)", pointgourd: "Pointed Gourd (परवल)", tinda: "Tinda (टिंडा)", ginger: "Ginger (अदरक)",
+  broccli: "Broccoli (ब्रोकोली)", capsicum: "Capsicum (शिमला मिर्च)", corn: "Corn (मक्का)", jackfruit: "Jackfruit (कटहल)", masroom: "Mushroom (मशरूम)", peas: "Peas (मटर)"
 };
 const productHinglish = {
   patato: "aloo aaloo aalu", tomato: "tamatar", brownonion: "safed pyaz safed pyaaz", redonion: "lal pyaz lal pyaaz",
@@ -55,7 +62,8 @@ const productHinglish = {
   pumkin: "kaddu", cauliflower: "phool gobhi", cabbage: "patta gobhi", brinjal: "baingan",
   fenugreekleaves: "methi", mustardgreens: "sarson ka saag", corianderleaves: "dhaniya patti",
   mint: "pudina", bathua: "bathua", radish: "mooli", beetroot: "chukandar", sweetpotato: "shakarkand",
-  garlic: "lahsun lehsun", pointgourd: "parwal", tinda: "tinda", ginger: "adrak"
+  garlic: "lahsun lehsun", pointgourd: "parwal", tinda: "tinda", ginger: "adrak",
+  broccli: "broccoli", capsicum: "shimla mirch", corn: "makai bhutta", jackfruit: "kathal", masroom: "mushroom", peas: "matar"
 };
 
 function addToCart(name, price, image) {
@@ -163,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
     wishlistButton.type = "button";
     wishlistButton.className = "wishlist-button";
     wishlistButton.textContent = "♥ Wishlist";
-    wishlistButton.onclick = () => addToWishlist(match[1], Number(match[2]), "images/" + match[1] + ".png");
+    wishlistButton.onclick = () => addToWishlist(match[1], Number(match[2]), productImages[match[1]]);
     product.querySelector(".buttons").appendChild(wishlistButton);
   });
 
@@ -230,7 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <p class="section-kicker">From our farm to you</p>
       <h2>Shop fresh picks</h2>
     </div>
-    <span class="product-count">28 fresh choices</span>
+    <span class="product-count">34 fresh choices</span>
   </div>
 
     <div class="products" id="products">
@@ -485,6 +493,62 @@ document.addEventListener("DOMContentLoaded", () => {
                  <button>More info</button>
                </div>
                </div>
+
+               <!-- Broccoli -->
+               <div class="product">
+               <div class="broccli"></div>
+               <div class="buttons">
+                 <button onclick="addToCart('broccli', 60)">Add To Cart</button>
+                 <button>More info</button>
+               </div>
+               </div>
+
+               <!-- Capsicum -->
+               <div class="product">
+               <div class="capsicum"></div>
+               <div class="buttons">
+                 <button onclick="addToCart('capsicum', 50)">Add To Cart</button>
+                 <button>More info</button>
+               </div>
+               </div>
+
+               <!-- Corn -->
+               <div class="product">
+               <div class="corn"></div>
+               <div class="buttons">
+                 <button onclick="addToCart('corn', 40)">Add To Cart</button>
+                 <button>More info</button>
+               </div>
+               </div>
+
+               <!-- Jackfruit -->
+               <div class="product">
+               <div class="jackfruit"></div>
+               <div class="buttons">
+                 <button onclick="addToCart('jackfruit', 80)">Add To Cart</button>
+                 <button>More info</button>
+               </div>
+               </div>
+
+               <!-- Mushroom -->
+               <div class="product">
+               <div class="masroom"></div>
+               <div class="buttons">
+                 <button onclick="addToCart('masroom', 90)">Add To Cart</button>
+                 <button>More info</button>
+               </div>
+               </div>
+
+               <!-- Peas -->
+               <div class="product">
+               <div class="peas"></div>
+               <div class="buttons">
+                 <button onclick="addToCart('peas', 50)">Add To Cart</button>
+                 <button>More info</button>
+               </div>
+               </div>
+
+               
 
 
 

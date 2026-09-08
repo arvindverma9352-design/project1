@@ -9,7 +9,9 @@ const productImages = {
     mustardgreens: "images/mustardgreens.png", corianderleaves: "images/corianderleaves.png",
     mint: "images/mint.png", bathua: "images/bathua.png", radish: "images/radish.png",
     beetroot: "images/beetroot.png", sweetpotato: "images/sweetpatato.png", garlic: "images/garlic.png",
-    pointgourd: "images/pointgourd-परवल.png", tinda: "images/tinda.png", ginger: "images/ginger.png"
+    pointgourd: "images/pointgourd-परवल.png", tinda: "images/tinda.png", ginger: "images/ginger.png",
+    broccli: "images/broccli.png", capsicum: "images/capsicum.png", corn: "images/corn.png",
+    jackfruit: "images/jackfruit.png", masroom: "images/masroom.png", peas: "images/peas.png"
 };
 const productLabels = {
     patato: "Potato (आलू)", tomato: "Tomato (टमाटर)", brownonion: "Brown Onion (सफेद प्याज़)", redonion: "Red Onion (लाल प्याज़)",
@@ -18,7 +20,8 @@ const productLabels = {
     pumkin: "Pumpkin (कद्दू)", cauliflower: "Cauliflower (फूलगोभी)", cabbage: "Cabbage (पत्तागोभी)", brinjal: "Brinjal (बैंगन)",
     fenugreekleaves: "Fenugreek Leaves (मेथी)", mustardgreens: "Mustard Greens (सरसों का साग)", corianderleaves: "Coriander Leaves (धनिया पत्ती)",
     mint: "Mint (पुदीना)", bathua: "Bathua (बथुआ)", radish: "Radish (मूली)", beetroot: "Beetroot (चुकंदर)", sweetpotato: "Sweet Potato (शकरकंद)",
-    garlic: "Garlic (लहसुन)", pointgourd: "Pointed Gourd (परवल)", tinda: "Tinda (टिंडा)", ginger: "Ginger (अदरक)"
+    garlic: "Garlic (लहसुन)", pointgourd: "Pointed Gourd (परवल)", tinda: "Tinda (टिंडा)", ginger: "Ginger (अदरक)",
+    broccli: "Broccoli (ब्रोकोली)", capsicum: "Capsicum (शिमला मिर्च)", corn: "Corn (मक्का)", jackfruit: "Jackfruit (कटहल)", masroom: "Mushroom (मशरूम)", peas: "Peas (मटर)"
 };
 
 function displayCart() {

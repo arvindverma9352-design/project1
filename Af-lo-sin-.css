@@ -596,6 +596,22 @@ body{
     background-position: center;
 }
 
+/* Additional fresh picks */
+.broccli, .capsicum, .corn, .jackfruit, .masroom, .peas {
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+.broccli { background-image: url(images/broccli.png); }
+.capsicum { background-image: url(images/capsicum.png); }
+.corn { background-image: url(images/corn.png); }
+.jackfruit { background-image: url(images/jackfruit.png); }
+.masroom { background-image: url(images/masroom.png); }
+.peas { background-image: url(images/peas.png); }
+
 
 
 
