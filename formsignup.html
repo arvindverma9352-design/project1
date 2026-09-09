@@ -5,9 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vegetable Mart</title>
-    <link rel="icon" href="images/logo.png">
+    <link rel="icon" href="logo.png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+        :root {
+            --green-900: #155c3b;
+            --green-700: #1e7a4b;
+            --green-600: #26925b;
+            --orange: #c45d42;
+            --text: #17231d;
+            --muted: #6a776f;
+            --panel: rgba(255, 255, 255, .92);
+            --shadow: 0 24px 60px rgba(22, 77, 45, .2);
+        }
 
         * {
             box-sizing: border-box;
@@ -16,11 +27,8 @@
         body {
             min-height: 100vh;
             margin: 0;
-            display: grid;
-            place-items: center;
-            overflow: hidden;
             position: relative;
-            color: #17231d;
+            color: var(--text);
             font-family: 'DM Sans', sans-serif;
             background: linear-gradient(115deg, rgba(13, 72, 45, .88), rgba(62, 139, 61, .55) 48%, rgba(244, 191, 91, .44)), url(images/vegback.png) center / cover;
         }
@@ -36,115 +44,314 @@
             animation: texture-drift 18s linear infinite;
         }
 
-        body:after {
-            content: '';
-            position: fixed;
-            width: 360px;
-            height: 360px;
-            right: -125px;
-            bottom: -170px;
-            border: 2px solid rgba(255, 255, 255, .42);
-            border-radius: 50%;
-            box-shadow: 0 0 0 28px rgba(255, 255, 255, .08), 0 0 0 58px rgba(255, 255, 255, .05);
-            animation: orbit 16s linear infinite reverse;
+        a {
+            text-decoration: none;
         }
 
-        .container {
-            width: min(440px, calc(100% - 32px));
-            animation: form-rise .7s ease both;
-        }
-
-        .container>h2 {
-            margin: 0 0 22px;
-            color: #155c3b;
-            font: 700 34px 'Space Grotesk', sans-serif;
-            text-align: center;
-        }
-
-        #z {
-            margin: 0;
-            padding: 34px;
-            border: 1px solid rgba(255, 255, 255, .72);
-            border-radius: 22px;
-            background: rgba(255, 255, 255, .9);
-            box-shadow: 0 24px 60px rgba(22, 77, 45, .2);
-            backdrop-filter: blur(10px);
-        }
-
-        #z label {
+        img {
             display: block;
-            margin: 0 0 7px;
+            max-width: 100%;
+        }
+
+        .page-shell {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 32px 18px;
+        }
+
+        .auth-layout {
+            width: min(1080px, 100%);
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            overflow: hidden;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, .7);
+            background: rgba(255, 255, 255, .12);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+        }
+
+        .promo-panel {
+            padding: 42px 34px;
+            background: linear-gradient(160deg, rgba(14, 72, 45, .92), rgba(28, 131, 83, .72));
+            color: white;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        .brand-mark {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .18);
+            border: 2px solid rgba(255, 255, 255, .5);
+        }
+
+        .brand-mark img {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+        }
+
+        .promo-badge {
+            display: inline-flex;
+            margin-top: 26px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .28);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .promo-panel h1 {
+            margin: 22px 0 18px;
+            font: 700 clamp(30px, 4vw, 54px)/1.04 'Space Grotesk', sans-serif;
+            letter-spacing: -.04em;
+        }
+
+        .promo-panel h1 span {
+            color: #f7d278;
+        }
+
+        .promo-panel p {
+            margin: 0;
+            max-width: 430px;
+            color: rgba(255, 255, 255, .88);
+            font-size: 17px;
+            line-height: 1.7;
+        }
+
+        .promo-list {
+            list-style: none;
+            padding: 0;
+            margin: 26px 0 0;
+            display: grid;
+            gap: 12px;
+        }
+
+        .promo-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .14);
+            color: rgba(255, 255, 255, .9);
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .mini-spotlight {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+            padding: 16px 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .2);
+        }
+
+        .mini-spotlight-thumb {
+            width: 68px;
+            height: 68px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, .18);
+            border: 1px solid rgba(255, 255, 255, .26);
+        }
+
+        .mini-spotlight-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .mini-spotlight strong {
+            display: block;
+            font-size: 18px;
+        }
+
+        .mini-spotlight span {
+            color: rgba(255, 255, 255, .8);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .form-panel {
+            padding: 34px 30px;
+            background: var(--panel);
+        }
+
+        .form-header {
+            margin-bottom: 18px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(30, 122, 75, .08);
+            color: var(--green-900);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .form-panel h2 {
+            margin: 14px 0 0;
+            color: var(--green-900);
+            font: 700 36px 'Space Grotesk', sans-serif;
+        }
+
+        #signupForm {
+            display: grid;
+            gap: 12px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .input-group {
+            display: grid;
+            gap: 8px;
+        }
+
+        .input-group label {
             color: #41604d;
             font-size: 13px;
             font-weight: 700;
         }
 
-        #z input {
+        .input-group input {
             width: 100%;
-            margin: 0 0 17px;
-            padding: 13px 14px;
+            padding: 12px 14px;
             border: 1px solid #d5e4d1;
-            border-radius: 10px;
+            border-radius: 12px;
             outline: none;
-            color: #17231d;
+            color: var(--text);
             background: #f8fcf5;
             font: inherit;
             transition: .25s ease;
         }
 
-        #z input:focus {
-            border-color: #26925b;
+        .input-group input:focus {
+            border-color: var(--green-600);
             background: white;
             box-shadow: 0 0 0 4px rgba(38, 146, 91, .12);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .password-field input {
+            padding-right: 66px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 0;
+            background: transparent;
+            color: var(--green-700);
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .terms-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .terms-row input {
+            width: auto;
+            margin: 0;
+        }
+
+        .terms-row label {
+            margin: 0;
         }
 
         #btn {
-            width: 100%;
-            margin: 3px 0 18px;
-            padding: 13px;
-            border: 0;
-            border-radius: 10px;
+            margin-top: 4px;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 12px;
             color: white;
-            background: #1e7a4b;
-            font: 700 16px 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, var(--green-700), var(--green-600));
+            font: 800 16px 'DM Sans', sans-serif;
             cursor: pointer;
             transition: .25s ease;
+            box-shadow: 0 12px 24px rgba(30, 122, 75, .2);
         }
 
         #btn:hover {
-            background: #125d38;
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 20px rgba(30, 122, 75, .25);
+            transform: translateY(-2px);
+            box-shadow: 0 16px 28px rgba(30, 122, 75, .24);
         }
 
-        #z p {
-            color: #6a776f;
+        .form-message {
+            padding: 10px 12px;
+            border-radius: 10px;
             font-size: 13px;
-            text-align: center;
-        }
-
-        #z a {
-            color: #c45d42;
             font-weight: 700;
         }
 
-        @keyframes form-rise {
-            from {
-                opacity: 0;
-                transform: translateY(25px) scale(.97);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+        .form-message.error {
+            background: #fff0ee;
+            border: 1px solid #e8b7b0;
+            color: #a74838;
         }
 
-        @keyframes orbit {
-            to {
-                transform: rotate(360deg);
-            }
+        .form-message.success {
+            background: #ebfdf0;
+            border: 1px solid #a8d9b5;
+            color: #14653b;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .bottom-text {
+            margin-top: 16px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .bottom-text a {
+            color: var(--orange);
+            font-weight: 800;
         }
 
         @keyframes texture-drift {
@@ -153,40 +360,237 @@
             }
         }
 
-        @media (prefers-reduced-motion: reduce) {
+        @media (max-width: 900px) {
+            .auth-layout {
+                grid-template-columns: 1fr;
+            }
 
-            *,
-            *:before,
-            *:after {
-                animation-duration: .01ms !important;
-                transition-duration: .01ms !important;
+            .promo-panel {
+                padding-bottom: 24px;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .promo-panel,
+            .form-panel {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .input-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <!--Signup-->
-        <h2>Signup</h2>
-        <fieldset id="z">
-            <form action="">
-                <label for="Name">Name:</label><br>
-                <input type="text" placeholder="Enter your name" required><br><br>
-                <label for="email">Email:</label><br>
-                <input type="email" placeholder="Enter your email id" required><br><br>
-                <label for="mobile number">Mobile Number:</label><br>
-                <input type="tel" placeholder="Enter your Mobile Number" required><br><br>
-                <label for="password">Password:</label><br>
-                <input type="password" placeholder="Enter Your Password" required><br><br>
-                <button id="btn" type="submit">Signup</button>
-                <p>If you have an account /<a href="formlogin.html">Login</a> </p>
-            </form>
-        </fieldset>
+    <div class="page-shell">
+        <div class="auth-layout">
+            <aside class="promo-panel">
+                <div class="brand">
+                    <span class="brand-mark"><img src="logo.png" alt="Vegetable Mart logo"></span>
+                    <span>Vegetable Mart</span>
+                </div>
 
+                <div class="promo-badge">Fresh groceries, faster</div>
 
+                <h1>Create a <span>healthier home</span> with us.</h1>
+                <p>Sign up to explore fresh vegetables, seasonal picks, and easy home deliveries tailored for everyday life.</p>
+
+                <ul class="promo-list">
+                    <li>✔ Easy account setup</li>
+                    <li>✔ Fresh produce at great prices</li>
+                    <li>✔ Simple ordering and delivery tracking</li>
+                </ul>
+
+                <div class="mini-spotlight">
+                    <div class="mini-spotlight-thumb">
+                        <img src="images/capsicum.png" alt="Capsicum">
+                    </div>
+                    <div>
+                        <strong>Capsicum pack</strong>
+                        <span>Fresh, crunchy &amp; colorful</span>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="form-panel">
+                <div class="form-header">
+                    <span class="eyebrow">Create account</span>
+                    <h2>Signup</h2>
+                </div>
+
+                <form id="signupForm">
+                    <div id="signup-message" class="form-message hidden"></div>
+
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="signupName">Name</label>
+                            <input id="signupName" type="text" placeholder="Enter your name" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="signupMobile">Mobile Number</label>
+                            <input id="signupMobile" type="tel" placeholder="Enter mobile number" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="signupEmail">Email</label>
+                        <input id="signupEmail" type="email" placeholder="Enter your email" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="signupAddress">Address (optional)</label>
+                        <input id="signupAddress" type="text" placeholder="Enter your address">
+                    </div>
+
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="signupPassword">Password</label>
+                            <div class="password-field">
+                                <input id="signupPassword" type="password" placeholder="Enter password" required>
+                                <button type="button" class="toggle-password" data-target="signupPassword">Show</button>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="signupConfirmPassword">Confirm Password</label>
+                            <div class="password-field">
+                                <input id="signupConfirmPassword" type="password" placeholder="Confirm password" required>
+                                <button type="button" class="toggle-password" data-target="signupConfirmPassword">Show</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="terms-row">
+                        <input id="agreeTerms" type="checkbox">
+                        <label for="agreeTerms">I agree to Terms &amp; Privacy Policy</label>
+                    </div>
+
+                    <button id="btn" type="submit">Signup</button>
+                </form>
+
+                <p class="bottom-text">Already have an account? <a href="formlogin.html">Login</a></p>
+            </section>
+        </div>
     </div>
 
+    <script>
+        const USERS_KEY = 'vegetable-mart-users';
+
+        function getUsers() {
+            try {
+                const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+                return Array.isArray(users) ? users : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        function ensureAdminAccount() {
+            const users = getUsers();
+            const hasAdmin = users.some((user) => user.email === 'admin@vegetablemart.com');
+
+            if (!hasAdmin) {
+                users.push({
+                    name: 'Admin',
+                    email: 'admin@vegetablemart.com',
+                    mobile: '9999999999',
+                    password: 'admin123',
+                    role: 'admin'
+                });
+                saveUsers(users);
+            }
+        }
+
+        function setMessage(messageEl, text, type) {
+            messageEl.textContent = text;
+            messageEl.classList.remove('hidden', 'error', 'success');
+            messageEl.classList.add(type);
+        }
+
+        ensureAdminAccount();
+
+        document.querySelectorAll('.toggle-password').forEach((button) => {
+            button.addEventListener('click', () => {
+                const target = document.getElementById(button.dataset.target);
+                if (!target) return;
+
+                const isPassword = target.type === 'password';
+                target.type = isPassword ? 'text' : 'password';
+                button.textContent = isPassword ? 'Hide' : 'Show';
+            });
+        });
+
+        const signupForm = document.getElementById('signupForm');
+        const signupMessage = document.getElementById('signup-message');
+
+        signupForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+            const mobile = document.getElementById('signupMobile').value.trim();
+            const address = document.getElementById('signupAddress').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+            const confirmPassword = document.getElementById('signupConfirmPassword').value.trim();
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+
+            if (!name || !email || !mobile || !password || !confirmPassword) {
+                setMessage(signupMessage, 'Please fill in all fields.', 'error');
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                setMessage(signupMessage, 'Please enter a valid email address.', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                setMessage(signupMessage, 'Password must be at least 6 characters long.', 'error');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                setMessage(signupMessage, 'Passwords do not match.', 'error');
+                return;
+            }
+
+            if (!agreeTerms) {
+                setMessage(signupMessage, 'Please accept the terms and privacy policy.', 'error');
+                return;
+            }
+
+            const users = getUsers();
+            const duplicateUser = users.find((user) => user.email === email || user.mobile === mobile);
+
+            if (duplicateUser) {
+                setMessage(signupMessage, 'This email or mobile number is already registered.', 'error');
+                return;
+            }
+
+            users.push({
+                name,
+                email,
+                mobile,
+                address,
+                password,
+                role: 'customer'
+            });
+            saveUsers(users);
+
+            setMessage(signupMessage, 'Signup successful! Redirecting to login...', 'success');
+            setTimeout(() => {
+                window.location.href = 'formlogin.html';
+            }, 800);
+        });
+    </script>
 
 </body>
 

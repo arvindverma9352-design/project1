@@ -66,19 +66,58 @@ const productHinglish = {
   broccli: "broccoli", capsicum: "shimla mirch", corn: "makai bhutta", jackfruit: "kathal", masroom: "mushroom", peas: "matar"
 };
 
+const product1KgPrices = {
+  patato: 120, tomato: 110, brownonion: 100, redonion: 105,
+  ladyfinger: 150, greenchilli: 90, spinch: 85, lauki: 100,
+  greencucumber: 90, cucumber: 80, bittergourd: 120, carrot: 90,
+  pumkin: 100, cauliflower: 130, cabbage: 80, brinjal: 110,
+  fenugreekleaves: 80, mustardgreens: 80, corianderleaves: 65,
+  mint: 65, bathua: 70, radish: 70, beetroot: 100, sweetpotato: 120,
+  garlic: 80, pointgourd: 95, tinda: 105, ginger: 110,
+  broccli: 150, capsicum: 130, corn: 110, jackfruit: 170, masroom: 180, peas: 110
+};
+
+function getSavedAdminProducts() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('vegetable-mart-admin-products') || 'null');
+    return saved && saved.length ? saved : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function syncProduct1KgPrices() {
+  const savedProducts = getSavedAdminProducts();
+
+  if (!savedProducts.length) {
+    return;
+  }
+
+  savedProducts.forEach((product) => {
+    const key = product.key;
+    if (key && product.prices && typeof product.prices['1kg'] !== 'undefined') {
+      product1KgPrices[key] = Number(product.prices['1kg']) || product1KgPrices[key];
+    }
+  });
+}
+
 function addToCart(name, price, image) {
 
-    let existingProduct = cart.find(item => item.name === name);
+    const finalPrice = product1KgPrices[name] || Number(price) || 0;
+    let existingProduct = cart.find(item => item.name === name && (!item.weight || item.weight === '1kg'));
 
     if (existingProduct) {
         existingProduct.quantity++;
       existingProduct.image = existingProduct.image || image || productImages[name];
+      existingProduct.price = finalPrice;
+      existingProduct.weight = '1kg';
     } else {
         cart.push({
             name: name,
-            price: price,
+            price: finalPrice,
         image: image || productImages[name],
-            quantity: 1
+            quantity: 1,
+            weight: '1kg'
         });
     }
 
@@ -152,6 +191,7 @@ function filterProducts(searchTerm) {
 
 
 document.addEventListener("DOMContentLoaded", () => {
+  syncProduct1KgPrices();
   updateCartCount();
 
   document.querySelectorAll(".product").forEach(product => {
@@ -166,6 +206,43 @@ document.addEventListener("DOMContentLoaded", () => {
     productName.textContent = productLabels[match[1]] || match[1];
     product.insertBefore(productName, product.querySelector(".buttons"));
     product.dataset.searchName = `${productName.textContent} ${productHinglish[match[1]] || ""}`.toLowerCase();
+
+    const productImage = product.querySelector("div:first-child");
+    if (productImage) {
+      productImage.style.cursor = "pointer";
+      productImage.onclick = () => {
+        window.location.href = `product-details.html?product=${match[1]}`;
+      };
+    }
+
+    const infoButton = product.querySelectorAll(".buttons button")[1];
+    if (infoButton) {
+      infoButton.type = "button";
+      infoButton.textContent = `₹${product1KgPrices[match[1]] || Number(match[2])} / 1kg`;
+      infoButton.onclick = () => {
+        window.location.href = `product-details.html?product=${match[1]}`;
+      };
+    }
+
+    const savedProducts = JSON.parse(localStorage.getItem('vegetable-mart-admin-products') || 'null');
+    const savedProduct = savedProducts && savedProducts.find((item) => item.key === match[1]);
+    if (savedProduct && savedProduct.available === false) {
+      const statusBadge = document.createElement('div');
+      statusBadge.className = 'availability-badge not-available';
+      statusBadge.textContent = 'Not available';
+      product.appendChild(statusBadge);
+      const addToCartButton = product.querySelector("button[onclick^=\"addToCart\"]");
+      if (addToCartButton) {
+        addToCartButton.disabled = true;
+        addToCartButton.style.opacity = '0.5';
+        addToCartButton.style.cursor = 'not-allowed';
+      }
+    } else {
+      const statusBadge = document.createElement('div');
+      statusBadge.className = 'availability-badge available';
+      statusBadge.textContent = 'Available';
+      product.appendChild(statusBadge);
+    }
 
     const wishlistButton = document.createElement("button");
     wishlistButton.type = "button";

@@ -21,7 +21,7 @@
         <section class="profile-hero" aria-labelledby="profile-title">
             <div class="hero-copy">
                 <p class="eyebrow">Your personal space</p>
-                <h1 id="profile-title">Hello, Arvind</h1>
+                <h1 id="profile-title">Hello, Guest</h1>
                 <p class="hero-text">Keep your account details, orders and favourites close at hand.</p>
             </div>
             <div class="hero-spark" aria-hidden="true">✦</div>
@@ -34,11 +34,11 @@
                     <span class="online-dot" title="Online"></span>
                 </div>
                 <div class="identity-copy">
-                    <h2>Arvind Kumar</h2>
-                    <p>Fresh food enthusiast</p>
+                    <h2 id="profile-name">User</h2>
+                    <p id="profile-role">Fresh food enthusiast</p>
                     <button class="outline-button" type="button">Change photo</button>
                 </div>
-                <div class="member-label">Member since 2026</div>
+                <div id="member-label" class="member-label">Member since 2026</div>
             </article>
 
             <article class="profile-card details-card">
@@ -50,11 +50,20 @@
                     <span class="heading-icon">✎</span>
                 </div>
                 <div class="details-list">
-                    <div class="detail-row"><span class="detail-icon">✉</span><div><small>Email</small><strong>arvind@example.com</strong></div></div>
-                    <div class="detail-row"><span class="detail-icon">☎</span><div><small>Mobile number</small><strong>+91 98765 43210</strong></div></div>
-                    <div class="detail-row"><span class="detail-icon">⌂</span><div><small>Address</small><strong>New Delhi, India</strong></div></div>
+                    <div class="detail-row"><span class="detail-icon">✉</span><div><small>Email</small><strong id="profile-email">-</strong></div></div>
+                    <div class="detail-row"><span class="detail-icon">☎</span><div><small>Mobile number</small><strong id="profile-mobile">-</strong></div></div>
+                    <div class="detail-row"><span class="detail-icon">⌂</span><div><small>Address</small><strong id="profile-address">No address added yet</strong></div></div>
                 </div>
-                <button class="primary-button" type="button">Edit profile <span>→</span></button>
+                <button id="edit-address-btn" class="primary-button" type="button">Edit address <span>→</span></button>
+
+                <div id="address-editor" style="margin-top: 18px; display: none;">
+                    <label for="address-input" style="display: block; margin-bottom: 8px; font-size: 13px; color: #41604d; font-weight: 700;">Update address</label>
+                    <input id="address-input" type="text" placeholder="Enter your address" style="width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #d5e4d1; font: inherit; margin-bottom: 10px;">
+                    <div style="display: flex; gap: 10px;">
+                        <button id="save-address-btn" class="primary-button" type="button" style="flex: 1;">Save</button>
+                        <button id="cancel-address-btn" class="outline-button" type="button" style="flex: 1;">Cancel</button>
+                    </div>
+                </div>
             </article>
         </section>
 
@@ -77,10 +86,147 @@
     </main>
 
     <script>
-        function logout() {
-            const message = document.getElementById("logout-message");
-            message.textContent = "You have been logged out. See you again soon!";
+        const CURRENT_USER_KEY = 'vegetable-mart-current-user';
+        const USERS_KEY = 'vegetable-mart-users';
+
+        function getUsers() {
+            try {
+                const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+                return Array.isArray(users) ? users : [];
+            } catch (error) {
+                return [];
+            }
         }
+
+        function saveUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        function getCurrentUser() {
+            const localUser = localStorage.getItem(CURRENT_USER_KEY);
+            const sessionUser = sessionStorage.getItem(CURRENT_USER_KEY);
+            const rawUser = localUser || sessionUser;
+
+            try {
+                return rawUser ? JSON.parse(rawUser) : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function setCurrentUser(user) {
+            sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+            if (localStorage.getItem(CURRENT_USER_KEY)) {
+                localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+            }
+        }
+
+        function updateCurrentUserAddress(newAddress) {
+            const currentUser = getCurrentUser();
+            if (!currentUser) return;
+
+            const users = getUsers();
+            const userIndex = users.findIndex((user) => {
+                return user.email === currentUser.email || user.mobile === currentUser.mobile;
+            });
+
+            if (userIndex >= 0) {
+                users[userIndex].address = newAddress;
+                saveUsers(users);
+            }
+
+            const updatedUser = {
+                ...currentUser,
+                address: newAddress
+            };
+
+            setCurrentUser(updatedUser);
+            return updatedUser;
+        }
+
+        function populateProfile() {
+            const currentUser = getCurrentUser();
+            const profileTitle = document.getElementById('profile-title');
+            const profileName = document.getElementById('profile-name');
+            const profileRole = document.getElementById('profile-role');
+            const profileEmail = document.getElementById('profile-email');
+            const profileMobile = document.getElementById('profile-mobile');
+            const profileAddress = document.getElementById('profile-address');
+            const memberLabel = document.getElementById('member-label');
+
+            if (!currentUser) {
+                profileTitle.textContent = 'Hello, Guest';
+                profileName.textContent = 'Please login';
+                profileRole.textContent = 'Access your personal profile';
+                profileEmail.textContent = '-';
+                profileMobile.textContent = '-';
+                profileAddress.textContent = 'No address added yet';
+                memberLabel.textContent = 'Member since 2026';
+                return;
+            }
+
+            profileTitle.textContent = `Hello, ${currentUser.name || 'there'}`;
+            profileName.textContent = currentUser.name || 'Vegetable Mart User';
+            profileRole.textContent = currentUser.role === 'admin' ? 'Administrator' : 'Fresh food enthusiast';
+            profileEmail.textContent = currentUser.email || '-';
+            profileMobile.textContent = currentUser.mobile || '-';
+            profileAddress.textContent = currentUser.address || 'No address added yet';
+            memberLabel.textContent = `Member since ${new Date().getFullYear()}`;
+        }
+
+        function logout() {
+            const message = document.getElementById('logout-message');
+            localStorage.removeItem(CURRENT_USER_KEY);
+            sessionStorage.removeItem(CURRENT_USER_KEY);
+            message.textContent = 'You have been logged out. See you again soon!';
+
+            setTimeout(() => {
+                window.location.href = 'formlogin.html';
+            }, 700);
+        }
+
+        const editAddressBtn = document.getElementById('edit-address-btn');
+        const addressEditor = document.getElementById('address-editor');
+        const addressInput = document.getElementById('address-input');
+        const saveAddressBtn = document.getElementById('save-address-btn');
+        const cancelAddressBtn = document.getElementById('cancel-address-btn');
+
+        editAddressBtn.addEventListener('click', () => {
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                return;
+            }
+
+            addressInput.value = currentUser.address || '';
+            addressEditor.style.display = 'block';
+        });
+
+        cancelAddressBtn.addEventListener('click', () => {
+            addressEditor.style.display = 'none';
+            addressInput.value = '';
+        });
+
+        saveAddressBtn.addEventListener('click', () => {
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                return;
+            }
+
+            const newAddress = addressInput.value.trim();
+            const updatedUser = updateCurrentUserAddress(newAddress);
+
+            if (updatedUser) {
+                document.getElementById('profile-address').textContent = newAddress || 'No address added yet';
+                addressEditor.style.display = 'none';
+                const message = document.getElementById('logout-message');
+                message.textContent = 'Address updated successfully.';
+                setTimeout(() => {
+                    message.textContent = '';
+                }, 1500);
+            }
+        });
+
+        populateProfile();
     </script>
 </body>
 </html>

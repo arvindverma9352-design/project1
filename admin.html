@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel | Vegetable Mart</title>
+  <link rel="stylesheet" href="admin.css" />
+  <link rel="icon" href="logo.png" />
+</head>
+<body>
+  <header class="admin-header">
+    <div class="brand-wrap">
+      <img src="logo.png" alt="Vegetable Mart logo" />
+      <div>
+        <p class="brand-tag">Control room</p>
+        <h1>VEGETABLE MART ADMIN</h1>
+      </div>
+    </div>
+
+    <nav class="admin-nav">
+      <a href="Af-lo-sin-.html">Home</a>
+      <a href="cart.html">Cart</a>
+      <a href="wishlist.html">Wishlist</a>
+      <a href="profile.html">Profile</a>
+    </nav>
+  </header>
+
+  <main class="admin-shell">
+    <section class="panel form-panel">
+      <div class="section-heading">
+        <p class="eyebrow">Manage products</p>
+        <h2>Add or update item</h2>
+      </div>
+
+      <form id="product-form">
+        <input type="hidden" id="product-id" />
+
+        <div class="field-grid">
+          <div class="field">
+            <label for="product-key">Product key</label>
+            <input id="product-key" name="product-key" type="text" placeholder="tomato" required />
+          </div>
+
+          <div class="field">
+            <label for="product-title">Title</label>
+            <input id="product-title" name="product-title" type="text" placeholder="Tomato (टमाटर)" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="product-description">Description</label>
+          <textarea id="product-description" name="product-description" rows="3" placeholder="Product description"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="product-image">Image URL</label>
+          <input id="product-image" name="product-image" type="text" placeholder="images/tomato.png" />
+        </div>
+
+        <div class="field">
+          <label for="product-category">Category</label>
+          <input id="product-category" name="product-category" type="text" placeholder="Vegetables" />
+        </div>
+
+        <div class="field">
+          <label for="product-availability">Availability</label>
+          <select id="product-availability" name="product-availability">
+            <option value="available">Available</option>
+            <option value="not-available">Not Available</option>
+          </select>
+        </div>
+
+        <div class="price-grid">
+          <div class="field">
+            <label for="price-250">250g</label>
+            <input id="price-250" name="price-250" type="number" min="0" placeholder="35" />
+          </div>
+
+          <div class="field">
+            <label for="price-500">500g</label>
+            <input id="price-500" name="price-500" type="number" min="0" placeholder="60" />
+          </div>
+
+          <div class="field">
+            <label for="price-1000">1kg</label>
+            <input id="price-1000" name="price-1000" type="number" min="0" placeholder="110" />
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button type="submit" class="primary-btn">Save product</button>
+          <button type="button" id="reset-form" class="secondary-btn">Reset form</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel list-panel">
+      <div class="section-heading split-heading">
+        <div>
+          <p class="eyebrow">Inventory</p>
+          <h2>Products</h2>
+        </div>
+        <span id="product-count" class="count-badge">0 items</span>
+      </div>
+
+      <div class="controls-row">
+        <div class="control-box">
+          <label for="product-search">Search</label>
+          <input id="product-search" type="search" placeholder="Search by name or keyword" />
+        </div>
+
+        <div class="control-box">
+          <label for="product-sort">Sort</label>
+          <select id="product-sort">
+            <option value="az">A - Z</option>
+            <option value="za">Z - A</option>
+          </select>
+        </div>
+
+        <div class="control-box">
+          <label for="category-filter">Category</label>
+          <select id="category-filter">
+            <option value="all">All categories</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bulk-actions">
+        <button type="button" id="bulk-delete" class="secondary-btn danger-btn" disabled>Delete selected</button>
+        <button type="button" id="export-products" class="primary-btn">Export products to JSON</button>
+      </div>
+
+      <div id="product-list" class="product-list"></div>
+    </section>
+
+    <section class="panel orders-panel">
+      <div class="section-heading">
+        <p class="eyebrow">Recent activity</p>
+        <h2>Orders</h2>
+      </div>
+
+      <div id="order-list" class="order-list"></div>
+    </section>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Details | Vegetable Mart</title>
+  <link rel="stylesheet" href="Af-lo-sin-.css" />
+  <link rel="stylesheet" href="product-details.css" />
+  <link rel="icon" href="logo.png" />
+</head>
+<body>
+  <div id="cart-toast" class="cart-toast" role="status" aria-live="polite"></div>
+
+  <div class="page-shell">
+    <nav class="detail-nav">
+      <a href="Af-lo-sin-.html" class="brand">
+        <img src="logo.png" alt="Vegetable Mart logo" />
+        <span>VEGETABLE MART</span>
+      </a>
+
+      <div class="detail-nav-links">
+        <a href="Af-lo-sin-.html">Home</a>
+        <a href="Af-lo-sin-.html#products">Vegetables</a>
+        <a href="cart.html">Cart<span id="nav-cart-count">0</span></a>
+        <a href="wishlist.html">Wishlist</a>
+        <a href="profile.html">Profile</a>
+      </div>
+    </nav>
+
+    <main>
+      <section class="product-detail-shell" id="product-detail"></section>
+
+      <section class="related-section">
+        <div class="related-header">
+          <h2>More vegetables</h2>
+          <p>Explore fresh picks you may love</p>
+        </div>
+        <div class="related-grid" id="related-products"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="product-details.js"></script>
+</body>
+</html>
