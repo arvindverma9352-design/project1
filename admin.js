@@ -40,6 +40,8 @@ const STORAGE_KEYS = {
   orders: 'vegetable-mart-admin-orders'
 };
 
+const API_BASE = 'http://localhost:5000';
+
 const productForm = document.getElementById('product-form');
 const productList = document.getElementById('product-list');
 const orderList = document.getElementById('order-list');
@@ -80,6 +82,59 @@ function getSavedProducts() {
 
 function saveProducts(products) {
   localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(products));
+}
+
+async function apiRequest(endpoint, options = {}) {
+  const response = await fetch(`${API_BASE}${endpoint}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    },
+    ...options
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Request failed');
+  }
+
+  return data;
+}
+
+async function loadProductsFromBackend() {
+  try {
+    const data = await apiRequest('/api/products');
+
+    if (Array.isArray(data.products) && data.products.length) {
+      const normalizedProducts = data.products.map((product, index) => normalizeProduct(product, product.key || product.id || index));
+      localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(normalizedProducts));
+      return normalizedProducts;
+    }
+  } catch (error) {
+    console.warn('Unable to sync products from backend:', error.message);
+  }
+
+  return getSavedProducts();
+}
+
+async function syncProductToBackend(product, method = 'POST') {
+  if (!product) return;
+
+  try {
+    const endpoint = method === 'POST' ? '/api/products' : `/api/products/${product.id}`;
+
+    const options = {
+      method,
+      ...(method === 'POST' || method === 'PUT'
+        ? { body: JSON.stringify(product) }
+        : {})
+    };
+
+    await apiRequest(endpoint, options);
+  } catch (error) {
+    console.warn('Unable to sync product with backend:', error.message);
+  }
 }
 
 function getSavedOrders() {
@@ -222,7 +277,7 @@ function resetForm() {
   document.getElementById('product-category').value = 'Vegetables';
 }
 
-function handleSubmit(event) {
+async function handleSubmit(event) {
   event.preventDefault();
 
   const products = getSavedProducts();
@@ -257,8 +312,10 @@ function handleSubmit(event) {
 
   if (existingIndex >= 0) {
     products[existingIndex] = newProduct;
+    await syncProductToBackend(newProduct, 'PUT');
   } else {
     products.unshift(newProduct);
+    await syncProductToBackend(newProduct, 'POST');
   }
 
   saveProducts(products);
@@ -266,7 +323,7 @@ function handleSubmit(event) {
   resetForm();
 }
 
-function handleProductListClick(event) {
+async function handleProductListClick(event) {
   const button = event.target.closest('button[data-action]');
   if (!button) return;
 
@@ -284,6 +341,7 @@ function handleProductListClick(event) {
     const updatedProducts = products.filter((item) => item.id !== product.id);
     selectedProductIds.delete(product.id);
     saveProducts(updatedProducts);
+    await syncProductToBackend(product, 'DELETE');
     renderProducts();
   }
 }
@@ -301,12 +359,22 @@ function handleSelectionChange(event) {
   renderProducts();
 }
 
-function handleBulkDelete() {
+async function handleBulkDelete() {
   if (!selectedProductIds.size) return;
 
   const products = getSavedProducts().filter((product) => !selectedProductIds.has(product.id));
+  const deletedIds = [...selectedProductIds];
   selectedProductIds.clear();
   saveProducts(products);
+
+  for (const id of deletedIds) {
+    try {
+      await apiRequest(`/api/products/${id}`, { method: 'DELETE' });
+    } catch (error) {
+      console.warn('Unable to delete product from backend:', error.message);
+    }
+  }
+
   renderProducts();
 }
 
@@ -335,5 +403,10 @@ categoryFilterInput?.addEventListener('change', renderProducts);
 bulkDeleteButton?.addEventListener('click', handleBulkDelete);
 exportProductsButton?.addEventListener('click', handleExportProducts);
 
-renderProducts();
-renderOrders();
+async function initializeAdminPage() {
+  await loadProductsFromBackend();
+  renderProducts();
+  renderOrders();
+}
+
+initializeAdminPage();

@@ -1,3 +1,5 @@
+const API_BASE = 'http://localhost:5000';
+
 const productImages = {
   patato: "images/patato.png",
   tomato: "images/tomato.png",
@@ -316,8 +318,32 @@ function getSavedProducts() {
   }
 }
 
-function getProductData(productKey) {
-  const savedProducts = getSavedProducts();
+async function loadProductsFromBackend() {
+  try {
+    const response = await fetch(`${API_BASE}/api/products`);
+    const data = await response.json();
+
+    if (!response.ok || !Array.isArray(data.products)) {
+      return getSavedProducts();
+    }
+
+    const normalizedProducts = data.products.map((product) => ({
+      ...product,
+      key: product.key || product.id,
+      available: product.available !== false,
+      image: product.image || productImages[product.key] || 'images/vegback.png'
+    }));
+
+    localStorage.setItem('vegetable-mart-admin-products', JSON.stringify(normalizedProducts));
+    return normalizedProducts;
+  } catch (error) {
+    return getSavedProducts();
+  }
+}
+
+async function getProductData(productKey) {
+  const savedProducts = await loadProductsFromBackend();
+
   if (savedProducts) {
     const savedProduct = savedProducts.find((item) => item.key === productKey);
     if (savedProduct) {
@@ -339,9 +365,9 @@ function getProductData(productKey) {
   };
 }
 
-function renderProductDetail() {
+async function renderProductDetail() {
   const productKey = getProductKey();
-  const product = getProductData(productKey);
+  const product = await getProductData(productKey);
   const detailContainer = document.getElementById("product-detail");
 
   if (!detailContainer || !product) {
@@ -440,8 +466,8 @@ function renderRelatedProducts() {
     .join("");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   updateCartCount();
-  renderProductDetail();
+  await renderProductDetail();
   renderRelatedProducts();
 });

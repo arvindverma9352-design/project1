@@ -1,0 +1,14 @@
+{
+  "users": [
+    {
+      "id": "admin-1",
+      "name": "Admin",
+      "email": "admin@vegetablemart.com",
+      "mobile": "9999999999",
+      "password": "admin123",
+      "role": "admin"
+    }
+  ],
+  "products": [],
+  "orders": []
+}

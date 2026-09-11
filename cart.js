@@ -145,17 +145,59 @@ function showToast(message) {
     showCartToast(message);
 }
 
-function placeOrder() {
+function getCurrentUser() {
+    try {
+        const rawUser = localStorage.getItem('vegetable-mart-current-user') || sessionStorage.getItem('vegetable-mart-current-user');
+        return rawUser ? JSON.parse(rawUser) : null;
+    } catch (error) {
+        return null;
+    }
+}
+
+async function placeOrder() {
     if (cart.length === 0) return;
 
     const orderMessage = document.getElementById("order-message");
-    const orderNumber = Math.floor(1000 + Math.random() * 9000);
-    orderMessage.innerText = `Order #VM${orderNumber} placed successfully! Your fresh picks are being packed.`;
-    orderMessage.classList.add("is-visible");
-    showToast(`Order #VM${orderNumber} successfully placed`);
-    cart = [];
-    saveCart();
-    displayCart();
+    const currentUser = getCurrentUser();
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    try {
+        const response = await fetch('http://localhost:5000/api/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                customer: currentUser ? currentUser.name : 'Guest Customer',
+                total,
+                items: cart.map((item) => ({
+                    name: item.name,
+                    quantity: item.quantity,
+                    price: item.price,
+                    image: item.image,
+                    weight: item.weight
+                }))
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Unable to place order');
+        }
+
+        const orderNumber = data.order?.id || `VM${Math.floor(1000 + Math.random() * 9000)}`;
+        orderMessage.innerText = `Order #${orderNumber} placed successfully! Your fresh picks are being packed.`;
+        orderMessage.classList.add("is-visible");
+        showToast(`Order #${orderNumber} successfully placed`);
+        cart = [];
+        saveCart();
+        displayCart();
+    } catch (error) {
+        orderMessage.innerText = error.message || 'Unable to place order right now.';
+        orderMessage.classList.add("is-visible");
+        showToast('Unable to place order right now');
+    }
 }
 
 

@@ -1,3 +1,4 @@
+const API_BASE = 'http://localhost:5000';
 const wishlistItems = document.getElementById("wishlist-items");
 const productLabels = {
     patato: "Potato (आलू)", tomato: "Tomato (टमाटर)", brownonion: "Brown Onion (सफेद प्याज़)", redonion: "Red Onion (लाल प्याज़)",
@@ -10,16 +11,83 @@ const productLabels = {
     broccli: "Broccoli (ब्रोकोली)", capsicum: "Capsicum (शिमला मिर्च)", corn: "Corn (मक्का)", jackfruit: "Jackfruit (कटहल)", masroom: "Mushroom (मशरूम)", peas: "Peas (मटर)"
 };
 
-function getWishlist() {
-    return JSON.parse(localStorage.getItem("wishlist")) || [];
+function getCurrentUser() {
+    try {
+        const rawUser = localStorage.getItem('vegetable-mart-current-user') || sessionStorage.getItem('vegetable-mart-current-user');
+        return rawUser ? JSON.parse(rawUser) : null;
+    } catch (error) {
+        return null;
+    }
 }
 
-function saveWishlist(items) {
+function getWishlistStorage() {
+    try {
+        return JSON.parse(localStorage.getItem("wishlist")) || [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function saveWishlistStorage(items) {
     localStorage.setItem("wishlist", JSON.stringify(items));
 }
 
-function renderWishlist() {
-    const wishlist = getWishlist();
+async function loadWishlist() {
+    const currentUser = getCurrentUser();
+
+    if (currentUser?.id) {
+        try {
+            const response = await fetch(`${API_BASE}/api/auth/wishlist/${currentUser.id}`);
+            const data = await response.json().catch(() => ({}));
+
+            if (response.ok && Array.isArray(data.wishlist)) {
+                saveWishlistStorage(data.wishlist);
+                return data.wishlist;
+            }
+        } catch (error) {
+            console.warn('Unable to load wishlist from backend:', error.message);
+        }
+    }
+
+    return getWishlistStorage();
+}
+
+async function saveWishlist(items) {
+    saveWishlistStorage(items);
+
+    const currentUser = getCurrentUser();
+    if (!currentUser?.id) {
+        return items;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/api/auth/wishlist/${currentUser.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ wishlist: items })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Unable to sync wishlist');
+        }
+
+        return data.wishlist || items;
+    } catch (error) {
+        console.warn('Unable to sync wishlist with backend:', error.message);
+        return items;
+    }
+}
+
+async function renderWishlist() {
+    if (!wishlistItems) {
+        return;
+    }
+
+    const wishlist = await loadWishlist();
 
     if (wishlist.length === 0) {
         wishlistItems.innerHTML = `
@@ -35,12 +103,12 @@ function renderWishlist() {
 
     wishlistItems.innerHTML = wishlist.map((item, index) => `
         <article class="wishlist-card">
-            <div class="wishlist-image ${item.name}">
-                <img src="${item.image || "images/logo.png"}" alt="${item.name}" onerror="this.src='images/logo.png'">
+            <div class="wishlist-image ${item.key || item.name}">
+                <img src="${item.image || "images/logo.png"}" alt="${item.key || item.name}" onerror="this.src='images/logo.png'">
             </div>
             <div class="wishlist-info">
                 <p class="item-label">Fresh pick</p>
-                <h2>${productLabels[item.name] || item.name}</h2>
+                <h2>${productLabels[item.key || item.name] || item.title || item.name}</h2>
                 <strong>₹${item.price}</strong>
             </div>
             <button class="remove-button" type="button" onclick="removeFromWishlist(${index})">Remove <span>×</span></button>
@@ -48,10 +116,10 @@ function renderWishlist() {
     `).join("");
 }
 
-function removeFromWishlist(index) {
-    const wishlist = getWishlist();
+async function removeFromWishlist(index) {
+    const wishlist = await loadWishlist();
     wishlist.splice(index, 1);
-    saveWishlist(wishlist);
+    await saveWishlist(wishlist);
     renderWishlist();
 }
 

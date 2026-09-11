@@ -306,9 +306,41 @@
             margin: 0;
         }
 
-        .helper-row a {
+        .helper-row a,
+        .text-button {
             color: var(--orange);
             font-weight: 700;
+        }
+
+        .text-button {
+            background: transparent;
+            border: none;
+            padding: 0;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .forgot-password-panel {
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 16px;
+            border: 1px solid #d7ead7;
+            background: #f5fbf3;
+        }
+
+        .forgot-password-panel.hidden {
+            display: none;
+        }
+
+        .forgot-password-panel h3 {
+            margin: 0 0 14px;
+            color: var(--green-900);
+            font-size: 18px;
+        }
+
+        .forgot-grid {
+            display: grid;
+            gap: 12px;
         }
 
         #btn {
@@ -455,11 +487,51 @@
 
                     <div class="helper-row">
                         <label class="remember-box"><input id="rememberMe" type="checkbox"> Remember me</label>
-                        <a href="formsignup.html">Create account</a>
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <button type="button" id="forgotPasswordToggle" class="text-button">Forgot password?</button>
+                            <a href="formsignup.html">Create account</a>
+                        </div>
                     </div>
 
                     <button id="btn" type="submit">Login</button>
                 </form>
+
+                <div id="forgotPasswordPanel" class="forgot-password-panel hidden">
+                    <h3>Reset your password</h3>
+                    <form id="forgotPasswordForm">
+                        <div id="forgot-password-message" class="form-message hidden"></div>
+
+                        <div class="forgot-grid">
+                            <div class="input-group">
+                                <label for="resetEmail">Email</label>
+                                <input id="resetEmail" type="email" placeholder="Enter your registered email" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="resetMobile">Mobile Number</label>
+                                <input id="resetMobile" type="tel" placeholder="Enter your registered mobile number" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="resetPassword">New Password</label>
+                                <div class="password-field">
+                                    <input id="resetPassword" type="password" placeholder="Enter a new password" required>
+                                    <button type="button" class="toggle-password" data-target="resetPassword">Show</button>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="resetConfirmPassword">Confirm New Password</label>
+                                <div class="password-field">
+                                    <input id="resetConfirmPassword" type="password" placeholder="Confirm your new password" required>
+                                    <button type="button" class="toggle-password" data-target="resetConfirmPassword">Show</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="resetBtn" type="submit" style="margin-top: 14px;">Update Password</button>
+                    </form>
+                </div>
 
                 <p class="bottom-text">Don’t have an account? <a href="formsignup.html">Signup</a></p>
             </section>
@@ -527,6 +599,24 @@
             }
         }
 
+        async function apiRequest(endpoint, payload) {
+            const response = await fetch(`http://localhost:5000${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Something went wrong.');
+            }
+
+            return data;
+        }
+
         function redirectUser(user) {
             if (!user) return;
             window.location.href = user.role === 'admin' ? 'admin.html' : 'Af-lo-sin-.html';
@@ -534,6 +624,10 @@
 
         const loginForm = document.getElementById('loginForm');
         const loginMessage = document.getElementById('login-message');
+        const forgotPasswordToggle = document.getElementById('forgotPasswordToggle');
+        const forgotPasswordPanel = document.getElementById('forgotPasswordPanel');
+        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+        const forgotPasswordMessage = document.getElementById('forgot-password-message');
 
         ensureAdminAccount();
 
@@ -553,7 +647,61 @@
             });
         });
 
-        loginForm.addEventListener('submit', (event) => {
+        forgotPasswordToggle.addEventListener('click', () => {
+            forgotPasswordPanel.classList.toggle('hidden');
+            forgotPasswordMessage.classList.add('hidden');
+            forgotPasswordMessage.textContent = '';
+            forgotPasswordMessage.classList.remove('error', 'success');
+        });
+
+        forgotPasswordForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const email = document.getElementById('resetEmail').value.trim().toLowerCase();
+            const mobile = document.getElementById('resetMobile').value.trim();
+            const newPassword = document.getElementById('resetPassword').value.trim();
+            const confirmPassword = document.getElementById('resetConfirmPassword').value.trim();
+
+            if (!email || !mobile || !newPassword || !confirmPassword) {
+                setMessage(forgotPasswordMessage, 'Please fill in all fields.', 'error');
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                setMessage(forgotPasswordMessage, 'Please enter a valid email address.', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                setMessage(forgotPasswordMessage, 'Password must be at least 6 characters long.', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                setMessage(forgotPasswordMessage, 'Passwords do not match.', 'error');
+                return;
+            }
+
+            try {
+                const data = await apiRequest('/api/auth/forgot-password', {
+                    email,
+                    mobile,
+                    newPassword,
+                    confirmPassword
+                });
+
+                setMessage(forgotPasswordMessage, data.message || 'Password updated successfully.', 'success');
+                forgotPasswordForm.reset();
+
+                setTimeout(() => {
+                    forgotPasswordPanel.classList.add('hidden');
+                }, 1200);
+            } catch (error) {
+                setMessage(forgotPasswordMessage, error.message, 'error');
+            }
+        });
+
+        loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -571,31 +719,31 @@
                 return;
             }
 
-            const users = getUsers();
-            const foundUser = users.find((user) => {
-                return (user.email === email || user.mobile === mobile) && user.password === password;
-            });
+            try {
+                const data = await apiRequest('/api/auth/login', {
+                    email,
+                    mobile,
+                    password
+                });
 
-            if (!foundUser) {
-                setMessage(loginMessage, 'Invalid email/mobile or password.', 'error');
-                return;
+                setCurrentUser(
+                    {
+                        name: data.user.name,
+                        email: data.user.email,
+                        mobile: data.user.mobile,
+                        address: '',
+                        role: data.user.role || 'customer'
+                    },
+                    rememberMe
+                );
+
+                setMessage(loginMessage, 'Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    redirectUser(getCurrentUser());
+                }, 700);
+            } catch (error) {
+                setMessage(loginMessage, error.message, 'error');
             }
-
-            setCurrentUser(
-                {
-                    name: foundUser.name,
-                    email: foundUser.email,
-                    mobile: foundUser.mobile,
-                    address: foundUser.address || '',
-                    role: foundUser.role || 'customer'
-                },
-                rememberMe
-            );
-
-            setMessage(loginMessage, 'Login successful! Redirecting...', 'success');
-            setTimeout(() => {
-                redirectUser(getCurrentUser());
-            }, 700);
         });
     </script>
 

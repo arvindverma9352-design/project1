@@ -515,6 +515,24 @@
             messageEl.classList.add(type);
         }
 
+        async function apiRequest(endpoint, payload) {
+            const response = await fetch(`http://localhost:5000${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Something went wrong.');
+            }
+
+            return data;
+        }
+
         ensureAdminAccount();
 
         document.querySelectorAll('.toggle-password').forEach((button) => {
@@ -531,7 +549,7 @@
         const signupForm = document.getElementById('signupForm');
         const signupMessage = document.getElementById('signup-message');
 
-        signupForm.addEventListener('submit', (event) => {
+        signupForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
             const name = document.getElementById('signupName').value.trim();
@@ -567,28 +585,23 @@
                 return;
             }
 
-            const users = getUsers();
-            const duplicateUser = users.find((user) => user.email === email || user.mobile === mobile);
+            try {
+                const data = await apiRequest('/api/auth/signup', {
+                    name,
+                    email,
+                    mobile,
+                    address,
+                    password,
+                    role: 'customer'
+                });
 
-            if (duplicateUser) {
-                setMessage(signupMessage, 'This email or mobile number is already registered.', 'error');
-                return;
+                setMessage(signupMessage, data.message || 'Signup successful! Redirecting to login...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'formlogin.html';
+                }, 800);
+            } catch (error) {
+                setMessage(signupMessage, error.message, 'error');
             }
-
-            users.push({
-                name,
-                email,
-                mobile,
-                address,
-                password,
-                role: 'customer'
-            });
-            saveUsers(users);
-
-            setMessage(signupMessage, 'Signup successful! Redirecting to login...', 'success');
-            setTimeout(() => {
-                window.location.href = 'formlogin.html';
-            }, 800);
         });
     </script>
 

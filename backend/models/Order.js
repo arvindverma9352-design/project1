@@ -1,0 +1,18 @@
+const mongoose = require('mongoose');
+
+const orderSchema = new mongoose.Schema({
+  customer: { type: String, required: true },
+  total: { type: Number, required: true },
+  status: { type: String, default: 'Packed' },
+  items: [
+    {
+      name: String,
+      quantity: Number,
+      price: Number,
+      image: String,
+      weight: String
+    }
+  ]
+}, { timestamps: true });
+
+module.exports = mongoose.model('Order', orderSchema);
