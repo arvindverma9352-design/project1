@@ -154,12 +154,80 @@ function getCurrentUser() {
     }
 }
 
+function initDeliveryForm() {
+    const currentUser = getCurrentUser();
+    const nameInput = document.getElementById("delivery-name");
+    const mobileInput = document.getElementById("delivery-mobile");
+    const addressInput = document.getElementById("delivery-address");
+
+    if (currentUser) {
+        if (nameInput && !nameInput.value) nameInput.value = currentUser.name || '';
+        if (mobileInput && !mobileInput.value) mobileInput.value = currentUser.mobile || '';
+        if (addressInput && !addressInput.value) addressInput.value = currentUser.address || '';
+    }
+}
+
 async function placeOrder() {
     if (cart.length === 0) return;
+
+    // ── Store closed check ──────────────────────────
+    if (localStorage.getItem('vegetable-mart-store-open') === 'false') {
+      showStoreClosedPopup();
+      return;
+    }
+    // ───────────────────────────────────────────────
 
     const orderMessage = document.getElementById("order-message");
     const currentUser = getCurrentUser();
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    const nameInput = document.getElementById("delivery-name");
+    const mobileInput = document.getElementById("delivery-mobile");
+    const addressInput = document.getElementById("delivery-address");
+
+    const customerName = (nameInput ? nameInput.value : '').trim() || currentUser?.name || '';
+    const customerMobile = (mobileInput ? mobileInput.value : '').trim() || currentUser?.mobile || '';
+    const customerAddress = (addressInput ? addressInput.value : '').trim() || currentUser?.address || '';
+
+    if (!customerName) {
+        showToast('Please enter your full name');
+        orderMessage.innerText = 'Please enter your full name.';
+        orderMessage.classList.add("is-visible");
+        nameInput?.focus();
+        return;
+    }
+
+    if (!customerMobile) {
+        showToast('Please enter your mobile number');
+        orderMessage.innerText = 'Please enter your mobile number.';
+        orderMessage.classList.add("is-visible");
+        mobileInput?.focus();
+        return;
+    }
+
+    if (customerMobile.replace(/\D/g, '').length < 10) {
+        showToast('Please enter a valid 10-digit mobile number');
+        orderMessage.innerText = 'Please enter a valid 10-digit mobile number.';
+        orderMessage.classList.add("is-visible");
+        mobileInput?.focus();
+        return;
+    }
+
+    if (!customerAddress) {
+        showToast('Please enter your delivery address');
+        orderMessage.innerText = 'Please enter your delivery address.';
+        orderMessage.classList.add("is-visible");
+        addressInput?.focus();
+        return;
+    }
+
+    const orderItems = cart.map((item) => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        image: item.image,
+        weight: item.weight
+    }));
 
     try {
         const response = await fetch('http://localhost:5000/api/orders', {
@@ -168,15 +236,12 @@ async function placeOrder() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                customer: currentUser ? currentUser.name : 'Guest Customer',
+                customer: customerName,
+                mobile: customerMobile,
+                address: customerAddress,
+                email: currentUser?.email || '',
                 total,
-                items: cart.map((item) => ({
-                    name: item.name,
-                    quantity: item.quantity,
-                    price: item.price,
-                    image: item.image,
-                    weight: item.weight
-                }))
+                items: orderItems
             })
         });
 
@@ -186,10 +251,39 @@ async function placeOrder() {
             throw new Error(data.message || 'Unable to place order');
         }
 
-        const orderNumber = data.order?.id || `VM${Math.floor(1000 + Math.random() * 9000)}`;
-        orderMessage.innerText = `Order #${orderNumber} placed successfully! Your fresh picks are being packed.`;
+        const orderNumber = data.order?._id || data.order?.id || `VM${Math.floor(1000 + Math.random() * 9000)}`;
+
+        // Sync order to local admin backup
+        try {
+            const adminOrders = JSON.parse(localStorage.getItem('vegetable-mart-admin-orders') || '[]');
+            adminOrders.unshift({
+                id: orderNumber,
+                customer: customerName,
+                mobile: customerMobile,
+                address: customerAddress,
+                email: currentUser?.email || '',
+                total,
+                status: 'Packed',
+                items: orderItems
+            });
+            localStorage.setItem('vegetable-mart-admin-orders', JSON.stringify(adminOrders));
+        } catch (e) {
+            console.warn('Unable to sync order to local admin storage', e);
+        }
+
+        // Update current user address if logged in
+        if (currentUser) {
+            currentUser.address = customerAddress;
+            currentUser.mobile = customerMobile;
+            sessionStorage.setItem('vegetable-mart-current-user', JSON.stringify(currentUser));
+            if (localStorage.getItem('vegetable-mart-current-user')) {
+                localStorage.setItem('vegetable-mart-current-user', JSON.stringify(currentUser));
+            }
+        }
+
+        orderMessage.innerText = `Order #${orderNumber} placed successfully! Delivery to: ${customerAddress}`;
         orderMessage.classList.add("is-visible");
-        showToast(`Order #${orderNumber} successfully placed`);
+        showToast(`Order placed successfully!`);
         cart = [];
         saveCart();
         displayCart();
@@ -200,5 +294,37 @@ async function placeOrder() {
     }
 }
 
-
 displayCart();
+initDeliveryForm();
+
+/* ─── Store Closed Popup ─────────────────────────── */
+function showStoreClosedPopup() {
+  let overlay = document.getElementById('store-closed-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'store-closed-overlay';
+    overlay.style.cssText = 'display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; flex-direction:column;';
+    overlay.innerHTML = `
+      <div style="background:#fff; border-radius:16px; padding:40px 32px; max-width:420px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="font-size:3rem; margin-bottom:12px;">🔒</div>
+        <h2 style="color:#dc3545; margin:0 0 10px; font-size:1.5rem;">Website Abhi Band Hai</h2>
+        <p style="color:#555; margin:0 0 24px; line-height:1.6;">Humari website abhi orders ke liye band hai.<br>Thodi der baad try karein.</p>
+        <button onclick="document.getElementById('store-closed-overlay').style.display='none'" style="background:#dc3545; color:#fff; border:none; padding:12px 28px; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer;">Theek Hai</button>
+      </div>`;
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = 'flex';
+}
+
+// Fetch store status on cart page load
+(async function fetchStoreStatusCart() {
+  try {
+    const res = await fetch('http://localhost:5000/api/settings/store-status');
+    const data = await res.json();
+    if (data && typeof data.isOpen === 'boolean') {
+      localStorage.setItem('vegetable-mart-store-open', data.isOpen ? 'true' : 'false');
+    }
+  } catch (err) {
+    // Backend unreachable — keep localStorage value as-is
+  }
+})();

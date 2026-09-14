@@ -38,6 +38,25 @@
                 <div class="summary-row"><span>Delivery</span><strong class="free-delivery">FREE</strong></div>
                 <div class="summary-divider"></div>
                 <div class="summary-row summary-total"><span>To pay</span><strong>₹<span id="payable-price">0</span></strong></div>
+
+                <div class="delivery-details-card">
+                    <div class="delivery-card-title">
+                        <span>📍 Delivery Details</span>
+                    </div>
+                    <div class="delivery-input-group">
+                        <label for="delivery-name">Full Name *</label>
+                        <input type="text" id="delivery-name" placeholder="Your full name" required>
+                    </div>
+                    <div class="delivery-input-group">
+                        <label for="delivery-mobile">Mobile Number *</label>
+                        <input type="tel" id="delivery-mobile" placeholder="10-digit mobile number" required>
+                    </div>
+                    <div class="delivery-input-group">
+                        <label for="delivery-address">Delivery Address *</label>
+                        <textarea id="delivery-address" rows="2" placeholder="House no, street, locality, city" required></textarea>
+                    </div>
+                </div>
+
                 <button class="place-order" id="place-order" type="button" onclick="placeOrder()">
                     <span>Place Order</span><span class="order-arrow">→</span>
                 </button>

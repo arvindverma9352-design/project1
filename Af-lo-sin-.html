@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,6 +103,8 @@ function syncProduct1KgPrices() {
 }
 
 function addToCart(name, price, image) {
+  const storeOpen = localStorage.getItem('vegetable-mart-store-open');
+  if (storeOpen === 'false') { showStoreClosedPopup(); return; }
 
     const finalPrice = product1KgPrices[name] || Number(price) || 0;
     let existingProduct = cart.find(item => item.name === name && (!item.weight || item.weight === '1kg'));
@@ -133,7 +136,7 @@ function showCartToast(name) {
 
 function showToast(message) {
   const toast = document.getElementById("cart-toast");
-  toast.innerHTML = `<span class="toast-check">✓</span><span>${message}</span>`;
+  toast.innerHTML = `<span class="toast-check">✔</span><span>${message}</span>`;
   toast.classList.remove("toast-hide");
   toast.classList.add("toast-show");
 
@@ -173,18 +176,31 @@ function updateCartCount() {
     document.getElementById("nav-cart-count").innerText = count;
 }
 
+let activeCategory = 'all';
+
+function filterByCategory(cat) {
+  activeCategory = cat;
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.cat === cat);
+  });
+  const searchInput = document.getElementById('product-search');
+  filterProducts(searchInput ? searchInput.value : '');
+}
+
 function filterProducts(searchTerm) {
-  const normalizedTerm = searchTerm.trim().toLowerCase();
+  const normalizedTerm = (searchTerm || '').trim().toLowerCase();
   const products = document.querySelectorAll(".product");
   let visibleCount = 0;
-
   products.forEach(product => {
-    const searchableName = product.dataset.searchName || product.querySelector(".product-name").textContent.toLowerCase();
-    const isMatch = searchableName.includes(normalizedTerm);
-    product.hidden = !isMatch;
-    if (isMatch) visibleCount++;
+    const nameEl = product.querySelector(".product-name");
+    const searchableName = product.dataset.searchName || (nameEl ? nameEl.textContent.toLowerCase() : '');
+    const productCat = product.dataset.category || 'hari-sabzi';
+    const matchesSearch = !normalizedTerm || searchableName.includes(normalizedTerm);
+    const matchesCategory = activeCategory === 'all' || productCat === activeCategory;
+    const isVisible = matchesSearch && matchesCategory;
+    product.hidden = !isVisible;
+    if (isVisible) visibleCount++;
   });
-
   document.getElementById("no-products-message").hidden = visibleCount > 0;
   document.querySelector(".product-count").textContent = `${visibleCount} fresh choice${visibleCount === 1 ? "" : "s"}`;
 }
@@ -192,6 +208,18 @@ function filterProducts(searchTerm) {
 
 document.addEventListener("DOMContentLoaded", () => {
   syncProduct1KgPrices();
+
+  (async function fetchStoreStatus() {
+    try {
+      const res = await fetch('http://localhost:5000/api/settings/store-status');
+      const data = await res.json();
+      if (data && typeof data.isOpen === 'boolean') {
+        localStorage.setItem('vegetable-mart-store-open', data.isOpen ? 'true' : 'false');
+        const banner = document.getElementById('store-closed-banner');
+        if (banner) banner.style.display = data.isOpen ? 'none' : 'flex';
+      }
+    } catch (err) {}
+  })();
   updateCartCount();
 
   document.querySelectorAll(".product").forEach(product => {
@@ -310,6 +338,17 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   </section>
 
+
+  <!-- Category Filter Bar -->
+  <div class="category-filter-bar" id="category-filter-bar">
+    <button class="cat-btn active" data-cat="all" onclick="filterByCategory('all')">🌿 Sabhi</button>
+    <button class="cat-btn" data-cat="hari-sabzi" onclick="filterByCategory('hari-sabzi')">🥬 Hari Sabzi</button>
+    <button class="cat-btn" data-cat="jad" onclick="filterByCategory('jad')">🥕 Jad Sabjhi</button>
+    <button class="cat-btn" data-cat="masale" onclick="filterByCategory('masale')">🧅 Masale</button>
+    <button class="cat-btn" data-cat="fruits" onclick="filterByCategory('fruits')">🍎 Fruits</button>
+    <button class="cat-btn" data-cat="mushroom" onclick="filterByCategory('mushroom')">🍄 Mushroom</button>
+  </div>
+
   <div class="products-heading">
     <div>
       <p class="section-kicker">From our farm to you</p>
@@ -321,7 +360,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class="products" id="products">
       
       <!-- patato -->
-      <div class="product">
+      <div class="product" data-category="jad">
          <div class="patato"></div>
          <div class="buttons">
              <button onclick="addToCart('patato',40)">Add To Cart</button>
@@ -329,7 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
          </div>
         </div>
         <!-- TOMATO -->
-        <div class="product">
+        <div class="product" data-category="fruits">
            <div class="tomato"></div>
           <div class="buttons">
              <button onclick="addToCart('tomato',40)">Add To Cart</button>
@@ -338,7 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
         <!-- BROWN ONION -->
-         <div class="product">
+         <div class="product" data-category="masale">
           <div class="brownonion"></div>
           <div class="buttons">
              <button onclick="addToCart('brownonion', 40)">Add To Cart</button>
@@ -347,7 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
         <!-- RED ONION -->
-          <div class="product">
+          <div class="product" data-category="masale">
           <div class="rednonion"></div>
           <div class="buttons">
              <button onclick="addToCart('redonion',40,)">Add To Cart</button>
@@ -356,7 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
      <!-- LADY-FINGER -->
-     <div class="product">
+     <div class="product" data-category="hari-sabzi">
           <div class="ladyfinger"></div>
           <div class="buttons">
              <button onclick="addToCart('ladyfinger',60)">Add To Cart</button>
@@ -365,7 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
      </div>
 
         <!-- GREEN-CHILLI -->
-     <div class="product">
+     <div class="product" data-category="masale">
              <div class="greenchilli"></div>
           <div class="buttons">
                 <button onclick="addToCart('greenchilli',80)">Add To Cart</button>
@@ -374,7 +413,7 @@ document.addEventListener("DOMContentLoaded", () => {
      </div>
 
      <!-- SPINCH -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="spinch"></div>
                <div class="buttons">
                  <button onclick="addToCart('spinch',30)">Add To Cart</button>
@@ -383,7 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- LAUKI -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="lauki"></div>
                <div class="buttons">
                  <button onclick="addToCart('lauki', 40)">Add To Cart</button>
@@ -392,7 +431,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- GREEN-CUCUMBER -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="greencucumber"></div>
                <div class="buttons">
                  <button onclick="addToCart('greencucumber', 40)">Add To Cart</button>
@@ -401,7 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
              <!-- CUCUMBER -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="cucumber"></div>
                <div class="buttons">
                  <button onclick="addToCart('cucumber', 40)">Add To Cart</button>
@@ -410,7 +449,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- Bitter Gourd -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="bittergourd"></div>
                <div class="buttons">
                  <button onclick="addToCart('bittergourd', 50)">Add To Cart</button>
@@ -419,7 +458,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!--CARROT  -->
-            <div class="product">
+            <div class="product" data-category="jad">
                <div class="carrot"></div>
                <div class="buttons">
                  <button onclick="addToCart('carrot', 30)">Add To Cart</button>
@@ -428,7 +467,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- PUMKIN -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="pumkin"></div>
                <div class="buttons">
                  <button onclick="addToCart('pumkin', 40)">Add To Cart</button>
@@ -437,7 +476,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- Cauliflower -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="cauliflower"></div>
                <div class="buttons">
                  <button onclick="addToCart('cauliflower', 50)">Add To Cart</button>
@@ -446,7 +485,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- Cabbage -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="cabbage"></div>
                <div class="buttons">
                  <button onclick="addToCart('cabbage', 30)">Add To Cart</button>
@@ -455,7 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- Brinjal -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="brinjal"></div>
                <div class="buttons">
                  <button onclick="addToCart('brinjal', 40)">Add To Cart</button>
@@ -464,7 +503,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- Fenugreek Leaves-मेथी -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="fenugreekleaves"></div>
                <div class="buttons">
                  <button onclick="addToCart('fenugreekleaves', 30)">Add To Cart</button>
@@ -473,7 +512,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- Mustard Greens -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="mustardgreens"></div>
                <div class="buttons">
                  <button onclick="addToCart('mustardgreens', 30)">Add To Cart</button>
@@ -482,7 +521,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- Coriander Leaves -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="corianderleaves"></div>
                <div class="buttons">
                  <button onclick="addToCart('corianderleaves', 20)">Add To Cart</button>
@@ -491,7 +530,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- Mint -->
-             <div class="product">
+             <div class="product" data-category="hari-sabzi">
                <div class="mint"></div>
                <div class="buttons">
                  <button onclick="addToCart('mint', 10)">Add To Cart</button>
@@ -500,7 +539,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
                <!-- Ginger -->
-                <div class="product">
+                <div class="product" data-category="masale">
                <div class="ginger"></div>
                <div class="buttons">
                  <button onclick="addToCart('ginger', 50)">Add To Cart</button>
@@ -509,7 +548,7 @@ document.addEventListener("DOMContentLoaded", () => {
                </div>
 
             <!-- Bathua -->
-              <div class="product">
+              <div class="product" data-category="hari-sabzi">
                <div class="bathua"></div>
                <div class="buttons">
                  <button onclick="addToCart('bathua', 25)">Add To Cart</button>
@@ -518,7 +557,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- Radish -->
-            <div class="product">
+            <div class="product" data-category="jad">
                <div class="radish"></div>
                <div class="buttons">
                  <button onclick="addToCart('radish', 20)">Add To Cart</button>
@@ -527,7 +566,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- Beetroot -->
-              <div class="product">
+              <div class="product" data-category="jad">
                <div class="beetroot"></div>
                <div class="buttons">
                  <button onclick="addToCart('beetroot', 30)">Add To Cart</button>
@@ -536,7 +575,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             
             <!-- Sweet Potato -->
-             <div class="product">
+             <div class="product" data-category="jad">
                <div class="sweetpatato"></div>
                <div class="buttons">
                  <button onclick="addToCart('sweetpotato', 40)">Add To Cart</button>
@@ -545,7 +584,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
             <!-- Garlic -->
-             <div class="product">
+             <div class="product" data-category="masale">
                <div class="garlic"></div>
                <div class="buttons">
                  <button onclick="addToCart('garlic', 25)">Add To Cart</button>
@@ -554,7 +593,7 @@ document.addEventListener("DOMContentLoaded", () => {
                </div>
 
                <!-- Pointed Gourd-परवल -->
-               <div class="product">
+               <div class="product" data-category="hari-sabzi">
                <div class="pointgourd"></div>
                <div class="buttons">
                  <button onclick="addToCart('pointgourd', 35)">Add To Cart</button>
@@ -563,7 +602,7 @@ document.addEventListener("DOMContentLoaded", () => {
                </div>
 
                <!-- Tinda -->
-                <div class="product">
+                <div class="product" data-category="hari-sabzi">
                <div class="tinda"></div>
                <div class="buttons">
                  <button onclick="addToCart('tinda', 40)">Add To Cart</button>
@@ -572,7 +611,7 @@ document.addEventListener("DOMContentLoaded", () => {
                </div>
 
                <!-- Broccoli -->
-               <div class="product">
+               <div class="product" data-category="hari-sabzi">
                <div class="broccli"></div>
                <div class="buttons">
                  <button onclick="addToCart('broccli', 60)">Add To Cart</button>
@@ -581,7 +620,7 @@ document.addEventListener("DOMContentLoaded", () => {
                </div>
 
                <!-- Capsicum -->
-               <div class="product">
+               <div class="product" data-category="hari-sabzi">
                <div class="capsicum"></div>
                <div class="buttons">
                  <button onclick="addToCart('capsicum', 50)">Add To Cart</button>
@@ -590,7 +629,7 @@ document.addEventListener("DOMContentLoaded", () => {
                </div>
 
                <!-- Corn -->
-               <div class="product">
+               <div class="product" data-category="fruits">
                <div class="corn"></div>
                <div class="buttons">
                  <button onclick="addToCart('corn', 40)">Add To Cart</button>
@@ -599,7 +638,7 @@ document.addEventListener("DOMContentLoaded", () => {
                </div>
 
                <!-- Jackfruit -->
-               <div class="product">
+               <div class="product" data-category="fruits">
                <div class="jackfruit"></div>
                <div class="buttons">
                  <button onclick="addToCart('jackfruit', 80)">Add To Cart</button>
@@ -608,7 +647,7 @@ document.addEventListener("DOMContentLoaded", () => {
                </div>
 
                <!-- Mushroom -->
-               <div class="product">
+               <div class="product" data-category="mushroom">
                <div class="masroom"></div>
                <div class="buttons">
                  <button onclick="addToCart('masroom', 90)">Add To Cart</button>
@@ -617,7 +656,7 @@ document.addEventListener("DOMContentLoaded", () => {
                </div>
 
                <!-- Peas -->
-               <div class="product">
+               <div class="product" data-category="hari-sabzi">
                <div class="peas"></div>
                <div class="buttons">
                  <button onclick="addToCart('peas', 50)">Add To Cart</button>
@@ -632,6 +671,21 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
     <p class="no-products-message" id="no-products-message" hidden>No vegetables found. Try another search.</p>
   </main>
-        
+
+<!-- ── Store Closed Popup ── -->
+<div id="store-closed-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:32px 28px;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.18);">
+    <div style="font-size:48px;margin-bottom:12px;">🔒</div>
+    <h2 style="margin:0 0 8px;color:#1a1a1a;">Store Band Hai</h2>
+    <p style="color:#666;margin:0 0 20px;">Abhi hum orders nahi le rahe. Thodi der baad dobara try karein.</p>
+    <button onclick="hideStoreClosedPopup()" style="background:#22c55e;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:16px;cursor:pointer;font-weight:600;">Theek Hai</button>
+  </div>
+</div>
+
+<!-- ── Store Closed Banner ── -->
+<div id="store-closed-banner" style="display:none;background:#ef4444;color:#fff;text-align:center;padding:10px;font-size:15px;font-weight:600;position:sticky;top:0;z-index:1000;">
+  🔒 Store abhi band hai — orders temporarily unavailable
+</div>
+
 </body>
 </html>

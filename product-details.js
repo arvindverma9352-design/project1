@@ -288,7 +288,32 @@ function showToast(message) {
   }, 2600);
 }
 
+function showStoreClosedPopup() {
+  let overlay = document.getElementById('store-closed-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'store-closed-overlay';
+    overlay.style.cssText = 'display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; flex-direction:column;';
+    overlay.innerHTML = `
+      <div style="background:#fff; border-radius:16px; padding:40px 32px; max-width:420px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="font-size:3rem; margin-bottom:12px;">🔒</div>
+        <h2 style="color:#dc3545; margin:0 0 10px; font-size:1.5rem;">Website Abhi Band Hai</h2>
+        <p style="color:#555; margin:0 0 24px; line-height:1.6;">Humari website abhi orders ke liye band hai.<br>Thodi der baad try karein.</p>
+        <button onclick="document.getElementById('store-closed-overlay').style.display='none'" style="background:#dc3545; color:#fff; border:none; padding:12px 28px; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer;">Theek Hai</button>
+      </div>`;
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = 'flex';
+}
+
 function addToCart(productKey, price, weightLabel) {
+  // ── Store closed check ──────────────────────────
+  if (localStorage.getItem('vegetable-mart-store-open') === 'false') {
+    showStoreClosedPopup();
+    return;
+  }
+  // ───────────────────────────────────────────────
+
   const cart = getCart();
   const existingProduct = cart.find((item) => item.name === productKey && item.weight === weightLabel);
 

@@ -731,7 +731,7 @@
                         name: data.user.name,
                         email: data.user.email,
                         mobile: data.user.mobile,
-                        address: '',
+                        address: data.user.address || '',
                         role: data.user.role || 'customer'
                     },
                     rememberMe

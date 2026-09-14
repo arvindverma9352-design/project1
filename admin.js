@@ -1,38 +1,38 @@
 const productCatalog = {
-  patato: { title: 'Potato (???)', subtitle: 'Fresh, clean and kitchen-ready', description: 'Soft, versatile potatoes perfect for curries, fries, sabzi and everyday cooking.', image: 'images/patato.png', prices: { '250g': 40, '500g': 75, '1kg': 120 } },
-  tomato: { title: 'Tomato (?????)', subtitle: 'Juicy and naturally sweet', description: 'Fresh tomatoes rich in flavour, ideal for sauces, salads, curries and soups.', image: 'images/tomato.png', prices: { '250g': 35, '500g': 60, '1kg': 110 } },
-  brownonion: { title: 'Brown Onion (???? ??????)', subtitle: 'Everyday pantry staple', description: 'Mild, crunchy onion with a balanced flavour that enhances Indian home cooking.', image: 'images/brown-onion.png', prices: { '250g': 30, '500g': 55, '1kg': 100 } },
-  redonion: { title: 'Red Onion (??? ??????)', subtitle: 'Bold, fresh and crisp', description: 'Bright red onion perfect for salads, pickles, chaats and quick stir-fries.', image: 'images/red-onion.png', prices: { '250g': 32, '500g': 58, '1kg': 105 } },
-  ladyfinger: { title: 'Lady Finger (?????)', subtitle: 'Tender and farm-fresh', description: 'Healthy and delicious lady fingers that stay crisp and flavourful when cooked well.', image: 'images/lady-finger.png', prices: { '250g': 45, '500g': 80, '1kg': 150 } },
-  greenchilli: { title: 'Green Chilli (??? ?????)', subtitle: 'Spicy and vibrant', description: 'Fresh green chillies for chutneys, tadkas, curries and spicy everyday meals.', image: 'images/greenchilli.png', prices: { '250g': 30, '500g': 50, '1kg': 90 } },
-  spinch: { title: 'Spinach (????)', subtitle: 'Leafy greens with nutrition', description: 'Tender spinach leaves packed with nutrients and ideal for saag, smoothies and stir-fries.', image: 'images/spinch.png', prices: { '250g': 28, '500g': 48, '1kg': 85 } },
-  lauki: { title: 'Lauki (????)', subtitle: 'Light, healthy and versatile', description: 'Smooth and mild bottle gourd best suited for curries, soups and nutritious meals.', image: 'images/lauki.png', prices: { '250g': 30, '500g': 55, '1kg': 100 } },
-  greencucumber: { title: 'Green Cucumber (??? ????)', subtitle: 'Cool, crisp and refreshing', description: 'Fresh green cucumber perfect for salads, juices and light summer snacks.', image: 'images/greencucumber.png', prices: { '250g': 28, '500g': 50, '1kg': 90 } },
-  cucumber: { title: 'Cucumber (????)', subtitle: 'Hydrating and crunchy', description: 'Classic cucumber known for its crisp texture and refreshing taste.', image: 'images/cucumber.png', prices: { '250g': 25, '500g': 45, '1kg': 80 } },
-  bittergourd: { title: 'Bitter Gourd (?????)', subtitle: 'Bittersweet and wholesome', description: 'Bold in flavour, rich in taste and ideal for traditional desi recipes.', image: 'images/bitter-gourd.png', prices: { '250g': 35, '500g': 65, '1kg': 120 } },
-  carrot: { title: 'Carrot (????)', subtitle: 'Sweet, crunchy and colourful', description: 'Fresh carrots loaded with sweetness and perfect for salads, soups and sabzi.', image: 'images/carrot.png', prices: { '250g': 28, '500g': 50, '1kg': 90 } },
-  pumkin: { title: 'Pumpkin (?????)', subtitle: 'Soft texture and rich flavour', description: 'Naturally sweet pumpkin ideal for curries, soups, sweets and festive dishes.', image: 'images/pumkin.png', prices: { '250g': 30, '500g': 55, '1kg': 100 } },
-  cauliflower: { title: 'Cauliflower (???????)', subtitle: 'Fresh florets, great texture', description: 'Tender cauliflower with firm florets, ideal for curries, gravies and snacks.', image: 'images/cauliflower.png', prices: { '250g': 40, '500g': 70, '1kg': 130 } },
-  cabbage: { title: 'Cabbage (?????????)', subtitle: 'Crisp, clean and versatile', description: 'High-quality cabbage used in salads, curries, stir-fries and slaws.', image: 'images/cabbage.png', prices: { '250g': 25, '500g': 45, '1kg': 80 } },
-  brinjal: { title: 'Brinjal (?????)', subtitle: 'Smooth and flavour-packed', description: 'Fresh brinjal with a meaty texture that works beautifully in curries and roasting.', image: 'images/brinjal.png', prices: { '250g': 35, '500g': 60, '1kg': 110 } },
-  fenugreekleaves: { title: 'Fenugreek Leaves (????)', subtitle: 'Aromatic and wholesome', description: 'Fresh methi leaves for parathas, sabzi, tadka and traditional Indian meals.', image: 'images/Fenugreek Leaves-????.png', prices: { '250g': 25, '500g': 45, '1kg': 80 } },
-  mustardgreens: { title: 'Mustard Greens (????? ?? ???)', subtitle: 'Peppery and nutritious', description: 'Tender mustard greens with a slightly peppery taste, loved in authentic home cooking.', image: 'images/mustardgreens.png', prices: { '250g': 25, '500g': 45, '1kg': 80 } },
-  corianderleaves: { title: 'Coriander Leaves (????? ?????)', subtitle: 'Fresh herb for every meal', description: 'Bright coriander leaves used in chutneys, garnishes, curries and sandwiches.', image: 'images/corianderleaves.png', prices: { '250g': 20, '500g': 35, '1kg': 65 } },
-  mint: { title: 'Mint (??????)', subtitle: 'Refreshing and aromatic', description: 'Fresh mint leaves ideal for chutneys, drinks, salads and seasonal recipes.', image: 'images/mint.png', prices: { '250g': 20, '500g': 35, '1kg': 65 } },
-  bathua: { title: 'Bathua (????)', subtitle: 'Seasonal green goodness', description: 'Nutritious bathua leaves known for their earthy taste and traditional value.', image: 'images/bathua.png', prices: { '250g': 22, '500g': 40, '1kg': 70 } },
-  radish: { title: 'Radish (????)', subtitle: 'Peppery and crunchy', description: 'Fresh radishes that bring a crisp bite to salads, pickles and side dishes.', image: 'images/radish.png', prices: { '250g': 22, '500g': 40, '1kg': 70 } },
-  beetroot: { title: 'Beetroot (??????)', subtitle: 'Sweet, earthy and vibrant', description: 'Colorful beetroot that adds sweetness, nutrition and taste to many recipes.', image: 'images/beetroot.png', prices: { '250g': 30, '500g': 55, '1kg': 100 } },
-  sweetpotato: { title: 'Sweet Potato (??????)', subtitle: 'Naturally sweet and filling', description: 'Soft sweet potatoes with a rich taste, perfect for roasting, soups and snacks.', image: 'images/sweetpatato.png', prices: { '250g': 35, '500g': 65, '1kg': 120 } },
-  garlic: { title: 'Garlic (?????)', subtitle: 'Strong aroma, rich flavour', description: 'Fresh garlic cloves that build the base of countless flavorful dishes.', image: 'images/garlic.png', prices: { '250g': 25, '500g': 45, '1kg': 80 } },
-  pointgourd: { title: 'Pointed Gourd (????)', subtitle: 'Tender and traditional', description: 'Soft, mild pointed gourd favourite in everyday Indian kitchen cooking.', image: 'images/pointgourd-????.png', prices: { '250g': 30, '500g': 55, '1kg': 95 } },
-  tinda: { title: 'Tinda (?????)', subtitle: 'Light, subtle and healthy', description: 'Fresh tinda with a gentle flavour and smooth texture for simple home recipes.', image: 'images/tinda.png', prices: { '250g': 32, '500g': 58, '1kg': 105 } },
-  ginger: { title: 'Ginger (????)', subtitle: 'Pungent, warm and aromatic', description: 'Fresh ginger used for curries, tea, pickles and many comforting dishes.', image: 'images/ginger.png', prices: { '250g': 35, '500g': 60, '1kg': 110 } },
-  broccli: { title: 'Broccoli (????????)', subtitle: 'Fresh and nutrient-rich', description: 'Healthy broccoli heads packed with crunch, colour and excellent taste.', image: 'images/broccli.png', prices: { '250g': 45, '500g': 80, '1kg': 150 } },
-  capsicum: { title: 'Capsicum (????? ?????)', subtitle: 'Sweet, colourful and crunchy', description: 'Fresh capsicum for stir-fries, curries, wraps and vibrant salads.', image: 'images/capsicum.png', prices: { '250g': 40, '500g': 70, '1kg': 130 } },
-  corn: { title: 'Corn (?????)', subtitle: 'Sweet and naturally satisfying', description: 'Tender corn cobs and kernels with a bright sweetness for snacks and meals.', image: 'images/corn.png', prices: { '250g': 35, '500g': 60, '1kg': 110 } },
-  jackfruit: { title: 'Jackfruit (????)', subtitle: 'Unique texture and rich taste', description: 'Fresh jackfruit pieces for savoury curries, kebabs and hearty meal preparations.', image: 'images/jackfruit.png', prices: { '250g': 50, '500g': 90, '1kg': 170 } },
-  masroom: { title: 'Mushroom (?????)', subtitle: 'Earthy, juicy and savoury', description: 'Plump mushroom pieces perfect for gravies, stir-fries and special dinners.', image: 'images/masroom.png', prices: { '250g': 55, '500g': 95, '1kg': 180 } },
-  peas: { title: 'Peas (???)', subtitle: 'Green, sweet and wholesome', description: 'Fresh peas for curries, pulao, soups and healthy everyday meals.', image: 'images/peas.png', prices: { '250g': 35, '500g': 60, '1kg': 110 } }
+  patato:         { title: 'Potato (आलू)',                  subtitle: 'Fresh, clean and kitchen-ready',      description: 'Soft, versatile potatoes perfect for curries, fries, sabzi and everyday cooking.',                         image: 'images/patato.png',                  prices: { '250g': 40, '500g': 75,  '1kg': 120 } },
+  tomato:         { title: 'Tomato (टमाटर)',                subtitle: 'Juicy and naturally sweet',            description: 'Fresh tomatoes rich in flavour, ideal for sauces, salads, curries and soups.',                             image: 'images/tomato.png',                  prices: { '250g': 35, '500g': 60,  '1kg': 110 } },
+  brownonion:     { title: 'Brown Onion (सफेद प्याज़)',     subtitle: 'Everyday pantry staple',               description: 'Mild, crunchy onion with a balanced flavour that enhances Indian home cooking.',                           image: 'images/brown-onion.png',             prices: { '250g': 30, '500g': 55,  '1kg': 100 } },
+  redonion:       { title: 'Red Onion (लाल प्याज़)',        subtitle: 'Bold, fresh and crisp',                description: 'Bright red onion perfect for salads, pickles, chaats and quick stir-fries.',                               image: 'images/red-onion.png',               prices: { '250g': 32, '500g': 58,  '1kg': 105 } },
+  ladyfinger:     { title: 'Lady Finger (भिंडी)',           subtitle: 'Tender and farm-fresh',                description: 'Healthy and delicious lady fingers that stay crisp and flavourful when cooked well.',                      image: 'images/lady-finger.png',             prices: { '250g': 45, '500g': 80,  '1kg': 150 } },
+  greenchilli:    { title: 'Green Chilli (हरी मिर्च)',      subtitle: 'Spicy and vibrant',                    description: 'Fresh green chillies for chutneys, tadkas, curries and spicy everyday meals.',                            image: 'images/greenchilli.png',             prices: { '250g': 30, '500g': 50,  '1kg': 90  } },
+  spinch:         { title: 'Spinach (पालक)',                subtitle: 'Leafy greens with nutrition',          description: 'Tender spinach leaves packed with nutrients and ideal for saag, smoothies and stir-fries.',                image: 'images/spinch.png',                  prices: { '250g': 28, '500g': 48,  '1kg': 85  } },
+  lauki:          { title: 'Lauki (लौकी)',                  subtitle: 'Light, healthy and versatile',         description: 'Smooth and mild bottle gourd best suited for curries, soups and nutritious meals.',                       image: 'images/lauki.png',                   prices: { '250g': 30, '500g': 55,  '1kg': 100 } },
+  greencucumber:  { title: 'Green Cucumber (हरा खीरा)',     subtitle: 'Cool, crisp and refreshing',           description: 'Fresh green cucumber perfect for salads, juices and light summer snacks.',                                 image: 'images/greencucumber.png',           prices: { '250g': 28, '500g': 50,  '1kg': 90  } },
+  cucumber:       { title: 'Cucumber (खीरा)',               subtitle: 'Hydrating and crunchy',                description: 'Classic cucumber known for its crisp texture and refreshing taste.',                                       image: 'images/cucumber.png',                prices: { '250g': 25, '500g': 45,  '1kg': 80  } },
+  bittergourd:    { title: 'Bitter Gourd (करेला)',          subtitle: 'Bittersweet and wholesome',            description: 'Bold in flavour, rich in taste and ideal for traditional desi recipes.',                                  image: 'images/bitter-gourd.png',            prices: { '250g': 35, '500g': 65,  '1kg': 120 } },
+  carrot:         { title: 'Carrot (गाजर)',                 subtitle: 'Sweet, crunchy and colourful',         description: 'Fresh carrots loaded with sweetness and perfect for salads, soups and sabzi.',                           image: 'images/carrot.png',                  prices: { '250g': 28, '500g': 50,  '1kg': 90  } },
+  pumkin:         { title: 'Pumpkin (कद्दू)',               subtitle: 'Soft texture and rich flavour',        description: 'Naturally sweet pumpkin ideal for curries, soups, sweets and festive dishes.',                           image: 'images/pumkin.png',                  prices: { '250g': 30, '500g': 55,  '1kg': 100 } },
+  cauliflower:    { title: 'Cauliflower (फूलगोभी)',         subtitle: 'Fresh florets, great texture',         description: 'Tender cauliflower with firm florets, ideal for curries, gravies and snacks.',                           image: 'images/cauliflower.png',             prices: { '250g': 40, '500g': 70,  '1kg': 130 } },
+  cabbage:        { title: 'Cabbage (पत्तागोभी)',           subtitle: 'Crisp, clean and versatile',           description: 'High-quality cabbage used in salads, curries, stir-fries and slaws.',                                    image: 'images/cabbage.png',                 prices: { '250g': 25, '500g': 45,  '1kg': 80  } },
+  brinjal:        { title: 'Brinjal (बैंगन)',               subtitle: 'Smooth and flavour-packed',            description: 'Fresh brinjal with a meaty texture that works beautifully in curries and roasting.',                     image: 'images/brinjal.png',                 prices: { '250g': 35, '500g': 60,  '1kg': 110 } },
+  fenugreekleaves:{ title: 'Fenugreek Leaves (मेथी)',       subtitle: 'Aromatic and wholesome',               description: 'Fresh methi leaves for parathas, sabzi, tadka and traditional Indian meals.',                            image: 'images/Fenugreek Leaves-मेथी.png',  prices: { '250g': 25, '500g': 45,  '1kg': 80  } },
+  mustardgreens:  { title: 'Mustard Greens (सरसों का साग)', subtitle: 'Peppery and nutritious',               description: 'Tender mustard greens with a slightly peppery taste, loved in authentic home cooking.',                   image: 'images/mustardgreens.png',           prices: { '250g': 25, '500g': 45,  '1kg': 80  } },
+  corianderleaves:{ title: 'Coriander Leaves (धनिया पत्ती)',subtitle: 'Fresh herb for every meal',            description: 'Bright coriander leaves used in chutneys, garnishes, curries and sandwiches.',                           image: 'images/corianderleaves.png',         prices: { '250g': 20, '500g': 35,  '1kg': 65  } },
+  mint:           { title: 'Mint (पुदीना)',                 subtitle: 'Refreshing and aromatic',              description: 'Fresh mint leaves ideal for chutneys, drinks, salads and seasonal recipes.',                             image: 'images/mint.png',                    prices: { '250g': 20, '500g': 35,  '1kg': 65  } },
+  bathua:         { title: 'Bathua (बथुआ)',                 subtitle: 'Seasonal green goodness',              description: 'Nutritious bathua leaves known for their earthy taste and traditional value.',                           image: 'images/bathua.png',                  prices: { '250g': 22, '500g': 40,  '1kg': 70  } },
+  radish:         { title: 'Radish (मूली)',                 subtitle: 'Peppery and crunchy',                  description: 'Fresh radishes that bring a crisp bite to salads, pickles and side dishes.',                            image: 'images/radish.png',                  prices: { '250g': 22, '500g': 40,  '1kg': 70  } },
+  beetroot:       { title: 'Beetroot (चुकंदर)',             subtitle: 'Sweet, earthy and vibrant',            description: 'Colorful beetroot that adds sweetness, nutrition and taste to many recipes.',                           image: 'images/beetroot.png',                prices: { '250g': 30, '500g': 55,  '1kg': 100 } },
+  sweetpotato:    { title: 'Sweet Potato (शकरकंद)',         subtitle: 'Naturally sweet and filling',          description: 'Soft sweet potatoes with a rich taste, perfect for roasting, soups and snacks.',                       image: 'images/sweetpatato.png',             prices: { '250g': 35, '500g': 65,  '1kg': 120 } },
+  garlic:         { title: 'Garlic (लहसुन)',                subtitle: 'Strong aroma, rich flavour',           description: 'Fresh garlic cloves that build the base of countless flavorful dishes.',                               image: 'images/garlic.png',                  prices: { '250g': 25, '500g': 45,  '1kg': 80  } },
+  pointgourd:     { title: 'Pointed Gourd (परवल)',          subtitle: 'Tender and traditional',               description: 'Soft, mild pointed gourd favourite in everyday Indian kitchen cooking.',                              image: 'images/pointgourd-परवल.png',         prices: { '250g': 30, '500g': 55,  '1kg': 95  } },
+  tinda:          { title: 'Tinda (टिंडा)',                 subtitle: 'Light, subtle and healthy',            description: 'Fresh tinda with a gentle flavour and smooth texture for simple home recipes.',                        image: 'images/tinda.png',                   prices: { '250g': 32, '500g': 58,  '1kg': 105 } },
+  ginger:         { title: 'Ginger (अदरक)',                 subtitle: 'Pungent, warm and aromatic',           description: 'Fresh ginger used for curries, tea, pickles and many comforting dishes.',                             image: 'images/ginger.png',                  prices: { '250g': 35, '500g': 60,  '1kg': 110 } },
+  broccli:        { title: 'Broccoli (ब्रोकोली)',           subtitle: 'Fresh and nutrient-rich',              description: 'Healthy broccoli heads packed with crunch, colour and excellent taste.',                               image: 'images/broccli.png',                 prices: { '250g': 45, '500g': 80,  '1kg': 150 } },
+  capsicum:       { title: 'Capsicum (शिमला मिर्च)',        subtitle: 'Sweet, colourful and crunchy',         description: 'Fresh capsicum for stir-fries, curries, wraps and vibrant salads.',                                   image: 'images/capsicum.png',                prices: { '250g': 40, '500g': 70,  '1kg': 130 } },
+  corn:           { title: 'Corn (मक्का)',                  subtitle: 'Sweet and naturally satisfying',       description: 'Tender corn cobs and kernels with a bright sweetness for snacks and meals.',                         image: 'images/corn.png',                    prices: { '250g': 35, '500g': 60,  '1kg': 110 } },
+  jackfruit:      { title: 'Jackfruit (कटहल)',              subtitle: 'Unique texture and rich taste',        description: 'Fresh jackfruit pieces for savoury curries, kebabs and hearty meal preparations.',                    image: 'images/jackfruit.png',               prices: { '250g': 50, '500g': 90,  '1kg': 170 } },
+  masroom:        { title: 'Mushroom (मशरूम)',              subtitle: 'Earthy, juicy and savoury',            description: 'Plump mushroom pieces perfect for gravies, stir-fries and special dinners.',                         image: 'images/masroom.png',                 prices: { '250g': 55, '500g': 95,  '1kg': 180 } },
+  peas:           { title: 'Peas (मटर)',                    subtitle: 'Green, sweet and wholesome',           description: 'Fresh peas for curries, pulao, soups and healthy everyday meals.',                                   image: 'images/peas.png',                    prices: { '250g': 35, '500g': 60,  '1kg': 110 } }
 };
 
 const STORAGE_KEYS = {
@@ -54,18 +54,31 @@ const exportProductsButton = document.getElementById('export-products');
 const selectedProductIds = new Set();
 
 function normalizeProduct(product, key) {
+  const prodKey = key || product.key || product.id;
+  const catalogItem = productCatalog[prodKey] || {};
+
+  let title = product.title || catalogItem.title || '';
+  if ((title.includes('?') || !title) && catalogItem.title) {
+    title = catalogItem.title;
+  }
+
+  let image = product.image || catalogItem.image || 'images/vegback.png';
+  if ((image.includes('?') || !image) && catalogItem.image) {
+    image = catalogItem.image;
+  }
+
   return {
-    id: product.id || key,
-    key: key || product.key || product.id,
-    title: product.title || '',
-    description: product.description || '',
-    image: product.image || 'images/vegback.png',
+    id: product.id || prodKey,
+    key: prodKey,
+    title,
+    description: product.description || catalogItem.description || '',
+    image,
     category: product.category || 'Vegetables',
     available: typeof product.available === 'boolean' ? product.available : true,
     prices: {
-      '250g': Number(product.prices?.['250g']) || 0,
-      '500g': Number(product.prices?.['500g']) || 0,
-      '1kg': Number(product.prices?.['1kg']) || 0
+      '250g': Number(product.prices?.['250g'] ?? catalogItem.prices?.['250g']) || 0,
+      '500g': Number(product.prices?.['500g'] ?? catalogItem.prices?.['500g']) || 0,
+      '1kg': Number(product.prices?.['1kg'] ?? catalogItem.prices?.['1kg']) || 0
     }
   };
 }
@@ -74,10 +87,14 @@ function getSavedProducts() {
   const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.products) || 'null');
 
   if (saved && saved.length) {
-    return saved.map((product, index) => normalizeProduct(product, product.key || product.id || index));
+    const healed = saved.map((product, index) => normalizeProduct(product, product.key || product.id || index));
+    saveProducts(healed);
+    return healed;
   }
 
-  return Object.entries(productCatalog).map(([key, product]) => normalizeProduct({ ...product, category: 'Vegetables' }, key));
+  const initial = Object.entries(productCatalog).map(([key, product]) => normalizeProduct({ ...product, category: 'Vegetables' }, key));
+  saveProducts(initial);
+  return initial;
 }
 
 function saveProducts(products) {
@@ -148,6 +165,30 @@ function getSavedOrders() {
 
 function saveOrders(orders) {
   localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(orders));
+}
+
+async function loadOrdersFromBackend() {
+  try {
+    const data = await apiRequest('/api/orders');
+
+    if (Array.isArray(data.orders)) {
+      const normalizedOrders = data.orders.map((order) => ({
+        ...order,
+        id: order.id || order._id,
+        customer: order.customer || 'Guest Customer',
+        mobile: order.mobile || '',
+        address: order.address || '',
+        email: order.email || ''
+      }));
+
+      saveOrders(normalizedOrders);
+      return normalizedOrders;
+    }
+  } catch (error) {
+    console.warn('Unable to sync orders from backend:', error.message);
+  }
+
+  return getSavedOrders();
 }
 
 function buildCategoryOptions(products) {
@@ -223,9 +264,9 @@ function renderProducts() {
           ${product.available === false ? 'Not available' : 'Available'}
         </div>
         <div class="product-prices">
-          <span>250g: ?${product.prices['250g'] || 0}</span>
-          <span>500g: ?${product.prices['500g'] || 0}</span>
-          <span>1kg: ?${product.prices['1kg'] || 0}</span>
+          <span>250g: ₹${product.prices['250g'] || 0}</span>
+          <span>500g: ₹${product.prices['500g'] || 0}</span>
+          <span>1kg: ₹${product.prices['1kg'] || 0}</span>
         </div>
       </div>
 
@@ -245,16 +286,29 @@ function renderOrders() {
     return;
   }
 
-  orderList.innerHTML = orders.map((order) => `
-    <div class="order-item">
-      <div class="order-meta">
-        <h3>${order.id}</h3>
-        <p>Customer: ${order.customer}</p>
-        <small>Total: ?${order.total}</small>
+  orderList.innerHTML = orders.map((order) => {
+    const orderId = order.id || order._id || order.orderId || 'Unknown';
+    const itemsText = Array.isArray(order.items) && order.items.length
+      ? order.items.map((item) => `${item.name} × ${item.quantity}`).join(', ')
+      : 'No items listed';
+
+    return `
+      <div class="order-item">
+        <div class="order-meta">
+          <h3>${orderId}</h3>
+          <p><strong>Customer:</strong> ${order.customer || 'Guest Customer'}</p>
+          <p><strong>Mobile:</strong> ${order.mobile || 'Not provided'}</p>
+          <p><strong>Address:</strong> ${order.address || 'Not provided'}</p>
+          <p><strong>Items:</strong> ${itemsText}</p>
+          <small>Total: ₹${order.total || 0}</small>
+        </div>
+
+        <div class="order-side">
+          <span class="order-status ${order.status ? order.status.toLowerCase().replace(/\s+/g, '-') : 'packed'}">${order.status || 'Packed'}</span>
+        </div>
       </div>
-      <span class="order-status">${order.status}</span>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function populateForm(product) {
@@ -403,8 +457,64 @@ categoryFilterInput?.addEventListener('change', renderProducts);
 bulkDeleteButton?.addEventListener('click', handleBulkDelete);
 exportProductsButton?.addEventListener('click', handleExportProducts);
 
+/* ─── Store Open / Close Feature ─────────────────────────── */
+async function loadStoreStatus() {
+  const badge = document.getElementById('store-badge');
+  const label = document.getElementById('store-status-label');
+  const btn = document.getElementById('store-toggle-btn');
+
+  let isOpen = true;
+
+  try {
+    const data = await apiRequest('/api/settings/store-status');
+    if (data && typeof data.isOpen === 'boolean') {
+      isOpen = data.isOpen;
+    }
+  } catch (err) {
+    const stored = localStorage.getItem('vegetable-mart-store-open');
+    isOpen = stored !== 'false';
+  }
+
+  localStorage.setItem('vegetable-mart-store-open', isOpen ? 'true' : 'false');
+
+  if (isOpen) {
+    badge.textContent = '● OPEN';
+    badge.className = 'store-badge store-open';
+    label.textContent = 'Website abhi khuli hai — customers order kar sakte hain';
+    btn.textContent = 'Website Band Karo';
+    btn.className = 'store-toggle-btn store-close-btn';
+  } else {
+    badge.textContent = '● CLOSED';
+    badge.className = 'store-badge store-closed';
+    label.textContent = 'Website band hai — customers order nahi kar sakte';
+    btn.textContent = 'Website Kholo';
+    btn.className = 'store-toggle-btn store-open-btn';
+  }
+}
+
+async function toggleStoreStatus() {
+  const currentIsOpen = localStorage.getItem('vegetable-mart-store-open') !== 'false';
+  const newIsOpen = !currentIsOpen;
+
+  try {
+    await apiRequest('/api/settings/store-status', {
+      method: 'PUT',
+      body: JSON.stringify({ isOpen: newIsOpen })
+    });
+  } catch (err) {
+    console.warn('Could not update store status on server:', err.message);
+  }
+
+  localStorage.setItem('vegetable-mart-store-open', newIsOpen ? 'true' : 'false');
+  await loadStoreStatus();
+}
+
+document.getElementById('store-toggle-btn')?.addEventListener('click', toggleStoreStatus);
+
 async function initializeAdminPage() {
   await loadProductsFromBackend();
+  await loadOrdersFromBackend();
+  await loadStoreStatus();
   renderProducts();
   renderOrders();
 }
