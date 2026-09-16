@@ -44,7 +44,18 @@ const productImages = {
   corn: "images/corn.png",
   jackfruit: "images/jackfruit.png",
   masroom: "images/masroom.png",
-  peas: "images/peas.png"
+  peas: "images/peas.png",
+  beans: "images/beans.jpeg",
+  chotebaingan: "images/chotebaingan.jpeg",
+  redcarrot: "images/gajar.jpeg",
+  kachri: "images/kachri.jpeg",
+  lemon: "images/lemon.jpeg",
+  motimirch: "images/motimirch.jpeg",
+  oldginger: "images/oldginger.jpeg",
+  starfruit: "images/starfruit.jpeg",
+  taroroot: "images/taroroot.jpeg",
+  tikhimirchi: "images/tikhimirchi.jpeg",
+  torai: "images/torai.jpeg"
 };
 const productLabels = {
   patato: "Potato (आलू)", tomato: "Tomato (टमाटर)", brownonion: "Brown Onion (सफेद प्याज़)", redonion: "Red Onion (लाल प्याज़)",
@@ -54,7 +65,18 @@ const productLabels = {
   fenugreekleaves: "Fenugreek Leaves (मेथी)", mustardgreens: "Mustard Greens (सरसों का साग)", corianderleaves: "Coriander Leaves (धनिया पत्ती)",
   mint: "Mint (पुदीना)", bathua: "Bathua (बथुआ)", radish: "Radish (मूली)", beetroot: "Beetroot (चुकंदर)", sweetpotato: "Sweet Potato (शकरकंद)",
   garlic: "Garlic (लहसुन)", pointgourd: "Pointed Gourd (परवल)", tinda: "Tinda (टिंडा)", ginger: "Ginger (अदरक)",
-  broccli: "Broccoli (ब्रोकोली)", capsicum: "Capsicum (शिमला मिर्च)", corn: "Corn (मक्का)", jackfruit: "Jackfruit (कटहल)", masroom: "Mushroom (मशरूम)", peas: "Peas (मटर)"
+  broccli: "Broccoli (ब्रोकोली)", capsicum: "Capsicum (शिमला मिर्च)", corn: "Corn (मक्का)", jackfruit: "Jackfruit (कटहल)", masroom: "Mushroom (मशरूम)", peas: "Peas (मटर)",
+  beans: "French Beans (बीन्स)",
+  chotebaingan: "Small Brinjal (छोटे बैंगन)",
+  redcarrot: "Red Carrot (देसी गाजर)",
+  kachri: "Kachri (काचरी)",
+  lemon: "Lemon (नींबू)",
+  motimirch: "Moti Mirch (मोटी मिर्च)",
+  oldginger: "Old Ginger (पुरानी अदरक)",
+  starfruit: "Star Fruit (कमरख)",
+  taroroot: "Taro Root (अरबी)",
+  tikhimirchi: "Spicy Chilli (तीखी मिर्च)",
+  torai: "Torai / Tori (तोरई)"
 };
 const productHinglish = {
   patato: "aloo aaloo aalu", tomato: "tamatar", brownonion: "safed pyaz safed pyaaz", redonion: "lal pyaz lal pyaaz",
@@ -64,7 +86,18 @@ const productHinglish = {
   fenugreekleaves: "methi", mustardgreens: "sarson ka saag", corianderleaves: "dhaniya patti",
   mint: "pudina", bathua: "bathua", radish: "mooli", beetroot: "chukandar", sweetpotato: "shakarkand",
   garlic: "lahsun lehsun", pointgourd: "parwal", tinda: "tinda", ginger: "adrak",
-  broccli: "broccoli", capsicum: "shimla mirch", corn: "makai bhutta", jackfruit: "kathal", masroom: "mushroom", peas: "matar"
+  broccli: "broccoli", capsicum: "shimla mirch", corn: "makai bhutta", jackfruit: "kathal", masroom: "mushroom", peas: "matar",
+  beans: "beans french beans fali faliyaan",
+  chotebaingan: "chote baingan baigan chota baingan",
+  redcarrot: "desi gajar lal gajar gajar",
+  kachri: "kachri kachari rajasthani kachri",
+  lemon: "lemon nimbu neembu",
+  motimirch: "moti mirch achari mirch bhavnagri mirchi",
+  oldginger: "old ginger purani adrak sonth saunth",
+  starfruit: "star fruit kamrakh starfruit",
+  taroroot: "taro root arbi arvi ghuiya",
+  tikhimirchi: "tikhi mirchi teekhi hari mirch spicy chilli",
+  torai: "torai tori turiya ridge gourd"
 };
 
 const product1KgPrices = {
@@ -75,7 +108,7 @@ const product1KgPrices = {
   fenugreekleaves: 80, mustardgreens: 80, corianderleaves: 65,
   mint: 65, bathua: 70, radish: 70, beetroot: 100, sweetpotato: 120,
   garlic: 80, pointgourd: 95, tinda: 105, ginger: 110,
-  broccli: 150, capsicum: 130, corn: 110, jackfruit: 170, masroom: 180, peas: 110
+  broccli: 150, capsicum: 130, corn: 110, jackfruit: 170, masroom: 180, peas: 110,   beans: 90,   chotebaingan: 80,   redcarrot: 70,   kachri: 100,   lemon: 120,   motimirch: 80,   oldginger: 160,   starfruit: 140,   taroroot: 90,   tikhimirchi: 100,   torai: 70
 };
 
 function getSavedAdminProducts() {
@@ -87,47 +120,72 @@ function getSavedAdminProducts() {
   }
 }
 
-function syncProduct1KgPrices() {
-  const savedProducts = getSavedAdminProducts();
-
-  if (!savedProducts.length) {
-    return;
-  }
-
-  savedProducts.forEach((product) => {
-    const key = product.key;
-    if (key && product.prices && typeof product.prices['1kg'] !== 'undefined') {
-      product1KgPrices[key] = Number(product.prices['1kg']) || product1KgPrices[key];
+function updateCardPriceButtons() {
+  document.querySelectorAll(".product").forEach(product => {
+    const cartButton = product.querySelector("button[onclick^=\"addToCart\"]");
+    if (!cartButton) return;
+    const match = cartButton.getAttribute("onclick").match(/addToCart\('([^']+)'/);
+    if (!match) return;
+    const key = match[1];
+    const infoButton = product.querySelectorAll(".buttons button")[1];
+    if (infoButton && product1KgPrices[key]) {
+      infoButton.textContent = `₹${product1KgPrices[key]} / 1kg`;
     }
   });
+}
+
+function applySavedPrices(savedProducts) {
+  if (!savedProducts || !savedProducts.length) return;
+  savedProducts.forEach((product) => {
+    const key = product.key || product.id;
+    if (key && product.prices && typeof product.prices['1kg'] !== 'undefined') {
+      const p = Number(product.prices['1kg']);
+      if (p > 0) product1KgPrices[key] = p;
+    }
+  });
+  updateCardPriceButtons();
+}
+
+async function syncProduct1KgPrices() {
+  const localSaved = getSavedAdminProducts();
+  applySavedPrices(localSaved);
+
+  try {
+    const res = await fetch('http://localhost:5000/api/products');
+    const data = await res.json();
+    if (res.ok && Array.isArray(data.products) && data.products.length > 0) {
+      applySavedPrices(data.products);
+      localStorage.setItem('vegetable-mart-admin-products', JSON.stringify(data.products));
+    }
+  } catch (e) {}
 }
 
 function addToCart(name, price, image) {
   const storeOpen = localStorage.getItem('vegetable-mart-store-open');
   if (storeOpen === 'false') { showStoreClosedPopup(); return; }
 
-    const finalPrice = product1KgPrices[name] || Number(price) || 0;
-    let existingProduct = cart.find(item => item.name === name && (!item.weight || item.weight === '1kg'));
+  const finalPrice = product1KgPrices[name] || Number(price) || 0;
+  let existingProduct = cart.find(item => item.name === name && (!item.weight || item.weight === '1kg'));
 
-    if (existingProduct) {
-        existingProduct.quantity++;
-      existingProduct.image = existingProduct.image || image || productImages[name];
-      existingProduct.price = finalPrice;
-      existingProduct.weight = '1kg';
-    } else {
-        cart.push({
-            name: name,
-            price: finalPrice,
-        image: image || productImages[name],
-            quantity: 1,
-            weight: '1kg'
-        });
-    }
+  if (existingProduct) {
+    existingProduct.quantity++;
+    existingProduct.image = existingProduct.image || image || productImages[name];
+    existingProduct.price = finalPrice;
+    existingProduct.weight = '1kg';
+  } else {
+    cart.push({
+      name: name,
+      price: finalPrice,
+      image: image || productImages[name],
+      quantity: 1,
+      weight: '1kg'
+    });
+  }
 
-    saveCart();
-    updateCartCount();
+  saveCart();
+  updateCartCount();
 
-    showCartToast(name);
+  showCartToast(name);
 }
 
 function showCartToast(name) {
@@ -136,6 +194,7 @@ function showCartToast(name) {
 
 function showToast(message) {
   const toast = document.getElementById("cart-toast");
+  if (!toast) return;
   toast.innerHTML = `<span class="toast-check">✔</span><span>${message}</span>`;
   toast.classList.remove("toast-hide");
   toast.classList.add("toast-show");
@@ -147,9 +206,8 @@ function showToast(message) {
   }, 2600);
 }
 
-
 function saveCart() {
-    localStorage.setItem("cart", JSON.stringify(cart));
+  localStorage.setItem("cart", JSON.stringify(cart));
 }
 
 function addToWishlist(name, price, image) {
@@ -164,16 +222,13 @@ function addToWishlist(name, price, image) {
   }
 }
 
-
 function updateCartCount() {
-
-    let count = 0;
-
-    cart.forEach(item => {
-        count += item.quantity;
-    });
-
-    document.getElementById("nav-cart-count").innerText = count;
+  let count = 0;
+  cart.forEach(item => {
+    count += item.quantity;
+  });
+  const countEl = document.getElementById("nav-cart-count");
+  if (countEl) countEl.innerText = count;
 }
 
 let activeCategory = 'all';
@@ -354,7 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <p class="section-kicker">From our farm to you</p>
       <h2>Shop fresh picks</h2>
     </div>
-    <span class="product-count">34 fresh choices</span>
+    <span class="product-count">45 fresh choices</span>
   </div>
 
     <div class="products" id="products">
@@ -663,6 +718,105 @@ document.addEventListener("DOMContentLoaded", () => {
                  <button>More info</button>
                </div>
                </div>
+
+                <!-- BEANS -->
+                <div class="product" data-category="hari-sabzi">
+                <div class="beans"></div>
+                <div class="buttons">
+                  <button onclick="addToCart('beans', 28)">Add To Cart</button>
+                  <button>More info</button>
+                </div>
+                </div>
+
+                <!-- CHOTEBAINGAN -->
+                <div class="product" data-category="hari-sabzi">
+                <div class="chotebaingan"></div>
+                <div class="buttons">
+                  <button onclick="addToCart('chotebaingan', 25)">Add To Cart</button>
+                  <button>More info</button>
+                </div>
+                </div>
+
+                <!-- REDCARROT -->
+                <div class="product" data-category="jad">
+                <div class="redcarrot"></div>
+                <div class="buttons">
+                  <button onclick="addToCart('redcarrot', 22)">Add To Cart</button>
+                  <button>More info</button>
+                </div>
+                </div>
+
+                <!-- KACHRI -->
+                <div class="product" data-category="fruits">
+                <div class="kachri"></div>
+                <div class="buttons">
+                  <button onclick="addToCart('kachri', 30)">Add To Cart</button>
+                  <button>More info</button>
+                </div>
+                </div>
+
+                <!-- LEMON -->
+                <div class="product" data-category="masale">
+                <div class="lemon"></div>
+                <div class="buttons">
+                  <button onclick="addToCart('lemon', 35)">Add To Cart</button>
+                  <button>More info</button>
+                </div>
+                </div>
+
+                <!-- MOTIMIRCH -->
+                <div class="product" data-category="masale">
+                <div class="motimirch"></div>
+                <div class="buttons">
+                  <button onclick="addToCart('motimirch', 25)">Add To Cart</button>
+                  <button>More info</button>
+                </div>
+                </div>
+
+                <!-- OLDGINGER -->
+                <div class="product" data-category="masale">
+                <div class="oldginger"></div>
+                <div class="buttons">
+                  <button onclick="addToCart('oldginger', 45)">Add To Cart</button>
+                  <button>More info</button>
+                </div>
+                </div>
+
+                <!-- STARFRUIT -->
+                <div class="product" data-category="fruits">
+                <div class="starfruit"></div>
+                <div class="buttons">
+                  <button onclick="addToCart('starfruit', 40)">Add To Cart</button>
+                  <button>More info</button>
+                </div>
+                </div>
+
+                <!-- TAROROOT -->
+                <div class="product" data-category="jad">
+                <div class="taroroot"></div>
+                <div class="buttons">
+                  <button onclick="addToCart('taroroot', 28)">Add To Cart</button>
+                  <button>More info</button>
+                </div>
+                </div>
+
+                <!-- TIKHIMIRCHI -->
+                <div class="product" data-category="masale">
+                <div class="tikhimirchi"></div>
+                <div class="buttons">
+                  <button onclick="addToCart('tikhimirchi', 30)">Add To Cart</button>
+                  <button>More info</button>
+                </div>
+                </div>
+
+                <!-- TORAI -->
+                <div class="product" data-category="hari-sabzi">
+                <div class="torai"></div>
+                <div class="buttons">
+                  <button onclick="addToCart('torai', 22)">Add To Cart</button>
+                  <button>More info</button>
+                </div>
+                </div>
 
                
 

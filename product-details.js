@@ -34,7 +34,18 @@ const productImages = {
   corn: "images/corn.png",
   jackfruit: "images/jackfruit.png",
   masroom: "images/masroom.png",
-  peas: "images/peas.png"
+  peas: "images/peas.png",
+  torai: "images/torai.jpeg",
+  tikhimirchi: "images/tikhimirchi.jpeg",
+  taroroot: "images/taroroot.jpeg",
+  starfruit: "images/starfruit.jpeg",
+  oldginger: "images/oldginger.jpeg",
+  motimirch: "images/motimirch.jpeg",
+  lemon: "images/lemon.jpeg",
+  kachri: "images/kachri.jpeg",
+  redcarrot: "images/gajar.jpeg",
+  chotebaingan: "images/chotebaingan.jpeg",
+  beans: "images/beans.jpeg",
 };
 
 const productCatalog = {
@@ -242,6 +253,73 @@ const productCatalog = {
     description: "Fresh peas for curries, pulao, soups and healthy everyday meals.",
     prices: { "250g": 35, "500g": 60, "1kg": 110 }
   }
+,
+  beans: {
+    title: "French Beans (बीन्स)",
+    subtitle: "Crisp and tender green beans",
+    description: "Fresh green beans packed with vitamins, perfect for stir-fries, curries and sabzi.",
+    prices: { "250g": 28, "500g": 50, "1kg": 90 }
+  },
+  chotebaingan: {
+    title: "Small Brinjal (छोटे बैंगन)",
+    subtitle: "Tender baby eggplants",
+    description: "Small purple brinjals ideal for bharwa baingan, spicy curries and home cooking.",
+    prices: { "250g": 25, "500g": 45, "1kg": 80 }
+  },
+  redcarrot: {
+    title: "Red Carrot (देसी गाजर)",
+    subtitle: "Sweet, juicy winter carrots",
+    description: "Naturally sweet red carrots best suited for gajar ka halwa, fresh salads and healthy juices.",
+    prices: { "250g": 22, "500g": 40, "1kg": 70 }
+  },
+  kachri: {
+    title: "Kachri (काचरी)",
+    subtitle: "Tangy and aromatic wild melon",
+    description: "Traditional desi kachri used for authentic Rajasthani sabzi, spicy chutneys and curries.",
+    prices: { "250g": 30, "500g": 55, "1kg": 100 }
+  },
+  lemon: {
+    title: "Lemon (नींबू)",
+    subtitle: "Juicy and refreshing citrus",
+    description: "Fresh juicy lemons rich in Vitamin C for dressings, beverages, salads and everyday zest.",
+    prices: { "250g": 35, "500g": 65, "1kg": 120 }
+  },
+  motimirch: {
+    title: "Moti Mirch (मोटी मिर्च)",
+    subtitle: "Mild heat, great for stuffing",
+    description: "Bhavnagri thick green chillies perfect for pakodas, achar, besan mirch and stuffed delicacies.",
+    prices: { "250g": 25, "500g": 45, "1kg": 80 }
+  },
+  oldginger: {
+    title: "Old Ginger (पुरानी अदरक)",
+    subtitle: "Intense flavour and herbal warmth",
+    description: "Mature ginger with concentrated aroma and spice, ideal for kadha, chai, curries and medicinal teas.",
+    prices: { "250g": 45, "500g": 85, "1kg": 160 }
+  },
+  starfruit: {
+    title: "Star Fruit (कमरख)",
+    subtitle: "Sweet, sour and crisp",
+    description: "Unique star-shaped fruit with a refreshing tangy crunch, great for chaat, pickles and fresh snacking.",
+    prices: { "250g": 40, "500g": 75, "1kg": 140 }
+  },
+  taroroot: {
+    title: "Taro Root (अरबी)",
+    subtitle: "Earthy, starchy and satisfying",
+    description: "Nutritious arbi roots that turn delicious and crispy when fried, roasted or simmered in masala gravy.",
+    prices: { "250g": 28, "500g": 50, "1kg": 90 }
+  },
+  tikhimirchi: {
+    title: "Spicy Chilli (तीखी मिर्च)",
+    subtitle: "Fiery and pungent heat",
+    description: "Extra spicy slender green chillies to give a fiery kick to tadkas, chutneys, snacks and curries.",
+    prices: { "250g": 30, "500g": 55, "1kg": 100 }
+  },
+  torai: {
+    title: "Torai / Tori (तोरई)",
+    subtitle: "Light, healthy and cooling",
+    description: "Tender ridge gourd that cooks quickly into a wholesome, digestive and light vegetable curry.",
+    prices: { "250g": 22, "500g": 40, "1kg": 70 }
+  }
 };
 
 const fallbackKeys = Object.keys(productCatalog);
@@ -348,15 +426,17 @@ async function loadProductsFromBackend() {
     const response = await fetch(`${API_BASE}/api/products`);
     const data = await response.json();
 
-    if (!response.ok || !Array.isArray(data.products)) {
+    if (!response.ok || !Array.isArray(data.products) || data.products.length === 0) {
       return getSavedProducts();
     }
 
     const normalizedProducts = data.products.map((product) => ({
       ...product,
+      id: product._id || product.id || product.key,
       key: product.key || product.id,
       available: product.available !== false,
-      image: product.image || productImages[product.key] || 'images/vegback.png'
+      image: product.image || productImages[product.key] || 'images/vegback.png',
+      prices: product.prices || (productCatalog[product.key] ? productCatalog[product.key].prices : { '250g': 0, '500g': 0, '1kg': 0 })
     }));
 
     localStorage.setItem('vegetable-mart-admin-products', JSON.stringify(normalizedProducts));

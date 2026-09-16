@@ -624,6 +624,28 @@ body{
 .masroom { background-image: url(images/masroom.png); }
 .peas { background-image: url(images/peas.png); }
 
+/* 11 New fresh picks */
+.beans, .chotebaingan, .redcarrot, .kachri, .lemon, .motimirch, .oldginger, .starfruit, .taroroot, .tikhimirchi, .torai {
+    border: 2px solid blue;
+    height: 200px;
+    width: 200px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+.beans { background-image: url(images/beans.jpeg); }
+.chotebaingan { background-image: url(images/chotebaingan.jpeg); }
+.redcarrot { background-image: url(images/gajar.jpeg); }
+.kachri { background-image: url(images/kachri.jpeg); }
+.lemon { background-image: url(images/lemon.jpeg); }
+.motimirch { background-image: url(images/motimirch.jpeg); }
+.oldginger { background-image: url(images/oldginger.jpeg); }
+.starfruit { background-image: url(images/starfruit.jpeg); }
+.taroroot { background-image: url(images/taroroot.jpeg); }
+.tikhimirchi { background-image: url(images/tikhimirchi.jpeg); }
+.torai { background-image: url(images/torai.jpeg); }
+
+
 
 
 

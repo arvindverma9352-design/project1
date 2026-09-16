@@ -8,7 +8,18 @@ const productLabels = {
     fenugreekleaves: "Fenugreek Leaves (मेथी)", mustardgreens: "Mustard Greens (सरसों का साग)", corianderleaves: "Coriander Leaves (धनिया पत्ती)",
     mint: "Mint (पुदीना)", bathua: "Bathua (बथुआ)", radish: "Radish (मूली)", beetroot: "Beetroot (चुकंदर)", sweetpotato: "Sweet Potato (शकरकंद)",
     garlic: "Garlic (लहसुन)", pointgourd: "Pointed Gourd (परवल)", tinda: "Tinda (टिंडा)", ginger: "Ginger (अदरक)",
-    broccli: "Broccoli (ब्रोकोली)", capsicum: "Capsicum (शिमला मिर्च)", corn: "Corn (मक्का)", jackfruit: "Jackfruit (कटहल)", masroom: "Mushroom (मशरूम)", peas: "Peas (मटर)"
+    broccli: "Broccoli (ब्रोकोली)", capsicum: "Capsicum (शिमला मिर्च)", corn: "Corn (मक्का)", jackfruit: "Jackfruit (कटहल)", masroom: "Mushroom (मशरूम)", peas: "Peas (मटर)",
+    beans: "French Beans (बीन्स)",
+    chotebaingan: "Small Brinjal (छोटे बैंगन)",
+    redcarrot: "Red Carrot (देसी गाजर)",
+    kachri: "Kachri (काचरी)",
+    lemon: "Lemon (नींबू)",
+    motimirch: "Moti Mirch (मोटी मिर्च)",
+    oldginger: "Old Ginger (पुरानी अदरक)",
+    starfruit: "Star Fruit (कमरख)",
+    taroroot: "Taro Root (अरबी)",
+    tikhimirchi: "Spicy Chilli (तीखी मिर्च)",
+    torai: "Torai / Tori (तोरई)"
 };
 
 function getCurrentUser() {

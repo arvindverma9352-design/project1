@@ -32,7 +32,18 @@ const productCatalog = {
   corn:           { title: 'Corn (मक्का)',                  subtitle: 'Sweet and naturally satisfying',       description: 'Tender corn cobs and kernels with a bright sweetness for snacks and meals.',                         image: 'images/corn.png',                    prices: { '250g': 35, '500g': 60,  '1kg': 110 } },
   jackfruit:      { title: 'Jackfruit (कटहल)',              subtitle: 'Unique texture and rich taste',        description: 'Fresh jackfruit pieces for savoury curries, kebabs and hearty meal preparations.',                    image: 'images/jackfruit.png',               prices: { '250g': 50, '500g': 90,  '1kg': 170 } },
   masroom:        { title: 'Mushroom (मशरूम)',              subtitle: 'Earthy, juicy and savoury',            description: 'Plump mushroom pieces perfect for gravies, stir-fries and special dinners.',                         image: 'images/masroom.png',                 prices: { '250g': 55, '500g': 95,  '1kg': 180 } },
-  peas:           { title: 'Peas (मटर)',                    subtitle: 'Green, sweet and wholesome',           description: 'Fresh peas for curries, pulao, soups and healthy everyday meals.',                                   image: 'images/peas.png',                    prices: { '250g': 35, '500g': 60,  '1kg': 110 } }
+  peas:           { title: 'Peas (मटर)',                    subtitle: 'Green, sweet and wholesome',           description: 'Fresh peas for curries, pulao, soups and healthy everyday meals.',                                   image: 'images/peas.png',                    prices: { '250g': 35, '500g': 60,  '1kg': 110 } },
+  beans           : { title: 'French Beans (बीन्स)', subtitle: 'Crisp and tender green beans', description: 'Fresh green beans packed with vitamins, perfect for stir-fries, curries and sabzi.', image: 'images/beans.jpeg', prices: { '250g': 28, '500g': 50, '1kg': 90 } },
+  chotebaingan    : { title: 'Small Brinjal (छोटे बैंगन)', subtitle: 'Tender baby eggplants', description: 'Small purple brinjals ideal for bharwa baingan, spicy curries and home cooking.', image: 'images/chotebaingan.jpeg', prices: { '250g': 25, '500g': 45, '1kg': 80 } },
+  redcarrot       : { title: 'Red Carrot (देसी गाजर)', subtitle: 'Sweet, juicy winter carrots', description: 'Naturally sweet red carrots best suited for gajar ka halwa, fresh salads and healthy juices.', image: 'images/gajar.jpeg', prices: { '250g': 22, '500g': 40, '1kg': 70 } },
+  kachri          : { title: 'Kachri (काचरी)', subtitle: 'Tangy and aromatic wild melon', description: 'Traditional desi kachri used for authentic Rajasthani sabzi, spicy chutneys and curries.', image: 'images/kachri.jpeg', prices: { '250g': 30, '500g': 55, '1kg': 100 } },
+  lemon           : { title: 'Lemon (नींबू)', subtitle: 'Juicy and refreshing citrus', description: 'Fresh juicy lemons rich in Vitamin C for dressings, beverages, salads and everyday zest.', image: 'images/lemon.jpeg', prices: { '250g': 35, '500g': 65, '1kg': 120 } },
+  motimirch       : { title: 'Moti Mirch (मोटी मिर्च)', subtitle: 'Mild heat, great for stuffing', description: 'Bhavnagri thick green chillies perfect for pakodas, achar, besan mirch and stuffed delicacies.', image: 'images/motimirch.jpeg', prices: { '250g': 25, '500g': 45, '1kg': 80 } },
+  oldginger       : { title: 'Old Ginger (पुरानी अदरक)', subtitle: 'Intense flavour and herbal warmth', description: 'Mature ginger with concentrated aroma and spice, ideal for kadha, chai, curries and medicinal teas.', image: 'images/oldginger.jpeg', prices: { '250g': 45, '500g': 85, '1kg': 160 } },
+  starfruit       : { title: 'Star Fruit (कमरख)', subtitle: 'Sweet, sour and crisp', description: 'Unique star-shaped fruit with a refreshing tangy crunch, great for chaat, pickles and fresh snacking.', image: 'images/starfruit.jpeg', prices: { '250g': 40, '500g': 75, '1kg': 140 } },
+  taroroot        : { title: 'Taro Root (अरबी)', subtitle: 'Earthy, starchy and satisfying', description: 'Nutritious arbi roots that turn delicious and crispy when fried, roasted or simmered in masala gravy.', image: 'images/taroroot.jpeg', prices: { '250g': 28, '500g': 50, '1kg': 90 } },
+  tikhimirchi     : { title: 'Spicy Chilli (तीखी मिर्च)', subtitle: 'Fiery and pungent heat', description: 'Extra spicy slender green chillies to give a fiery kick to tadkas, chutneys, snacks and curries.', image: 'images/tikhimirchi.jpeg', prices: { '250g': 30, '500g': 55, '1kg': 100 } },
+  torai           : { title: 'Torai / Tori (तोरई)', subtitle: 'Light, healthy and cooling', description: 'Tender ridge gourd that cooks quickly into a wholesome, digestive and light vegetable curry.', image: 'images/torai.jpeg', prices: { '250g': 22, '500g': 40, '1kg': 70 } }
 };
 
 const STORAGE_KEYS = {
@@ -139,10 +150,14 @@ async function syncProductToBackend(product, method = 'POST') {
   if (!product) return;
 
   try {
-    const endpoint = method === 'POST' ? '/api/products' : `/api/products/${product.id}`;
+    const keyOrId = product.key || product.id;
+    const endpoint = method === 'POST' ? '/api/products' : `/api/products/${keyOrId}`;
 
     const options = {
       method,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       ...(method === 'POST' || method === 'PUT'
         ? { body: JSON.stringify(product) }
         : {})
