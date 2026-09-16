@@ -152,6 +152,9 @@ body{
 .delivery-input-group input::placeholder, .delivery-input-group textarea::placeholder { color: rgba(255, 255, 255, 0.45); }
 .delivery-input-group input:focus, .delivery-input-group textarea:focus { border-color: #b6d58e; background: rgba(255, 255, 255, 0.16); }
 .delivery-input-group textarea { resize: vertical; }
+.pincode-status-text { display: none; font-size: 12px; font-weight: 600; margin-top: 4px; border-radius: 6px; padding: 4px 8px; }
+.pincode-status-text.available { display: block; color: #155c3b; background: #eaf7ee; border: 1px solid #bce6c6; }
+.pincode-status-text.unavailable { display: block; color: #9c2727; background: #ffebeb; border: 1px solid #f8b4b4; }
 .empty-cart { padding: 55px 20px; border: 1px dashed #cbdcc5; border-radius: 14px; text-align: center; }
 .empty-icon { margin-bottom: 12px; font-size: 44px; animation: basketFloat 3s ease-in-out infinite; }
 .empty-cart h2 { margin: 0 0 7px; font-family: 'Space Grotesk', sans-serif; font-size: 22px; }

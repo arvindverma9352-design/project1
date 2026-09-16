@@ -52,6 +52,11 @@
                         <input type="tel" id="delivery-mobile" placeholder="10-digit mobile number" required>
                     </div>
                     <div class="delivery-input-group">
+                        <label for="delivery-pincode">Pincode (एरिया पिनकोड) *</label>
+                        <input type="text" id="delivery-pincode" placeholder="6-digit pincode" maxlength="6" required>
+                        <span id="pincode-status-text" class="pincode-status-text"></span>
+                    </div>
+                    <div class="delivery-input-group">
                         <label for="delivery-address">Delivery Address *</label>
                         <textarea id="delivery-address" rows="2" placeholder="House no, street, locality, city" required></textarea>
                     </div>

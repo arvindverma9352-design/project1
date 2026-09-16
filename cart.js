@@ -153,16 +153,77 @@ function getCurrentUser() {
         return null;
     }
 }
+// ─── Delivery Area / Pincode Lock (Option 1) ─────────────────
+// Aap in pincodes ko apne area ke hisaab se edit kar sakte hain
+const DEFAULT_ALLOWED_PINCODES = [
+    "301001"
+];
+
+function getAllowedPincodes() {
+    try {
+        const saved = localStorage.getItem('vegetable-mart-allowed-pincodes');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed.map(p => String(p).trim());
+            }
+        }
+    } catch (e) {}
+    return DEFAULT_ALLOWED_PINCODES;
+}
+
+function checkPincodeAvailability(pincode) {
+    const cleanPin = (pincode || '').toString().trim();
+    const statusEl = document.getElementById('pincode-status-text');
+    if (!statusEl) return false;
+
+    if (cleanPin.length < 6) {
+        statusEl.style.display = 'none';
+        return false;
+    }
+
+    const allowed = getAllowedPincodes();
+    const isAvailable = allowed.includes(cleanPin);
+
+    if (isAvailable) {
+        statusEl.textContent = '✅ Delivery is available in your area!';
+        statusEl.className = 'pincode-status-text available';
+        statusEl.style.display = 'block';
+        return true;
+    } else {
+        statusEl.textContent = '❌ Sorry, hum abhi is pincode par deliver nahi karte.';
+        statusEl.className = 'pincode-status-text unavailable';
+        statusEl.style.display = 'block';
+        return false;
+    }
+}
 
 function initDeliveryForm() {
     const currentUser = getCurrentUser();
     const nameInput = document.getElementById("delivery-name");
     const mobileInput = document.getElementById("delivery-mobile");
+    const pincodeInput = document.getElementById("delivery-pincode");
     const addressInput = document.getElementById("delivery-address");
+
+    if (pincodeInput) {
+        pincodeInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+            if (e.target.value.length === 6) {
+                checkPincodeAvailability(e.target.value);
+            } else {
+                const statusEl = document.getElementById('pincode-status-text');
+                if (statusEl) statusEl.style.display = 'none';
+            }
+        });
+    }
 
     if (currentUser) {
         if (nameInput && !nameInput.value) nameInput.value = currentUser.name || '';
         if (mobileInput && !mobileInput.value) mobileInput.value = currentUser.mobile || '';
+        if (pincodeInput && !pincodeInput.value && currentUser.pincode) {
+            pincodeInput.value = currentUser.pincode;
+            checkPincodeAvailability(currentUser.pincode);
+        }
         if (addressInput && !addressInput.value) addressInput.value = currentUser.address || '';
     }
 }
@@ -183,10 +244,12 @@ async function placeOrder() {
 
     const nameInput = document.getElementById("delivery-name");
     const mobileInput = document.getElementById("delivery-mobile");
+    const pincodeInput = document.getElementById("delivery-pincode");
     const addressInput = document.getElementById("delivery-address");
 
     const customerName = (nameInput ? nameInput.value : '').trim() || currentUser?.name || '';
     const customerMobile = (mobileInput ? mobileInput.value : '').trim() || currentUser?.mobile || '';
+    const customerPincode = (pincodeInput ? pincodeInput.value : '').trim();
     const customerAddress = (addressInput ? addressInput.value : '').trim() || currentUser?.address || '';
 
     if (!customerName) {
@@ -213,6 +276,33 @@ async function placeOrder() {
         return;
     }
 
+    // ── Pincode / Location Area Check ───────────────
+    if (!customerPincode) {
+        showToast('Please enter your area pincode');
+        orderMessage.innerText = 'Please enter your 6-digit area pincode.';
+        orderMessage.classList.add("is-visible");
+        pincodeInput?.focus();
+        return;
+    }
+
+    if (customerPincode.length !== 6) {
+        showToast('Please enter a valid 6-digit pincode');
+        orderMessage.innerText = 'Please enter a valid 6-digit pincode.';
+        orderMessage.classList.add("is-visible");
+        pincodeInput?.focus();
+        return;
+    }
+
+    const isAreaServiceable = checkPincodeAvailability(customerPincode);
+    if (!isAreaServiceable) {
+        showToast('Delivery not available in your area');
+        orderMessage.innerText = `Aapke area (Pincode: ${customerPincode}) me abhi delivery service uplabdh nahi hai. Kripya apna area check karein.`;
+        orderMessage.classList.add("is-visible");
+        pincodeInput?.focus();
+        return;
+    }
+    // ───────────────────────────────────────────────
+
     if (!customerAddress) {
         showToast('Please enter your delivery address');
         orderMessage.innerText = 'Please enter your delivery address.';
@@ -220,6 +310,8 @@ async function placeOrder() {
         addressInput?.focus();
         return;
     }
+
+    const fullDeliveryAddress = `${customerAddress} (Pincode: ${customerPincode})`;
 
     const orderItems = cart.map((item) => ({
         name: item.name,
@@ -238,7 +330,7 @@ async function placeOrder() {
             body: JSON.stringify({
                 customer: customerName,
                 mobile: customerMobile,
-                address: customerAddress,
+                address: fullDeliveryAddress,
                 email: currentUser?.email || '',
                 total,
                 items: orderItems
@@ -260,7 +352,7 @@ async function placeOrder() {
                 id: orderNumber,
                 customer: customerName,
                 mobile: customerMobile,
-                address: customerAddress,
+                address: fullDeliveryAddress,
                 email: currentUser?.email || '',
                 total,
                 status: 'Packed',
@@ -275,13 +367,14 @@ async function placeOrder() {
         if (currentUser) {
             currentUser.address = customerAddress;
             currentUser.mobile = customerMobile;
+            currentUser.pincode = customerPincode;
             sessionStorage.setItem('vegetable-mart-current-user', JSON.stringify(currentUser));
             if (localStorage.getItem('vegetable-mart-current-user')) {
                 localStorage.setItem('vegetable-mart-current-user', JSON.stringify(currentUser));
             }
         }
 
-        orderMessage.innerText = `Order #${orderNumber} placed successfully! Delivery to: ${customerAddress}`;
+        orderMessage.innerText = `Order #${orderNumber} placed successfully! Delivery to: ${fullDeliveryAddress}`;
         orderMessage.classList.add("is-visible");
         showToast(`Order placed successfully!`);
         cart = [];
