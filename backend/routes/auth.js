@@ -41,17 +41,30 @@ router.post('/signup', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    const { email, mobile, password } = req.body;
+    const { email, mobile, identifier, password } = req.body;
 
-    if ((!email && !mobile) || !password) {
+    let loginEmail = email ? email.toLowerCase().trim() : '';
+    let loginMobile = mobile ? String(mobile).trim() : '';
+
+    if (identifier) {
+      const cleanId = String(identifier).trim();
+      if (cleanId.includes('@')) {
+        loginEmail = cleanId.toLowerCase();
+      } else {
+        loginMobile = cleanId;
+      }
+    }
+
+    if ((!loginEmail && !loginMobile) || !password) {
       return res.status(400).json({ success: false, message: 'Email/mobile and password are required.' });
     }
 
+    const queryConditions = [];
+    if (loginEmail) queryConditions.push({ email: loginEmail });
+    if (loginMobile) queryConditions.push({ mobile: loginMobile });
+
     const user = await User.findOne({
-      $or: [
-        { email: email ? email.toLowerCase() : undefined },
-        { mobile: mobile || undefined }
-      ],
+      $or: queryConditions,
       password
     });
 
