@@ -477,8 +477,19 @@
         </div>
     </div>
 
-    <script>
         const USERS_KEY = 'vegetable-mart-users';
+        const CURRENT_USER_KEY = 'vegetable-mart-current-user';
+
+        // If already logged in, redirect to store immediately without history entry
+        const existing = localStorage.getItem(CURRENT_USER_KEY) || sessionStorage.getItem(CURRENT_USER_KEY);
+        if (existing) {
+            try {
+                const u = JSON.parse(existing);
+                if (u) {
+                    window.location.replace(u.role === 'admin' ? 'admin.html' : 'Af-lo-sin-.html');
+                }
+            } catch (e) {}
+        }
 
         function getUsers() {
             try {
@@ -595,10 +606,21 @@
                     role: 'customer'
                 });
 
-                setMessage(signupMessage, data.message || 'Signup successful! Redirecting to login...', 'success');
+                // Auto-login user permanently into localStorage
+                const userObj = {
+                    name: (data.user && data.user.name) || name,
+                    email: (data.user && data.user.email) || email,
+                    mobile: (data.user && data.user.mobile) || mobile,
+                    address: (data.user && data.user.address) || address,
+                    role: (data.user && data.user.role) || 'customer'
+                };
+                localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userObj));
+                sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userObj));
+
+                setMessage(signupMessage, 'Account created successfully! Taking you to the store...', 'success');
                 setTimeout(() => {
-                    window.location.href = 'formlogin.html';
-                }, 800);
+                    window.location.replace('Af-lo-sin-.html');
+                }, 600);
             } catch (error) {
                 setMessage(signupMessage, error.message, 'error');
             }

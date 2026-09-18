@@ -12,6 +12,19 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Vegetable Mart">
+    <script>
+        (function() {
+            try {
+                var raw = localStorage.getItem('vegetable-mart-current-user') || sessionStorage.getItem('vegetable-mart-current-user');
+                if (raw) {
+                    var user = JSON.parse(raw);
+                    if (user && user.email) {
+                        window.location.replace(user.role === 'admin' ? 'admin.html' : 'Af-lo-sin-.html');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
@@ -865,7 +878,7 @@
 
         const existingUser = getCurrentUser();
         if (existingUser) {
-            window.location.href = existingUser.role === 'admin' ? 'admin.html' : 'Af-lo-sin-.html';
+            window.location.replace(existingUser.role === 'admin' ? 'admin.html' : 'Af-lo-sin-.html');
         }
     </script>
     <script src="pwa-install.js"></script>

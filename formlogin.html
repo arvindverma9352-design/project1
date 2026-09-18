@@ -542,6 +542,29 @@
         const USERS_KEY = 'vegetable-mart-users';
         const CURRENT_USER_KEY = 'vegetable-mart-current-user';
 
+        function getCurrentUser() {
+            const localUser = localStorage.getItem(CURRENT_USER_KEY);
+            const sessionUser = sessionStorage.getItem(CURRENT_USER_KEY);
+            const rawUser = localUser || sessionUser;
+
+            try {
+                return rawUser ? JSON.parse(rawUser) : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function redirectUser(user) {
+            if (!user) return;
+            window.location.replace(user.role === 'admin' ? 'admin.html' : 'Af-lo-sin-.html');
+        }
+
+        // If user is already logged in, instantly redirect to store without history entry
+        const existingUser = getCurrentUser();
+        if (existingUser) {
+            redirectUser(existingUser);
+        }
+
         function getUsers() {
             try {
                 const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
@@ -577,26 +600,10 @@
             messageEl.classList.add(type);
         }
 
-        function getCurrentUser() {
-            const localUser = localStorage.getItem(CURRENT_USER_KEY);
-            const sessionUser = sessionStorage.getItem(CURRENT_USER_KEY);
-            const rawUser = localUser || sessionUser;
-
-            try {
-                return rawUser ? JSON.parse(rawUser) : null;
-            } catch (error) {
-                return null;
-            }
-        }
-
         function setCurrentUser(user, rememberMe) {
+            // ALWAYS save to localStorage permanently so user NEVER auto-logouts on back or refresh!
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
             sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-
-            if (rememberMe) {
-                localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-            } else {
-                localStorage.removeItem(CURRENT_USER_KEY);
-            }
         }
 
         async function apiRequest(endpoint, payload) {
@@ -617,11 +624,6 @@
             return data;
         }
 
-        function redirectUser(user) {
-            if (!user) return;
-            window.location.href = user.role === 'admin' ? 'admin.html' : 'Af-lo-sin-.html';
-        }
-
         const loginForm = document.getElementById('loginForm');
         const loginMessage = document.getElementById('login-message');
         const forgotPasswordToggle = document.getElementById('forgotPasswordToggle');
@@ -630,11 +632,6 @@
         const forgotPasswordMessage = document.getElementById('forgot-password-message');
 
         ensureAdminAccount();
-
-        const existingUser = getCurrentUser();
-        if (existingUser) {
-            redirectUser(existingUser);
-        }
 
         document.querySelectorAll('.toggle-password').forEach((button) => {
             button.addEventListener('click', () => {
