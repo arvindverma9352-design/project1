@@ -1,7 +1,7 @@
 // Vegetable Mart - Customer Store Progressive Web App Service Worker
 // Network-First Strategy ensures all live code updates and admin changes reflect instantly.
 
-const CACHE_NAME = 'vegetable-mart-store-v4';
+const CACHE_NAME = 'vegetable-mart-store-v5';
 const PRECACHE_ASSETS = [
   './',
   'index.html',

@@ -24,6 +24,9 @@
       navigator.serviceWorker.register('sw.js')
         .then((reg) => {
           console.log('Vegetable Mart SW registered:', reg.scope);
+          if (typeof reg.update === 'function') {
+            reg.update();
+          }
         })
         .catch((err) => {
           console.warn('Vegetable Mart SW error:', err);

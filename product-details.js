@@ -425,7 +425,7 @@ function getSavedProducts() {
 
 async function loadProductsFromBackend() {
   try {
-    const response = await fetch(`${API_BASE}/api/products`);
+    const response = await fetch(`${API_BASE}/api/products?_t=${Date.now()}`, { cache: 'no-store' });
     const data = await response.json();
 
     if (!response.ok || !Array.isArray(data.products) || data.products.length === 0) {
