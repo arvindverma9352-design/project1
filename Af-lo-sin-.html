@@ -119,7 +119,7 @@ const productHinglish = {
   torai: "torai tori turiya ridge gourd"
 };
 
-const product1KgPrices = {
+let product1KgPrices = {
   patato: 120, tomato: 110, brownonion: 100, redonion: 105,
   ladyfinger: 150, greenchilli: 90, spinch: 85, lauki: 100,
   greencucumber: 90, cucumber: 80, bittergourd: 120, carrot: 90,
@@ -130,7 +130,9 @@ const product1KgPrices = {
   broccli: 150, capsicum: 130, corn: 110, jackfruit: 170, masroom: 180, peas: 110,   beans: 90,   chotebaingan: 80,   redcarrot: 70,   kachri: 100,   lemon: 120,   motimirch: 80,   oldginger: 160,   starfruit: 140,   taroroot: 90,   tikhimirchi: 100,   torai: 70
 };
 
-const API_BASE = 'https://project1-czw2.onrender.com';
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? `${window.location.protocol}//${window.location.hostname}:${window.location.port || 5000}`
+  : 'https://project1-czw2.onrender.com';
 
 function getSavedAdminProducts() {
   try {
@@ -141,48 +143,94 @@ function getSavedAdminProducts() {
   }
 }
 
-function updateCardPriceButtons() {
-  document.querySelectorAll(".product").forEach(product => {
-    const cartButton = product.querySelector("button[onclick^=\"addToCart\"]");
-    const name = product.querySelector("h3") ? product.querySelector("h3").textContent.trim() : "";
-    const priceText = product.querySelector("p") ? product.querySelector("p").textContent.replace(/[^0-9]/g, "") : "";
-    const price = priceText ? Number(priceText) : 0;
-    const imgEl = product.querySelector("img");
-    const imageSrc = imgEl ? (imgEl.getAttribute("src") || "") : "";
-    if (cartButton && name && price) {
-      cartButton.setAttribute("onclick", `addToCart('${name.replace(/'/g, "\\'")}', ${price}, '${imageSrc}')`);
-    }
-  });
-}
-
 function applySavedPrices(products) {
   if (!Array.isArray(products) || products.length === 0) return;
+
   products.forEach(item => {
-    const key = (item.key || item.title || item.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    const price = Number(item.price);
-    if (!key || Number.isNaN(price) || price <= 0) return;
-    product1KgPrices[key] = price;
-    const card = document.querySelector(`.product[data-key="${key}"]`);
+    const rawKey = item.key || item.id || item.title || '';
+    const key = rawKey.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!key) return;
+
+    let price = 0;
+    if (item.prices && typeof item.prices === 'object') {
+      price = Number(item.prices['1kg'] || item.prices['1KG'] || item.prices['500g'] || item.prices['250g']);
+    }
+    if (!price || isNaN(price)) {
+      price = Number(item.price);
+    }
+
+    if (price && !isNaN(price) && price > 0) {
+      product1KgPrices[key] = price;
+    }
+
+    const card = document.querySelector(`.product[data-product-key="${key}"]`)
+      || document.querySelector(`.product[data-key="${key}"]`)
+      || document.querySelector(`.product .${key}`)?.closest('.product')
+      || document.querySelector(`.product button[onclick*="'${key}'"]`)?.closest('.product');
+
     if (card) {
-      const priceElement = card.querySelector('p');
-      if (priceElement) priceElement.textContent = `₹${price} / 1 kg`;
+      card.dataset.productKey = key;
+
+      const buttons = card.querySelectorAll('.buttons button');
+      if (buttons && buttons.length >= 2) {
+        if (price && price > 0) {
+          buttons[1].textContent = `₹${price} / 1kg`;
+        }
+      }
+
+      const cartButton = card.querySelector('button[onclick^="addToCart"]');
+      if (cartButton && price && price > 0) {
+        const imgEl = card.querySelector('img');
+        const imageSrc = imgEl ? (imgEl.getAttribute('src') || '') : (productImages[key] || '');
+        cartButton.setAttribute('onclick', `addToCart('${key}', ${price}, '${imageSrc}')`);
+      }
+
+      if (typeof item.available === 'boolean') {
+        let badge = card.querySelector('.availability-badge');
+        if (!badge) {
+          badge = document.createElement('div');
+          card.appendChild(badge);
+        }
+        if (item.available === false) {
+          badge.className = 'availability-badge not-available';
+          badge.textContent = 'Not available';
+          if (cartButton) {
+            cartButton.disabled = true;
+            cartButton.style.opacity = '0.5';
+            cartButton.style.cursor = 'not-allowed';
+          }
+        } else {
+          badge.className = 'availability-badge available';
+          badge.textContent = 'Available';
+          if (cartButton) {
+            cartButton.disabled = false;
+            cartButton.style.opacity = '1';
+            cartButton.style.cursor = 'pointer';
+          }
+        }
+      }
     }
   });
-  updateCardPriceButtons();
 }
 
 async function syncProduct1KgPrices() {
   const localSaved = getSavedAdminProducts();
-  applySavedPrices(localSaved);
+  if (localSaved && localSaved.length) {
+    applySavedPrices(localSaved);
+  }
 
   try {
     const res = await fetch(`${API_BASE}/api/products`);
-    const data = await res.json();
-    if (res.ok && Array.isArray(data.products) && data.products.length > 0) {
-      applySavedPrices(data.products);
-      localStorage.setItem('vegetable-mart-admin-products', JSON.stringify(data.products));
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.products) && data.products.length > 0) {
+        applySavedPrices(data.products);
+        localStorage.setItem('vegetable-mart-admin-products', JSON.stringify(data.products));
+      }
     }
-  } catch (e) {}
+  } catch (e) {
+    console.warn('Could not sync products from API:', e);
+  }
 }
 
 function addToCart(name, price, image) {
@@ -287,8 +335,6 @@ function filterProducts(searchTerm) {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  syncProduct1KgPrices();
-
   (async function fetchStoreStatus() {
     try {
       const res = await fetch(`${API_BASE}/api/settings/store-status`);
@@ -302,6 +348,8 @@ document.addEventListener("DOMContentLoaded", () => {
   })();
   updateCartCount();
 
+  const savedAdminProducts = getSavedAdminProducts();
+
   document.querySelectorAll(".product").forEach(product => {
     const cartButton = product.querySelector("button[onclick^=\"addToCart\"]");
     if (!cartButton) return;
@@ -309,41 +357,59 @@ document.addEventListener("DOMContentLoaded", () => {
     const match = cartButton.getAttribute("onclick").match(/addToCart\('([^']+)',\s*([\d]+)/);
     if (!match) return;
 
+    const productKey = match[1];
+    product.dataset.productKey = productKey;
+
     const productName = document.createElement("h3");
     productName.className = "product-name";
-    productName.textContent = productLabels[match[1]] || match[1];
+    productName.textContent = productLabels[productKey] || productKey;
     product.insertBefore(productName, product.querySelector(".buttons"));
-    product.dataset.searchName = `${productName.textContent} ${productHinglish[match[1]] || ""}`.toLowerCase();
+    product.dataset.searchName = `${productName.textContent} ${productHinglish[productKey] || ""}`.toLowerCase();
 
     const productImage = product.querySelector("div:first-child");
     if (productImage) {
       productImage.style.cursor = "pointer";
       productImage.onclick = () => {
-        window.location.href = `product-details.html?product=${match[1]}`;
+        window.location.href = `product-details.html?product=${productKey}`;
       };
     }
+
+    const savedProduct = savedAdminProducts && savedAdminProducts.find((item) => (item.key || item.id) === productKey);
+    let current1Kg = product1KgPrices[productKey] || Number(match[2]);
+    if (savedProduct && savedProduct.prices && typeof savedProduct.prices === 'object') {
+      const p = Number(savedProduct.prices['1kg'] || savedProduct.prices['1KG'] || savedProduct.prices['500g'] || savedProduct.prices['250g']);
+      if (p > 0) {
+        current1Kg = p;
+        product1KgPrices[productKey] = p;
+      }
+    } else if (savedProduct && savedProduct.price) {
+      const p = Number(savedProduct.price);
+      if (p > 0) {
+        current1Kg = p;
+        product1KgPrices[productKey] = p;
+      }
+    }
+
+    cartButton.setAttribute("onclick", `addToCart('${productKey}', ${current1Kg}, '${productImages[productKey] || ''}')`);
 
     const infoButton = product.querySelectorAll(".buttons button")[1];
     if (infoButton) {
       infoButton.type = "button";
-      infoButton.textContent = `₹${product1KgPrices[match[1]] || Number(match[2])} / 1kg`;
+      infoButton.textContent = `₹${current1Kg} / 1kg`;
       infoButton.onclick = () => {
-        window.location.href = `product-details.html?product=${match[1]}`;
+        window.location.href = `product-details.html?product=${productKey}`;
       };
     }
 
-    const savedProducts = JSON.parse(localStorage.getItem('vegetable-mart-admin-products') || 'null');
-    const savedProduct = savedProducts && savedProducts.find((item) => item.key === match[1]);
     if (savedProduct && savedProduct.available === false) {
       const statusBadge = document.createElement('div');
       statusBadge.className = 'availability-badge not-available';
       statusBadge.textContent = 'Not available';
       product.appendChild(statusBadge);
-      const addToCartButton = product.querySelector("button[onclick^=\"addToCart\"]");
-      if (addToCartButton) {
-        addToCartButton.disabled = true;
-        addToCartButton.style.opacity = '0.5';
-        addToCartButton.style.cursor = 'not-allowed';
+      if (cartButton) {
+        cartButton.disabled = true;
+        cartButton.style.opacity = '0.5';
+        cartButton.style.cursor = 'not-allowed';
       }
     } else {
       const statusBadge = document.createElement('div');
@@ -356,8 +422,21 @@ document.addEventListener("DOMContentLoaded", () => {
     wishlistButton.type = "button";
     wishlistButton.className = "wishlist-button";
     wishlistButton.textContent = "♥ Wishlist";
-    wishlistButton.onclick = () => addToWishlist(match[1], Number(match[2]), productImages[match[1]]);
+    wishlistButton.onclick = () => addToWishlist(productKey, current1Kg, productImages[productKey]);
     product.querySelector(".buttons").appendChild(wishlistButton);
+  });
+
+  // Sync latest prices from backend API
+  syncProduct1KgPrices();
+
+  // Listen for admin panel price updates in other tabs
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'vegetable-mart-admin-products') {
+      try {
+        const updated = JSON.parse(e.newValue || '[]');
+        applySavedPrices(updated);
+      } catch (err) {}
+    }
   });
 
   const searchInput = document.getElementById("product-search");

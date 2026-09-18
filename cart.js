@@ -1,4 +1,6 @@
-const API_BASE = 'https://project1-czw2.onrender.com';
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? `${window.location.protocol}//${window.location.hostname}:${window.location.port || 5000}`
+  : 'https://project1-czw2.onrender.com';
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 const productImages = {
     patato: "images/patato.png", tomato: "images/tomato.png", brownonion: "images/brown-onion.png",
