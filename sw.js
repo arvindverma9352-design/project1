@@ -1,7 +1,7 @@
-// Vegetable Mart & VM Delivery Progressive Web App Service Worker
+// Vegetable Mart - Customer Store Progressive Web App Service Worker
 // Network-First Strategy ensures all live code updates and admin changes reflect instantly.
 
-const CACHE_NAME = 'vegetable-mart-v3';
+const CACHE_NAME = 'vegetable-mart-store-v4';
 const PRECACHE_ASSETS = [
   './',
   'index.html',
@@ -9,25 +9,21 @@ const PRECACHE_ASSETS = [
   'cart.html',
   'wishlist.html',
   'profile.html',
-  'delivery.html',
+  'product-details.html',
   'logo.png',
   'logo-192.png',
   'logo-512.png',
-  'delivery-icon.png',
-  'delivery-icon-192.png',
   'manifest.json',
-  'delivery-manifest.json',
   'Af-lo-sin-.css',
-  'delivery.css',
   'pwa-install.js'
 ];
 
-// Install: precache critical assets
+// Install: precache customer store assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(PRECACHE_ASSETS).catch((err) => {
-        console.warn('Precache partial fallback:', err);
+        console.warn('Store cache partial fallback:', err);
       });
     })
   );
@@ -50,8 +46,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: NETWORK-FIRST STRATEGY
-// Always get the freshest content from the server first so user edits are live!
+// Fetch: NETWORK-FIRST STRATEGY for Customer Store
 self.addEventListener('fetch', (event) => {
   const req = event.request;
 
@@ -60,8 +55,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Bypass API requests to Render backend directly (let fetch handle API data)
+  // Bypass API requests to Render backend directly
   if (req.url.includes('/api/')) {
+    return;
+  }
+
+  // Bypass delivery portal (handled by delivery service worker)
+  if (req.url.includes('/delivery/')) {
     return;
   }
 
@@ -81,9 +81,6 @@ self.addEventListener('fetch', (event) => {
         return caches.match(req).then((cachedRes) => {
           if (cachedRes) return cachedRes;
           if (req.mode === 'navigate') {
-            if (req.url.includes('delivery')) {
-              return caches.match('delivery.html');
-            }
             return caches.match('index.html') || caches.match('Af-lo-sin-.html');
           }
           return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
