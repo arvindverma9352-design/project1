@@ -1,10 +1,10 @@
 {
-  "id": "vegetable-mart-customer-store",
-  "name": "Vegetable Mart - Online Store",
+  "id": "vegetable-mart-customer-app",
+  "name": "Vegetable Mart",
   "short_name": "Vegetable Mart",
-  "description": "Fresh farm vegetables delivered to your doorstep in minutes",
-  "start_url": "index.html",
-  "scope": "./",
+  "description": "Order fresh farm vegetables online with fast doorstep delivery",
+  "start_url": "/customer/index.html",
+  "scope": "/customer/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f1813",
@@ -33,19 +33,19 @@
     {
       "name": "Shop Vegetables",
       "short_name": "Shop",
-      "url": "Af-lo-sin-.html",
+      "url": "/customer/Af-lo-sin-.html",
       "icons": [{ "src": "logo-192.png", "sizes": "192x192" }]
     },
     {
       "name": "My Cart",
       "short_name": "Cart",
-      "url": "cart.html",
+      "url": "/customer/cart.html",
       "icons": [{ "src": "logo-192.png", "sizes": "192x192" }]
     },
     {
       "name": "My Wishlist",
       "short_name": "Wishlist",
-      "url": "wishlist.html",
+      "url": "/customer/wishlist.html",
       "icons": [{ "src": "logo-192.png", "sizes": "192x192" }]
     }
   ]

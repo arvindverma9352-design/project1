@@ -528,36 +528,47 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// 1. Capture beforeinstallprompt
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
-
-    // Show header icon
-    const installBtn = document.getElementById('install-app-btn');
-    if (installBtn) {
-        installBtn.style.display = 'inline-flex';
-        installBtn.onclick = triggerDeliveryInstall;
-    }
-
-    // Check if dismissed recently (2 days)
-    const dismissedUntil = localStorage.getItem('vm_delivery_dismissed_until');
-    if (!dismissedUntil || Date.now() >= Number(dismissedUntil)) {
-        showDeliveryInstallBanner();
-    }
+    console.log('VM Captain beforeinstallprompt captured!');
+    const headerBtn = document.getElementById('install-app-btn');
+    if (headerBtn) headerBtn.style.display = 'inline-flex';
 });
 
-async function triggerDeliveryInstall() {
-    if (!deferredInstallPrompt) return;
-    deferredInstallPrompt.prompt();
-    const { outcome } = await deferredInstallPrompt.userChoice;
-    if (outcome === 'accepted') {
-        const headerBtn = document.getElementById('install-app-btn');
-        if (headerBtn) headerBtn.style.display = 'none';
-        const banner = document.getElementById('vm-delivery-install-banner');
-        if (banner) banner.remove();
-        showToast('🎉 VM Delivery App Successfully Installed!');
+// 2. Initialize install UI on load
+function initCaptainInstallUI() {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                         window.navigator.standalone === true;
+    if (isStandalone) return;
+
+    // Show header icon
+    const headerBtn = document.getElementById('install-app-btn');
+    if (headerBtn) {
+        headerBtn.style.display = 'inline-flex';
+        headerBtn.onclick = triggerDeliveryInstall;
     }
-    deferredInstallPrompt = null;
+
+    // Show bottom banner
+    const dismissedUntil = localStorage.getItem('vm_delivery_dismissed_until');
+    if (!dismissedUntil || Date.now() >= Number(dismissedUntil)) {
+        setTimeout(showDeliveryInstallBanner, 800);
+    }
+}
+
+async function triggerDeliveryInstall() {
+    if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+        if (outcome === 'accepted') {
+            cleanupCaptainInstallUI();
+            showToast('🎉 VM Delivery Captain App Installed!');
+        }
+        deferredInstallPrompt = null;
+    } else {
+        showCaptainInstallGuide();
+    }
 }
 
 function showDeliveryInstallBanner() {
@@ -567,9 +578,9 @@ function showDeliveryInstallBanner() {
     banner.id = 'vm-delivery-install-banner';
     banner.innerHTML = `
         <div class="vm-del-content">
-            <img src="delivery-icon-192.png" alt="VM Delivery" class="vm-del-icon">
+            <img src="delivery-icon-192.png" alt="VM Captain" class="vm-del-icon">
             <div class="vm-del-text">
-                <strong>VM Delivery Partner App</strong>
+                <strong>VM Delivery Captain App</strong>
                 <span>Install for quick orders & live GPS routing</span>
             </div>
         </div>
@@ -586,7 +597,7 @@ function showDeliveryInstallBanner() {
             bottom: 16px;
             left: 50%;
             transform: translateX(-50%);
-            width: calc(100% - 28px);
+            width: calc(100% - 24px);
             max-width: 440px;
             background: rgba(11, 28, 18, 0.97);
             backdrop-filter: blur(14px);
@@ -610,7 +621,7 @@ function showDeliveryInstallBanner() {
         .vm-del-content { display: flex; align-items: center; gap: 10px; min-width: 0; }
         .vm-del-icon { width: 40px; height: 40px; border-radius: 10px; object-fit: contain; flex-shrink: 0; }
         .vm-del-text { display: flex; flex-direction: column; min-width: 0; }
-        .vm-del-text strong { color: #f0fdf4; font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .vm-del-text strong { color: #f0fdf4; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .vm-del-text span { color: #86efac; font-size: 11px; margin-top: 1px; }
         .vm-del-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
         .vm-del-btn {
@@ -652,16 +663,59 @@ function showDeliveryInstallBanner() {
     }
 }
 
-window.addEventListener('appinstalled', () => {
+function showCaptainInstallGuide() {
+    if (document.getElementById('vm-captain-guide-modal')) return;
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    const modal = document.createElement('div');
+    modal.id = 'vm-captain-guide-modal';
+    modal.innerHTML = `
+      <div class="vm-guide-backdrop" onclick="document.getElementById('vm-captain-guide-modal').remove()" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999998;"></div>
+      <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#0e2417;border:1px solid rgba(74,222,128,0.4);border-radius:20px;max-width:360px;width:calc(100% - 36px);padding:20px;z-index:9999999;color:#f0fdf4;box-shadow:0 20px 40px rgba(0,0,0,0.7);font-family:sans-serif;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <img src="delivery-icon-192.png" style="width:44px;height:44px;border-radius:10px;">
+          <div>
+            <h3 style="margin:0;font-size:16px;">VM Delivery Captain</h3>
+            <p style="margin:2px 0 0;font-size:12px;color:#86efac;">Rider Partner App</p>
+          </div>
+          <button type="button" onclick="document.getElementById('vm-captain-guide-modal').remove()" style="margin-left:auto;background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;">✕</button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;font-size:13px;line-height:1.4;">
+          ${isIOS ? `
+            <div>1. Safari me niche <strong>Share ( ⬆️ )</strong> dabayein.</div>
+            <div>2. <strong>'Add to Home Screen' (➕)</strong> chunein.</div>
+            <div>3. Upar <strong>'Add'</strong> dabayein.</div>
+          ` : `
+            <div>1. Chrome me upar <strong>3 Dots (⋮)</strong> par tap karein.</div>
+            <div>2. <strong>'Install app'</strong> ya <strong>'Add to Home screen'</strong> chunein.</div>
+            <div>3. <strong>'Install'</strong> par tap karein.</div>
+          `}
+        </div>
+
+        <button type="button" onclick="document.getElementById('vm-captain-guide-modal').remove()" style="width:100%;background:#16a34a;color:#fff;border:none;padding:10px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Theek Hai</button>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+function cleanupCaptainInstallUI() {
     const banner = document.getElementById('vm-delivery-install-banner');
     if (banner) banner.remove();
     const headerBtn = document.getElementById('install-app-btn');
     if (headerBtn) headerBtn.style.display = 'none';
-    showToast('🎉 VM Delivery App Installed Successfully!');
+}
+
+window.addEventListener('appinstalled', () => {
+    cleanupCaptainInstallUI();
+    showToast('🎉 VM Delivery Captain App Installed Successfully!');
 });
 
 // On page load
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
+    initCaptainInstallUI();
 });
 
