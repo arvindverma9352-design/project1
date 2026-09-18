@@ -17,6 +17,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
+// Vegetable Mart Backend - Live Price Sync Engine v7.1
 app.use(express.json());
 app.use((req, res, next) => {
   const p = req.path.toLowerCase();
