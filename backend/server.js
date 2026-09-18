@@ -8,6 +8,8 @@ const productsRoutes = require('./routes/products');
 const ordersRoutes = require('./routes/orders');
 const settingsRoutes = require('./routes/settings');
 
+const path = require('path');
+
 dotenv.config();
 
 const app = express();
@@ -15,6 +17,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '..')));
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://arvind:arvind5299@cluster0.wnav3z6.mongodb.net/?appName=Cluster0')
   .then(() => console.log('MongoDB connected'))

@@ -1,0 +1,19 @@
+{
+  "name": "Vegetable Mart Delivery Partner",
+  "short_name": "VM Delivery",
+  "description": "Delivery partner dashboard for Vegetable Mart orders",
+  "start_url": "delivery.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1813",
+  "theme_color": "#1e7545",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+
