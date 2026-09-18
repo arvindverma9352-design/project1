@@ -51,6 +51,15 @@
                         <label for="delivery-mobile">Mobile Number *</label>
                         <input type="tel" id="delivery-mobile" placeholder="10-digit mobile number" required>
                     </div>
+
+                    <div class="location-detect-wrapper">
+                        <button type="button" id="detect-location-btn" class="detect-location-btn" onclick="detectLiveLocation()">
+                            <span class="location-btn-icon">📍</span>
+                            <span id="detect-location-text">Use Current Location</span>
+                        </button>
+                        <div id="location-status" class="location-status"></div>
+                    </div>
+
                     <div class="delivery-input-group">
                         <label for="delivery-pincode">Pincode (एरिया पिनकोड) *</label>
                         <input type="text" id="delivery-pincode" placeholder="6-digit pincode" maxlength="6" required>

@@ -24,7 +24,7 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const { customer, mobile, address, email, total, status, items } = req.body;
+    const { customer, mobile, address, location, email, total, status, items } = req.body;
 
     if (!customer || !total) {
       return res.status(400).json({ success: false, message: 'Customer and total are required.' });
@@ -34,6 +34,7 @@ router.post('/', async (req, res) => {
       customer,
       mobile: mobile || '',
       address: address || '',
+      location: location || '',
       email: email || '',
       total,
       status: status || 'Packed',

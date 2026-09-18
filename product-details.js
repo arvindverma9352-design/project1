@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'https://project1-czw2.onrender.com';
 
 const productImages = {
   patato: "images/patato.png",

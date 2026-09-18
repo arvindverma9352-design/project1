@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'https://project1-czw2.onrender.com';
 const wishlistItems = document.getElementById("wishlist-items");
 const productLabels = {
     patato: "Potato (आलू)", tomato: "Tomato (टमाटर)", brownonion: "Brown Onion (सफेद प्याज़)", redonion: "Red Onion (लाल प्याज़)",

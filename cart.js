@@ -1,3 +1,4 @@
+const API_BASE = 'https://project1-czw2.onrender.com';
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 const productImages = {
     patato: "images/patato.png", tomato: "images/tomato.png", brownonion: "images/brown-onion.png",
@@ -220,6 +221,139 @@ function checkPincodeAvailability(pincode) {
     }
 }
 
+let detectedLiveLocation = null;
+
+async function detectLiveLocation() {
+    const btn = document.getElementById('detect-location-btn');
+    const btnText = document.getElementById('detect-location-text');
+    const statusEl = document.getElementById('location-status');
+    const addressInput = document.getElementById('delivery-address');
+    const pincodeInput = document.getElementById('delivery-pincode');
+
+    if (!navigator.geolocation) {
+        showToast('Geolocation is not supported by your browser');
+        if (statusEl) {
+            statusEl.textContent = '❌ Aapka browser location support nahi karta. Kripya address haath se bharein.';
+            statusEl.className = 'location-status error';
+        }
+        return;
+    }
+
+    if (btn) {
+        btn.disabled = true;
+        btn.classList.add('is-loading');
+    }
+    if (btnText) btnText.textContent = 'Detecting location...';
+    if (statusEl) {
+        statusEl.textContent = '⏳ GPS se aapki live location prapt ki ja rahi hai...';
+        statusEl.className = 'location-status loading';
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const accuracy = Math.round(position.coords.accuracy || 0);
+            const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+
+            detectedLiveLocation = {
+                latitude: lat,
+                longitude: lon,
+                accuracy: accuracy,
+                mapUrl: mapUrl
+            };
+
+            if (statusEl) {
+                statusEl.textContent = '⏳ Address details fetch ki ja rahi hain...';
+                statusEl.className = 'location-status loading';
+            }
+
+            try {
+                // Reverse geocoding via OpenStreetMap Nominatim
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&accept-language=en`);
+                const data = await res.json();
+
+                let road = '';
+                let area = '';
+                let city = '';
+                let state = '';
+                let postcode = '';
+
+                if (data && data.address) {
+                    const addr = data.address;
+                    road = addr.road || addr.street || addr.residential || addr.suburb || '';
+                    area = addr.neighbourhood || addr.suburb || addr.city_district || addr.county || '';
+                    city = addr.city || addr.town || addr.village || addr.municipality || '';
+                    state = addr.state || '';
+                    postcode = addr.postcode ? addr.postcode.replace(/\D/g, '').slice(0, 6) : '';
+                }
+
+                const addressParts = [road, area, city, state].filter(Boolean);
+                const readableAddress = addressParts.length > 0 ? addressParts.join(', ') : (data.display_name || '');
+
+                if (addressInput && readableAddress) {
+                    addressInput.value = readableAddress;
+                    addressInput.focus();
+                }
+
+                if (pincodeInput && postcode && postcode.length === 6) {
+                    pincodeInput.value = postcode;
+                    checkPincodeAvailability(postcode);
+                }
+
+                if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('is-loading');
+                }
+                if (btnText) btnText.textContent = '📍 Location Detected (Click to refresh)';
+                if (statusEl) {
+                    statusEl.innerHTML = `✅ <strong>Location mil gayi!</strong> Kripya agar zaroori ho toh apna Flat/House number aage add kar lein.`;
+                    statusEl.className = 'location-status success';
+                }
+                showToast('Live location detected successfully!');
+            } catch (err) {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('is-loading');
+                }
+                if (btnText) btnText.textContent = '📍 Location Coordinates Saved';
+                if (statusEl) {
+                    statusEl.innerHTML = `✅ <strong>GPS location save ho gayi!</strong> Kripya apna address aur pincode likh dein.`;
+                    statusEl.className = 'location-status success';
+                }
+                showToast('GPS coordinates saved!');
+            }
+        },
+        (error) => {
+            if (btn) {
+                btn.disabled = false;
+                btn.classList.remove('is-loading');
+            }
+            if (btnText) btnText.textContent = 'Use Current Location';
+
+            let msg = 'Location prapt nahi ho saki. Kripya address haath se bharein.';
+            if (error.code === error.PERMISSION_DENIED) {
+                msg = '❌ Location permission allow nahi ki gayi. Browser settings mein jaakar location access on karein.';
+            } else if (error.code === error.POSITION_UNAVAILABLE) {
+                msg = '❌ Location signal uplabdh nahi hai. Kripya address haath se bharein.';
+            } else if (error.code === error.TIMEOUT) {
+                msg = '❌ Location request timeout ho gayi. Kripya dubara koshish karein.';
+            }
+
+            if (statusEl) {
+                statusEl.textContent = msg;
+                statusEl.className = 'location-status error';
+            }
+            showToast('Location access denied or unavailable');
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+
 function initDeliveryForm() {
     const currentUser = getCurrentUser();
     const nameInput = document.getElementById("delivery-name");
@@ -333,7 +467,11 @@ async function placeOrder() {
         return;
     }
 
-    const fullDeliveryAddress = `${customerAddress} (Pincode: ${customerPincode})`;
+    let fullDeliveryAddress = `${customerAddress} (Pincode: ${customerPincode})`;
+    const mapLocationUrl = (detectedLiveLocation && detectedLiveLocation.mapUrl) ? detectedLiveLocation.mapUrl : '';
+    if (mapLocationUrl) {
+        fullDeliveryAddress += ` | 📍 Map: ${mapLocationUrl}`;
+    }
 
     const orderItems = cart.map((item) => ({
         name: item.name,
@@ -344,7 +482,7 @@ async function placeOrder() {
     }));
 
     try {
-        const response = await fetch('http://localhost:5000/api/orders', {
+        const response = await fetch(`${API_BASE}/api/orders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -353,6 +491,7 @@ async function placeOrder() {
                 customer: customerName,
                 mobile: customerMobile,
                 address: fullDeliveryAddress,
+                location: mapLocationUrl,
                 email: currentUser?.email || '',
                 total,
                 items: orderItems
@@ -375,6 +514,7 @@ async function placeOrder() {
                 customer: customerName,
                 mobile: customerMobile,
                 address: fullDeliveryAddress,
+                location: mapLocationUrl,
                 email: currentUser?.email || '',
                 total,
                 status: 'Packed',
@@ -434,7 +574,7 @@ function showStoreClosedPopup() {
 // Fetch store status on cart page load
 (async function fetchStoreStatusCart() {
   try {
-    const res = await fetch('http://localhost:5000/api/settings/store-status');
+    const res = await fetch(`${API_BASE}/api/settings/store-status`);
     const data = await res.json();
     if (data && typeof data.isOpen === 'boolean') {
       localStorage.setItem('vegetable-mart-store-open', data.isOpen ? 'true' : 'false');

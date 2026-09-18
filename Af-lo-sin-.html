@@ -111,6 +111,8 @@ const product1KgPrices = {
   broccli: 150, capsicum: 130, corn: 110, jackfruit: 170, masroom: 180, peas: 110,   beans: 90,   chotebaingan: 80,   redcarrot: 70,   kachri: 100,   lemon: 120,   motimirch: 80,   oldginger: 160,   starfruit: 140,   taroroot: 90,   tikhimirchi: 100,   torai: 70
 };
 
+const API_BASE = 'https://project1-czw2.onrender.com';
+
 function getSavedAdminProducts() {
   try {
     const saved = JSON.parse(localStorage.getItem('vegetable-mart-admin-products') || 'null');
@@ -123,24 +125,28 @@ function getSavedAdminProducts() {
 function updateCardPriceButtons() {
   document.querySelectorAll(".product").forEach(product => {
     const cartButton = product.querySelector("button[onclick^=\"addToCart\"]");
-    if (!cartButton) return;
-    const match = cartButton.getAttribute("onclick").match(/addToCart\('([^']+)'/);
-    if (!match) return;
-    const key = match[1];
-    const infoButton = product.querySelectorAll(".buttons button")[1];
-    if (infoButton && product1KgPrices[key]) {
-      infoButton.textContent = `₹${product1KgPrices[key]} / 1kg`;
+    const name = product.querySelector("h3") ? product.querySelector("h3").textContent.trim() : "";
+    const priceText = product.querySelector("p") ? product.querySelector("p").textContent.replace(/[^0-9]/g, "") : "";
+    const price = priceText ? Number(priceText) : 0;
+    const imgEl = product.querySelector("img");
+    const imageSrc = imgEl ? (imgEl.getAttribute("src") || "") : "";
+    if (cartButton && name && price) {
+      cartButton.setAttribute("onclick", `addToCart('${name.replace(/'/g, "\\'")}', ${price}, '${imageSrc}')`);
     }
   });
 }
 
-function applySavedPrices(savedProducts) {
-  if (!savedProducts || !savedProducts.length) return;
-  savedProducts.forEach((product) => {
-    const key = product.key || product.id;
-    if (key && product.prices && typeof product.prices['1kg'] !== 'undefined') {
-      const p = Number(product.prices['1kg']);
-      if (p > 0) product1KgPrices[key] = p;
+function applySavedPrices(products) {
+  if (!Array.isArray(products) || products.length === 0) return;
+  products.forEach(item => {
+    const key = (item.key || item.title || item.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const price = Number(item.price);
+    if (!key || Number.isNaN(price) || price <= 0) return;
+    product1KgPrices[key] = price;
+    const card = document.querySelector(`.product[data-key="${key}"]`);
+    if (card) {
+      const priceElement = card.querySelector('p');
+      if (priceElement) priceElement.textContent = `₹${price} / 1 kg`;
     }
   });
   updateCardPriceButtons();
@@ -151,7 +157,7 @@ async function syncProduct1KgPrices() {
   applySavedPrices(localSaved);
 
   try {
-    const res = await fetch('http://localhost:5000/api/products');
+    const res = await fetch(`${API_BASE}/api/products`);
     const data = await res.json();
     if (res.ok && Array.isArray(data.products) && data.products.length > 0) {
       applySavedPrices(data.products);
@@ -266,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   (async function fetchStoreStatus() {
     try {
-      const res = await fetch('http://localhost:5000/api/settings/store-status');
+      const res = await fetch(`${API_BASE}/api/settings/store-status`);
       const data = await res.json();
       if (data && typeof data.isOpen === 'boolean') {
         localStorage.setItem('vegetable-mart-store-open', data.isOpen ? 'true' : 'false');

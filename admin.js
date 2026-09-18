@@ -51,7 +51,7 @@ const STORAGE_KEYS = {
   orders: 'vegetable-mart-admin-orders'
 };
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'https://project1-czw2.onrender.com';
 
 const productForm = document.getElementById('product-form');
 const productList = document.getElementById('product-list');
@@ -307,13 +307,27 @@ function renderOrders() {
       ? order.items.map((item) => `${item.name} × ${item.quantity}`).join(', ')
       : 'No items listed';
 
+    let addressDisplay = order.address || 'Not provided';
+    let mapUrl = order.location || '';
+    if (!mapUrl && addressDisplay.includes('https://www.google.com/maps')) {
+      const match = addressDisplay.match(/(https:\/\/www\.google\.com\/maps\S*)/);
+      if (match) {
+        mapUrl = match[1];
+        addressDisplay = addressDisplay.replace(/\|\s*📍\s*Map:\s*https:\/\/www\.google\.com\/maps\S*/, '').trim();
+      }
+    }
+
+    const mapBtnHtml = mapUrl 
+      ? `<br><a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="map-link-btn" style="display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; padding: 5px 12px; background: #1e7a4b; color: #ffffff !important; border-radius: 6px; font-size: 12px; text-decoration: none; font-weight: 600;">📍 Open in Google Maps</a>` 
+      : '';
+
     return `
       <div class="order-item">
         <div class="order-meta">
           <h3>${orderId}</h3>
           <p><strong>Customer:</strong> ${order.customer || 'Guest Customer'}</p>
           <p><strong>Mobile:</strong> ${order.mobile || 'Not provided'}</p>
-          <p><strong>Address:</strong> ${order.address || 'Not provided'}</p>
+          <p><strong>Address:</strong> ${addressDisplay}${mapBtnHtml}</p>
           <p><strong>Items:</strong> ${itemsText}</p>
           <small>Total: ₹${order.total || 0}</small>
         </div>
