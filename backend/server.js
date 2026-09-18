@@ -18,6 +18,16 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+app.use((req, res, next) => {
+  const p = req.path.toLowerCase();
+  if (p.endsWith('.html') || p === '/' || p.endsWith('.js') || p.endsWith('.json') || p.includes('/api/')) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+  next();
+});
+
 app.use('/delivery', express.static(path.join(__dirname, 'delivery')));
 app.use(express.static(path.join(__dirname, '..')));
 

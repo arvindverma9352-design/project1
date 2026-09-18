@@ -8,17 +8,7 @@
     return;
   }
 
-  // 1. Check if already running as installed standalone app
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                       window.navigator.standalone === true ||
-                       document.referrer.includes('android-app://');
-
-  if (isStandalone) {
-    // App is already installed and opened as app!
-    return;
-  }
-
-  // 2. Register Service Worker
+  // 1. Register Service Worker (MUST always run, even in standalone app, to check for updates!)
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js')
@@ -32,6 +22,24 @@
           console.warn('Vegetable Mart SW error:', err);
         });
     });
+
+    // Auto-reload when new service worker activates to purge stale cache
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!sessionStorage.getItem('vm-sw-reloaded')) {
+        sessionStorage.setItem('vm-sw-reloaded', '1');
+        window.location.reload();
+      }
+    });
+  }
+
+  // 2. Check if already running as installed standalone app (skip install banner only)
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                       window.navigator.standalone === true ||
+                       document.referrer.includes('android-app://');
+
+  if (isStandalone) {
+    // App is already installed - don't show install banner
+    return;
   }
 
   // 3. Capture native install prompt

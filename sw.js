@@ -1,7 +1,7 @@
 // Vegetable Mart - Customer Store Progressive Web App Service Worker
 // Network-First Strategy ensures all live code updates and admin changes reflect instantly.
 
-const CACHE_NAME = 'vegetable-mart-store-v5';
+const CACHE_NAME = 'vegetable-mart-store-v6';
 const PRECACHE_ASSETS = [
   './',
   'index.html',
@@ -66,7 +66,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    fetch(req)
+    fetch(req, { cache: 'no-cache' })
       .then((networkRes) => {
         if (networkRes && networkRes.status === 200 && networkRes.type === 'basic') {
           const resClone = networkRes.clone();

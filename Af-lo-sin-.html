@@ -26,6 +26,17 @@
       }
     });
   }
+
+  // Force-purge old service worker caches on client
+  if ('caches' in window) {
+    caches.keys().then(function(keys) {
+      keys.forEach(function(key) {
+        if (key !== 'vegetable-mart-store-v6') {
+          caches.delete(key);
+        }
+      });
+    }).catch(function() {});
+  }
 })();
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -120,17 +131,17 @@ const productHinglish = {
 };
 
 let product1KgPrices = {
-  patato: 120, tomato: 110, brownonion: 100, redonion: 105,
-  ladyfinger: 150, greenchilli: 90, spinch: 85, lauki: 100,
-  greencucumber: 90, cucumber: 80, bittergourd: 120, carrot: 90,
+  patato: 130, tomato: 110, brownonion: 100, redonion: 105,
+  ladyfinger: 150, greenchilli: 90, spinch: 85, lauki: 80,
+  greencucumber: 90, cucumber: 80, bittergourd: 40, carrot: 90,
   pumkin: 100, cauliflower: 130, cabbage: 80, brinjal: 110,
   fenugreekleaves: 80, mustardgreens: 80, corianderleaves: 65,
-  mint: 65, bathua: 70, radish: 70, beetroot: 100, sweetpotato: 120,
+  mint: 65, bathua: 70, radish: 70, beetroot: 50, sweetpotato: 120,
   garlic: 80, pointgourd: 95, tinda: 105, ginger: 110,
-  broccli: 150, capsicum: 130, corn: 110, jackfruit: 170, masroom: 180, peas: 110,   beans: 90,   chotebaingan: 80,   redcarrot: 70,   kachri: 100,   lemon: 120,   motimirch: 80,   oldginger: 160,   starfruit: 140,   taroroot: 90,   tikhimirchi: 100,   torai: 70
+  broccli: 150, capsicum: 130, corn: 110, jackfruit: 170, masroom: 180, peas: 110,   beans: 70,   chotebaingan: 80,   redcarrot: 70,   kachri: 100,   lemon: 120,   motimirch: 80,   oldginger: 160,   starfruit: 140,   taroroot: 90,   tikhimirchi: 100,   torai: 70
 };
 
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || /^192\.168\./.test(window.location.hostname) || /^10\./.test(window.location.hostname))
   ? `${window.location.protocol}//${window.location.hostname}:${window.location.port || 5000}`
   : 'https://project1-czw2.onrender.com';
 
@@ -170,6 +181,11 @@ function applySavedPrices(products) {
 
     if (card) {
       card.dataset.productKey = key;
+
+      const priceBadge = card.querySelector('.product-price-tag');
+      if (priceBadge && price && price > 0) {
+        priceBadge.textContent = `₹${price} / 1kg`;
+      }
 
       const buttons = card.querySelectorAll('.buttons button');
       if (buttons && buttons.length >= 2) {
@@ -391,6 +407,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     cartButton.setAttribute("onclick", `addToCart('${productKey}', ${current1Kg}, '${productImages[productKey] || ''}')`);
+
+    let priceBadge = product.querySelector(".product-price-tag");
+    if (!priceBadge) {
+      priceBadge = document.createElement("div");
+      priceBadge.className = "product-price-tag";
+      product.insertBefore(priceBadge, product.querySelector(".buttons"));
+    }
+    priceBadge.textContent = `₹${current1Kg} / 1kg`;
 
     const infoButton = product.querySelectorAll(".buttons button")[1];
     if (infoButton) {

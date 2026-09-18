@@ -636,6 +636,8 @@ async function handleSubmit(event) {
   saveProducts(products);
   renderProducts();
   resetForm();
+  alert(`Product "${title}" successfully saved and updated in store!`);
+  switchDashboardTab('products-section');
 }
 
 async function handleProductListClick(event) {
@@ -649,6 +651,7 @@ async function handleProductListClick(event) {
 
   if (button.dataset.action === 'edit') {
     populateForm(product);
+    switchDashboardTab('add-item-section');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 

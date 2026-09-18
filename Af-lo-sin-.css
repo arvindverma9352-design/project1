@@ -831,6 +831,7 @@ body{
 .product > div:first-child { width: 100%; height: 190px; border: 0; border-radius: 11px; background-color: #eef7e8; transition: transform .5s ease; cursor: pointer; }
 .product:hover > div:first-child { transform: scale(1.07); }
 .product-name { margin: 13px 2px 0; color: #1c5035; font: 700 16px 'Space Grotesk', sans-serif; text-transform: capitalize; }
+.product-price-tag { margin: 4px 2px 2px; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; color: #1e7a4b; }
 .buttons { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px 0 0; }
 .buttons button, .wishlist-button { width: 100%; height: 42px; border: 1px solid #d7e5d3; border-radius: 8px; color: #1e7a4b; background: #f8fcf5; font-size: 12px; font-weight: 700; cursor: pointer; transition: .25s ease; }
 .buttons button:hover, .wishlist-button:hover { color: white; background: #1e7a4b; transform: scale(1.04); }

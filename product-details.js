@@ -55,7 +55,7 @@ const productCatalog = {
     title: "Potato (आलू)",
     subtitle: "Fresh, clean and kitchen-ready",
     description: "Soft, versatile potatoes perfect for curries, fries, sabzi and everyday cooking.",
-    prices: { "250g": 40, "500g": 75, "1kg": 120 }
+    prices: { "250g": 45, "500g": 80, "1kg": 130 }
   },
   tomato: {
     title: "Tomato (टमाटर)",
@@ -97,7 +97,7 @@ const productCatalog = {
     title: "Lauki (लौकी)",
     subtitle: "Light, healthy and versatile",
     description: "Smooth and mild bottle gourd best suited for curries, soups and nutritious meals.",
-    prices: { "250g": 30, "500g": 55, "1kg": 100 }
+    prices: { "250g": 30, "500g": 55, "1kg": 80 }
   },
   greencucumber: {
     title: "Green Cucumber (हरा खीरा)",
@@ -115,7 +115,7 @@ const productCatalog = {
     title: "Bitter Gourd (करेला)",
     subtitle: "Bittersweet and wholesome",
     description: "Bold in flavour, rich in taste and ideal for traditional desi recipes.",
-    prices: { "250g": 35, "500g": 65, "1kg": 120 }
+    prices: { "250g": 15, "500g": 20, "1kg": 40 }
   },
   carrot: {
     title: "Carrot (गाजर)",
@@ -187,7 +187,7 @@ const productCatalog = {
     title: "Beetroot (चुकंदर)",
     subtitle: "Sweet, earthy and vibrant",
     description: "Colorful beetroot that adds sweetness, nutrition and taste to many recipes.",
-    prices: { "250g": 30, "500g": 55, "1kg": 100 }
+    prices: { "250g": 25, "500g": 50, "1kg": 50 }
   },
   sweetpotato: {
     title: "Sweet Potato (शकरकंद)",
