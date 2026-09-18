@@ -369,40 +369,31 @@ document.addEventListener("DOMContentLoaded", () => {
   <div id="cart-toast" class="cart-toast" role="status" aria-live="polite"></div>
 
   <!-- ================= NAVBAR ================= -->
-
 <nav class="navbar">
-
-    <div class="logo">
-      <img src="logo.png" alt="Vegetable Mart logo" class="brand-logo">
-      <span>VEGETABLE MART</span>
-    </div>
-
-    <div class="nav-links">
+    <!-- Top Row: Logo, VEGETABLE MART & Search Bar -->
+    <div class="nav-top-row">
+      <a href="Af-lo-sin-.html" class="logo">
+        <img src="logo.png" alt="Vegetable Mart logo" class="brand-logo">
+        <span>VEGETABLE MART</span>
+      </a>
 
       <label class="search-box" for="product-search">
         <span aria-hidden="true">⌕</span>
-        <input id="product-search" type="search" placeholder="Search vegetables" autocomplete="off">
+        <input id="product-search" type="search" placeholder="Search vegetables..." autocomplete="off">
       </label>
-
-        <a href="Af-lo-sin-.html">Home</a>
-
-        <a href="#products">Vegetables</a>
-
-        <a href="cart.html">
-            🛒 Cart
-            <span id="nav-cart-count">0</span>
-        </a>
-
-        <a href="wishlist.html">
-            ❤️ Wishlist
-        </a>
-
-        <a href="profile.html">
-            👤 Profile
-        </a>
-
     </div>
 
+    <!-- Bottom Row: All features in 1 single line -->
+    <div class="nav-bottom-row">
+      <a href="Af-lo-sin-.html" class="nav-btn-link active">🏠 Home</a>
+      <a href="#products" class="nav-btn-link">🥦 Vegetables</a>
+      <a href="cart.html" class="nav-btn-link cart-btn-link">
+        🛒 Cart
+        <span id="nav-cart-count">0</span>
+      </a>
+      <a href="wishlist.html" class="nav-btn-link">❤️ Wishlist</a>
+      <a href="profile.html" class="nav-btn-link">👤 Profile</a>
+    </div>
 </nav>
 
 <main class="home-main">
