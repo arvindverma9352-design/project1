@@ -1,101 +1,170 @@
 // Delivery Partner Dashboard Logic
-const API_BASE = 'https://project1-czw2.onrender.com';
-const RIDER_PIN = '1234';
-const AUTH_STORAGE_KEY = 'vegetable-mart-rider-auth';
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:5000'
+  : 'https://project1-czw2.onrender.com';
+
+const RIDER_SESSION_KEY = 'vegetable-mart-rider-session';
 const CACHE_STORAGE_KEY = 'vegetable-mart-rider-cache';
 
-let enteredPin = '';
+let currentRider = null;
 let allOrders = [];
 let currentFilter = 'all';
 let searchQuery = '';
 let pollingTimer = null;
 
-// ================= PIN AUTHENTICATION =================
+// ================= RIDER AUTHENTICATION =================
 function checkAuth() {
-    const isRemembered = localStorage.getItem(AUTH_STORAGE_KEY) === 'true';
-    const isSessionActive = sessionStorage.getItem(AUTH_STORAGE_KEY) === 'true';
+    let session = null;
+    try {
+        session = JSON.parse(localStorage.getItem(RIDER_SESSION_KEY) || sessionStorage.getItem(RIDER_SESSION_KEY));
+    } catch (e) {
+        session = null;
+    }
 
-    if (isRemembered || isSessionActive) {
+    if (session && (session.id || session._id || session.phone)) {
+        currentRider = session;
         unlockApp();
     } else {
         document.getElementById('pin-lock-overlay').style.display = 'flex';
         document.getElementById('delivery-app').style.display = 'none';
-        resetPinDots();
+        const err = document.getElementById('pin-error');
+        if (err) err.textContent = '';
     }
 }
 
-function enterPinDigit(digit) {
-    if (enteredPin.length >= 4) return;
-    enteredPin += digit;
-    updatePinDots();
-
-    if (enteredPin.length === 4) {
-        setTimeout(validatePin, 150);
-    }
-}
-
-function backspacePin() {
-    if (enteredPin.length > 0) {
-        enteredPin = enteredPin.slice(0, -1);
-        updatePinDots();
-        document.getElementById('pin-error').textContent = '';
-    }
-}
-
-function clearPin() {
-    enteredPin = '';
-    updatePinDots();
-    document.getElementById('pin-error').textContent = '';
-}
-
-function updatePinDots() {
-    for (let i = 1; i <= 4; i++) {
-        const dot = document.getElementById(`dot-${i}`);
-        if (dot) {
-            dot.classList.toggle('filled', i <= enteredPin.length);
-        }
-    }
-}
-
-function resetPinDots() {
-    enteredPin = '';
-    updatePinDots();
-    const err = document.getElementById('pin-error');
-    if (err) err.textContent = '';
-}
-
-function validatePin() {
-    const rememberMe = document.getElementById('pin-remember')?.checked;
+async function handleRiderLogin(event) {
+    if (event) event.preventDefault();
+    const phoneInput = document.getElementById('rider-login-phone');
+    const pinInput = document.getElementById('rider-login-pin');
     const errorEl = document.getElementById('pin-error');
+    const rememberMe = document.getElementById('pin-remember')?.checked;
+    const submitBtn = document.getElementById('login-submit-btn');
 
-    if (enteredPin === RIDER_PIN) {
-        sessionStorage.setItem(AUTH_STORAGE_KEY, 'true');
-        if (rememberMe) {
-            localStorage.setItem(AUTH_STORAGE_KEY, 'true');
-        }
-        unlockApp();
-    } else {
-        if (errorEl) {
-            errorEl.textContent = '❌ Galat PIN! Kripya sahi 4-digit PIN daalein.';
-        }
-        resetPinDots();
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+    const pin = pinInput ? pinInput.value.trim() : '';
+
+    if (!phone || !pin) {
+        if (errorEl) errorEl.textContent = '❌ Mobile number aur 4-digit PIN daalna zaroori hai.';
+        return;
     }
+
+    if (errorEl) errorEl.textContent = 'Logging in...';
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+        const res = await fetch(`${API_BASE}/api/riders/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, pin })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            throw new Error(data.message || 'Login failed. Sahi mobile aur PIN daalein.');
+        }
+
+        currentRider = data.rider;
+        const sessionStr = JSON.stringify(currentRider);
+        sessionStorage.setItem(RIDER_SESSION_KEY, sessionStr);
+        if (rememberMe) {
+            localStorage.setItem(RIDER_SESSION_KEY, sessionStr);
+        }
+
+        if (errorEl) errorEl.textContent = '';
+        unlockApp();
+    } catch (err) {
+        if (errorEl) errorEl.textContent = `❌ ${err.message}`;
+    } finally {
+        if (submitBtn) submitBtn.disabled = false;
+    }
+}
+
+async function quickTestLogin() {
+    const phoneInput = document.getElementById('rider-login-phone');
+    const pinInput = document.getElementById('rider-login-pin');
+    if (phoneInput && !phoneInput.value) phoneInput.value = '9876543210';
+    if (pinInput) pinInput.value = '1234';
+    await handleRiderLogin();
 }
 
 function unlockApp() {
     document.getElementById('pin-lock-overlay').style.display = 'none';
     document.getElementById('delivery-app').style.display = 'block';
+
+    const nameEl = document.getElementById('captain-display-name');
+    const phoneEl = document.getElementById('captain-display-phone');
+    if (nameEl && currentRider) nameEl.textContent = currentRider.name || 'Delivery Captain';
+    if (phoneEl && currentRider) phoneEl.textContent = `📱 ${currentRider.phone || ''}`;
+
+    updateDutyUI(currentRider ? currentRider.dutyStatus : 'ON');
+
     fetchOrders();
     startPolling();
 }
 
-function lockPortal() {
-    sessionStorage.removeItem(AUTH_STORAGE_KEY);
-    localStorage.removeItem(AUTH_STORAGE_KEY);
+function logoutCaptain() {
+    if (!confirm('Kya aap Captain account se logout karna chahte hain?')) return;
+    localStorage.removeItem(RIDER_SESSION_KEY);
+    sessionStorage.removeItem(RIDER_SESSION_KEY);
+    currentRider = null;
     stopPolling();
     document.getElementById('delivery-app').style.display = 'none';
     document.getElementById('pin-lock-overlay').style.display = 'flex';
-    resetPinDots();
+    const errEl = document.getElementById('pin-error');
+    if (errEl) errEl.textContent = '';
+}
+
+// ================= DUTY ON / OFF TOGGLE =================
+async function toggleCaptainDuty(desiredStatus) {
+    if (!currentRider) return;
+
+    const nextStatus = desiredStatus || (currentRider.dutyStatus === 'ON' ? 'OFF' : 'ON');
+    const riderId = currentRider.id || currentRider._id;
+
+    currentRider.dutyStatus = nextStatus;
+    updateDutyUI(nextStatus);
+
+    const sessionStr = JSON.stringify(currentRider);
+    sessionStorage.setItem(RIDER_SESSION_KEY, sessionStr);
+    if (localStorage.getItem(RIDER_SESSION_KEY)) {
+        localStorage.setItem(RIDER_SESSION_KEY, sessionStr);
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/api/riders/${riderId}/duty`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dutyStatus: nextStatus })
+        });
+        const data = await res.json();
+        if (data.success && data.dutyStatus) {
+            currentRider.dutyStatus = data.dutyStatus;
+            updateDutyUI(data.dutyStatus);
+        }
+        showToast(nextStatus === 'ON' ? '🟢 Duty ON! Ready for deliveries.' : '🔴 Duty OFF. Offline mode.');
+    } catch (err) {
+        console.warn('Duty status sync warning:', err.message);
+    }
+
+    fetchOrders();
+}
+
+function updateDutyUI(dutyStatus) {
+    const dutyBtn = document.getElementById('duty-toggle-btn');
+    const dutyText = document.getElementById('duty-text');
+    const dutyOffBanner = document.getElementById('duty-off-banner');
+
+    const isDutyOn = dutyStatus === 'ON';
+
+    if (dutyBtn) {
+        dutyBtn.className = `duty-toggle-btn ${isDutyOn ? 'on' : 'off'}`;
+    }
+    if (dutyText) {
+        dutyText.textContent = isDutyOn ? 'DUTY ON' : 'DUTY OFF';
+    }
+    if (dutyOffBanner) {
+        dutyOffBanner.style.display = isDutyOn ? 'none' : 'flex';
+    }
 }
 
 // ================= ORDER FETCHING & SYNC =================
@@ -106,7 +175,13 @@ async function fetchOrders(isManual = false) {
     }
 
     try {
-        const res = await fetch(`${API_BASE}/api/orders`);
+        const riderId = currentRider ? (currentRider.id || currentRider._id) : '';
+        const riderPhone = currentRider ? currentRider.phone : '';
+        const query = riderId || riderPhone
+            ? `?riderId=${encodeURIComponent(riderId)}&riderPhone=${encodeURIComponent(riderPhone)}`
+            : '';
+
+        const res = await fetch(`${API_BASE}/api/orders${query}`);
         if (!res.ok) {
             throw new Error(`Server returned status ${res.status}`);
         }
@@ -119,6 +194,15 @@ async function fetchOrders(isManual = false) {
             fetchedOrders = data.orders;
         } else if (data && data.order) {
             fetchedOrders = [data.order];
+        }
+
+        // Filter strictly for this captain if assigned
+        if (currentRider && (riderId || riderPhone)) {
+            fetchedOrders = fetchedOrders.filter((order) => {
+                if (order.deliveryBoyId && (order.deliveryBoyId === riderId || order.deliveryBoyId === currentRider._id)) return true;
+                if (order.deliveryBoyPhone && order.deliveryBoyPhone === riderPhone) return true;
+                return false;
+            });
         }
 
         // Sort: newest first
@@ -135,7 +219,6 @@ async function fetchOrders(isManual = false) {
         }
     } catch (err) {
         console.warn('Network error, loading offline cache:', err);
-        // Load cached orders if offline on road
         const cached = localStorage.getItem(CACHE_STORAGE_KEY);
         if (cached) {
             try {
@@ -255,6 +338,17 @@ function renderOrders() {
             const id = (order._id || order.id || '').toLowerCase();
             return name.includes(searchQuery) || mobile.includes(searchQuery) || address.includes(searchQuery) || id.includes(searchQuery);
         });
+    }
+
+    if (allOrders.length === 0) {
+        feed.innerHTML = `
+            <div class="no-assigned-orders">
+                <div class="no-orders-icon">🛵</div>
+                <h3>Abhi Koi Order Assign Nahi Hua Hai</h3>
+                <p>Admin panel se jaise hi aapko naya order assign hoga, wo yahan alert ke sath dikhayi dega.</p>
+            </div>
+        `;
+        return;
     }
 
     if (filtered.length === 0) {

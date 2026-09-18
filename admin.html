@@ -19,6 +19,8 @@
 
     <nav class="admin-nav">
       <a href="Af-lo-sin-.html">Home</a>
+      <a href="#riders-section">🛵 Delivery Boys</a>
+      <a href="#orders-section">📦 Orders</a>
       <a href="cart.html">Cart</a>
       <a href="wishlist.html">Wishlist</a>
       <a href="profile.html">Profile</a>
@@ -140,10 +142,45 @@
       <div id="product-list" class="product-list"></div>
     </section>
 
-    <section class="panel orders-panel">
-      <div class="section-heading">
-        <p class="eyebrow">Recent activity</p>
-        <h2>Orders</h2>
+    <section class="panel riders-panel" id="riders-section">
+      <div class="section-heading split-heading">
+        <div>
+          <p class="eyebrow">Fleet Management</p>
+          <h2>🛵 Delivery Boys / Captains</h2>
+        </div>
+        <span id="rider-count" class="count-badge">0 Active</span>
+      </div>
+
+      <form id="rider-form" class="rider-add-form">
+        <div class="rider-form-grid">
+          <div class="field">
+            <label for="rider-name">Delivery Boy Name *</label>
+            <input id="rider-name" type="text" placeholder="e.g. Ramesh Kumar" required />
+          </div>
+          <div class="field">
+            <label for="rider-phone">Mobile Number *</label>
+            <input id="rider-phone" type="tel" placeholder="10-digit mobile" required />
+          </div>
+          <div class="field">
+            <label for="rider-pin">4-Digit PIN</label>
+            <input id="rider-pin" type="text" maxlength="6" placeholder="1234" value="1234" required />
+          </div>
+        </div>
+        <div class="button-row" style="margin-top: 12px;">
+          <button type="submit" class="primary-btn" id="add-rider-btn">➕ Add Delivery Boy</button>
+        </div>
+      </form>
+
+      <div id="riders-list" class="riders-list"></div>
+    </section>
+
+    <section class="panel orders-panel" id="orders-section">
+      <div class="section-heading split-heading">
+        <div>
+          <p class="eyebrow">Recent activity</p>
+          <h2>Orders & Delivery Assignment</h2>
+        </div>
+        <span id="orders-count" class="count-badge">0 orders</span>
       </div>
 
       <div id="order-list" class="order-list"></div>

@@ -63,6 +63,7 @@ const categoryFilterInput = document.getElementById('category-filter');
 const bulkDeleteButton = document.getElementById('bulk-delete');
 const exportProductsButton = document.getElementById('export-products');
 const selectedProductIds = new Set();
+let allRiders = [];
 
 function normalizeProduct(product, key) {
   const prodKey = key || product.key || product.id;
@@ -321,6 +322,21 @@ function renderOrders() {
       ? `<br><a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="map-link-btn" style="display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; padding: 5px 12px; background: #1e7a4b; color: #ffffff !important; border-radius: 6px; font-size: 12px; text-decoration: none; font-weight: 600;">📍 Open in Google Maps</a>` 
       : '';
 
+    // Delivery Boy Assignment UI
+    const isAssigned = Boolean(order.deliveryBoyName || order.deliveryBoyId);
+    const assignedRiderText = isAssigned
+      ? `🛵 Assigned to: <strong>${order.deliveryBoyName}</strong> (${order.deliveryBoyPhone || 'No phone'})`
+      : `⚠️ <strong>Not Assigned Yet</strong> (Select delivery boy below)`;
+
+    const riderOptionsHtml = allRiders.map((rider) => {
+      const riderId = rider.id || rider._id;
+      const isSelected = (order.deliveryBoyId && (order.deliveryBoyId === riderId || order.deliveryBoyId === rider._id)) ||
+                         (order.deliveryBoyPhone && order.deliveryBoyPhone === rider.phone);
+      const dutyIcon = rider.dutyStatus === 'ON' ? '🟢' : '🔴';
+      const dutyText = rider.dutyStatus === 'ON' ? 'ON DUTY' : 'OFF DUTY';
+      return `<option value="${riderId}" ${isSelected ? 'selected' : ''}>${dutyIcon} ${rider.name} (${rider.phone}) — [${dutyText}]</option>`;
+    }).join('');
+
     return `
       <div class="order-item">
         <div class="order-meta">
@@ -330,6 +346,24 @@ function renderOrders() {
           <p><strong>Address:</strong> ${addressDisplay}${mapBtnHtml}</p>
           <p><strong>Items:</strong> ${itemsText}</p>
           <small>Total: ₹${order.total || 0}</small>
+
+          <div class="order-assignment-card">
+            <div class="assignment-header">
+              <span>${assignedRiderText}</span>
+              <span class="assigned-badge ${isAssigned ? 'assigned' : 'unassigned'}">
+                ${isAssigned ? '✓ Assigned' : '⏳ Pending'}
+              </span>
+            </div>
+            <div class="assignment-controls-row">
+              <select id="rider-select-${orderId}" class="assign-select">
+                <option value="">-- Select Delivery Boy --</option>
+                ${riderOptionsHtml}
+              </select>
+              <button type="button" class="assign-action-btn" onclick="assignOrderToRider('${orderId}')">
+                ${isAssigned ? 'Reassign' : 'Assign'}
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="order-side">
@@ -338,6 +372,11 @@ function renderOrders() {
       </div>
     `;
   }).join('');
+
+  const ordersCountEl = document.getElementById('orders-count');
+  if (ordersCountEl) {
+    ordersCountEl.textContent = `${orders.length} orders`;
+  }
 }
 
 function populateForm(product) {
@@ -540,11 +579,177 @@ async function toggleStoreStatus() {
 
 document.getElementById('store-toggle-btn')?.addEventListener('click', toggleStoreStatus);
 
+/* ─── Delivery Boys Fleet Management ──────────────────────── */
+async function loadRidersFromBackend() {
+  try {
+    const data = await apiRequest('/api/riders');
+    if (data && Array.isArray(data.riders)) {
+      allRiders = data.riders;
+      renderRiders();
+      return allRiders;
+    }
+  } catch (error) {
+    console.warn('Unable to fetch riders from backend:', error.message);
+  }
+  return allRiders;
+}
+
+function renderRiders() {
+  const ridersListEl = document.getElementById('riders-list');
+  const riderCountEl = document.getElementById('rider-count');
+  if (!ridersListEl) return;
+
+  const activeCount = allRiders.filter((r) => r.dutyStatus === 'ON').length;
+  if (riderCountEl) {
+    riderCountEl.textContent = `${activeCount} On Duty / ${allRiders.length} Total`;
+  }
+
+  if (!allRiders.length) {
+    ridersListEl.innerHTML = '<div class="empty-state" style="padding: 20px; color: #667a6c;">Abhi koi delivery boy registered nahi hai. Upar diye gaye form se naya delivery boy add karein.</div>';
+    return;
+  }
+
+  ridersListEl.innerHTML = allRiders.map((rider) => {
+    const isDutyOn = rider.dutyStatus === 'ON';
+    const riderId = rider.id || rider._id;
+    return `
+      <div class="rider-card">
+        <div class="rider-card-header">
+          <span class="rider-name">🛵 ${rider.name}</span>
+          <span class="duty-badge ${isDutyOn ? 'duty-on' : 'duty-off'}">
+            ${isDutyOn ? '● ON DUTY' : '○ OFF DUTY'}
+          </span>
+        </div>
+        <div class="rider-details">
+          <div>📱 <strong>Mobile:</strong> ${rider.phone}</div>
+          <div>🔑 <strong>PIN:</strong> ${rider.pin || '1234'}</div>
+          <div>📦 <strong>Active Orders:</strong> ${rider.activeOrdersCount || 0}</div>
+        </div>
+        <div class="rider-actions">
+          <small style="color: #888;">ID: ${(riderId || '').slice(-6)}</small>
+          <button type="button" class="rider-delete-btn" onclick="deleteRider('${riderId}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function handleRiderSubmit(event) {
+  event.preventDefault();
+  const nameInput = document.getElementById('rider-name');
+  const phoneInput = document.getElementById('rider-phone');
+  const pinInput = document.getElementById('rider-pin');
+  const addBtn = document.getElementById('add-rider-btn');
+
+  const name = nameInput.value.trim();
+  const phone = phoneInput.value.trim();
+  const pin = pinInput.value.trim() || '1234';
+
+  if (!name || !phone) {
+    alert('Delivery Boy Name aur Mobile Number zaroori hai.');
+    return;
+  }
+
+  if (addBtn) addBtn.disabled = true;
+
+  try {
+    const res = await apiRequest('/api/riders', {
+      method: 'POST',
+      body: JSON.stringify({ name, phone, pin })
+    });
+
+    alert(`✅ ${res.message || 'Delivery boy safaltapoorvak add ho gaya!'}`);
+    nameInput.value = '';
+    phoneInput.value = '';
+    pinInput.value = '1234';
+
+    await loadRidersFromBackend();
+    renderOrders();
+  } catch (err) {
+    alert(`❌ Delivery boy add nahi ho paya: ${err.message}`);
+  } finally {
+    if (addBtn) addBtn.disabled = false;
+  }
+}
+
+async function deleteRider(id) {
+  if (!confirm('Kya aap is delivery boy ko delete karna chahte hain? Unke pending orders unassigned ho jayenge.')) {
+    return;
+  }
+
+  try {
+    await apiRequest(`/api/riders/${id}`, { method: 'DELETE' });
+    alert('Delivery boy delete ho gaya.');
+    await loadRidersFromBackend();
+    await loadOrdersFromBackend();
+    renderOrders();
+  } catch (err) {
+    alert(`Failed to delete rider: ${err.message}`);
+  }
+}
+
+async function assignOrderToRider(orderId) {
+  const selectEl = document.getElementById(`rider-select-${orderId}`);
+  if (!selectEl) return;
+
+  const selectedRiderId = selectEl.value;
+  if (!selectedRiderId) {
+    if (!confirm('Kya aap is order ko unassign karna chahte hain?')) return;
+    try {
+      await apiRequest(`/api/orders/${orderId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          deliveryBoyId: null,
+          deliveryBoyName: '',
+          deliveryBoyPhone: '',
+          assignedAt: null
+        })
+      });
+      alert('Order unassign kar diya gaya.');
+      await loadOrdersFromBackend();
+      await loadRidersFromBackend();
+      renderOrders();
+    } catch (err) {
+      alert(`Unassign failed: ${err.message}`);
+    }
+    return;
+  }
+
+  const selectedRider = allRiders.find((r) => (r.id || r._id) === selectedRiderId);
+  if (!selectedRider) {
+    alert('Delivery boy nahi mila.');
+    return;
+  }
+
+  try {
+    await apiRequest(`/api/orders/${orderId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        deliveryBoyId: selectedRider.id || selectedRider._id,
+        deliveryBoyName: selectedRider.name,
+        deliveryBoyPhone: selectedRider.phone,
+        assignedAt: new Date()
+      })
+    });
+
+    alert(`✅ Order ${selectedRider.name} (${selectedRider.phone}) ko assign ho gaya!`);
+    await loadOrdersFromBackend();
+    await loadRidersFromBackend();
+    renderOrders();
+  } catch (err) {
+    alert(`Order assign karne me error: ${err.message}`);
+  }
+}
+
+document.getElementById('rider-form')?.addEventListener('submit', handleRiderSubmit);
+
 async function initializeAdminPage() {
   await loadProductsFromBackend();
+  await loadRidersFromBackend();
   await loadOrdersFromBackend();
   await loadStoreStatus();
   renderProducts();
+  renderRiders();
   renderOrders();
 }
 

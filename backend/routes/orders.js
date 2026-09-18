@@ -6,7 +6,22 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    const orders = await Order.find().sort({ createdAt: -1 }).lean();
+    const { riderId, riderPhone } = req.query;
+    let filter = {};
+
+    if (riderId || riderPhone) {
+      const conditions = [];
+      if (riderId) {
+        // Match ObjectId or string
+        conditions.push({ deliveryBoyId: riderId });
+      }
+      if (riderPhone) {
+        conditions.push({ deliveryBoyPhone: riderPhone });
+      }
+      filter = { $or: conditions };
+    }
+
+    const orders = await Order.find(filter).sort({ createdAt: -1 }).lean();
     return res.json({ success: true, orders });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -51,8 +66,10 @@ router.post('/', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   try {
-    const { status } = req.body;
-    const updateData = status ? { status } : req.body;
+    const updateData = { ...req.body };
+    if (updateData.deliveryBoyId && !updateData.assignedAt) {
+      updateData.assignedAt = new Date();
+    }
 
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,

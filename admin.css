@@ -516,3 +516,194 @@ input:focus, textarea:focus, select:focus {
   background: #218838;
 }
 
+/* ================= FLEET / RIDERS MANAGEMENT ================= */
+.riders-panel, .orders-panel {
+  grid-column: 1 / -1;
+}
+
+.rider-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.riders-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.rider-card {
+  background: #ffffff;
+  border: 1.5px solid #e0ebe0;
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 4px 14px rgba(25, 51, 37, 0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.rider-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(25, 51, 37, 0.08);
+}
+
+.rider-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.rider-name {
+  font-weight: 700;
+  font-size: 16px;
+  color: #193325;
+}
+
+.duty-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.duty-badge.duty-on {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.duty-badge.duty-off {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.rider-details {
+  font-size: 13.5px;
+  color: #556c5c;
+  line-height: 1.5;
+}
+
+.rider-details strong {
+  color: #193325;
+}
+
+.rider-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid #edf4ec;
+}
+
+.rider-delete-btn {
+  background: transparent;
+  color: #dc3545;
+  border: 1px solid #f5c2c7;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rider-delete-btn:hover {
+  background: #dc3545;
+  color: #ffffff;
+}
+
+/* ================= ORDER ASSIGNMENT CONTROLS ================= */
+.order-assignment-card {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: #f7faf5;
+  border: 1.5px dashed #cde2ca;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.assignment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.assigned-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.assigned-badge.assigned {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.assigned-badge.unassigned {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.assignment-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.assign-select {
+  flex: 1;
+  min-width: 200px;
+  padding: 7px 12px;
+  border: 1.5px solid #c0d8bc;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  color: #193325;
+  outline: none;
+}
+
+.assign-select:focus {
+  border-color: #1f874e;
+  box-shadow: 0 0 0 3px rgba(31, 135, 78, 0.12);
+}
+
+.assign-action-btn {
+  padding: 7px 16px;
+  background: #1f874e;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.assign-action-btn:hover {
+  background: #185a3a;
+  transform: translateY(-1px);
+}
+
+

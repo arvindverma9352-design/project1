@@ -7,6 +7,7 @@ const authRoutes = require('./routes/auth');
 const productsRoutes = require('./routes/products');
 const ordersRoutes = require('./routes/orders');
 const settingsRoutes = require('./routes/settings');
+const ridersRoutes = require('./routes/riders');
 
 const path = require('path');
 
@@ -37,6 +38,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/riders', ridersRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

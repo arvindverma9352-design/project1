@@ -16,7 +16,11 @@ const orderSchema = new mongoose.Schema({
       image: String,
       weight: String
     }
-  ]
+  ],
+  deliveryBoyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Rider', default: null },
+  deliveryBoyName: { type: String, default: '' },
+  deliveryBoyPhone: { type: String, default: '' },
+  assignedAt: { type: Date, default: null }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

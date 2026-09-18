@@ -15,47 +15,50 @@
 </head>
 <body class="delivery-body">
 
-    <!-- Quick PIN Unlock Overlay -->
+    <!-- Captain Login Overlay -->
     <div id="pin-lock-overlay" class="pin-overlay">
         <div class="pin-card">
             <div class="pin-brand">
                 <img src="logo.png" alt="Vegetable Mart" class="pin-logo">
-                <h2>Vegetable Mart</h2>
-                <p>Delivery Partner Portal</p>
+                <h2>VM Delivery Captain</h2>
+                <p>Delivery Partner Login Portal</p>
             </div>
 
-            <div class="pin-prompt">
-                <span>Enter 4-Digit Rider PIN</span>
-                <div class="pin-dots">
-                    <span class="dot" id="dot-1"></span>
-                    <span class="dot" id="dot-2"></span>
-                    <span class="dot" id="dot-3"></span>
-                    <span class="dot" id="dot-4"></span>
+            <form id="rider-login-form" onsubmit="handleRiderLogin(event)">
+                <div class="login-field-group">
+                    <label for="rider-login-phone">Captain Mobile Number</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">📱</span>
+                        <input type="tel" id="rider-login-phone" placeholder="10-digit mobile number" required autocomplete="tel" maxlength="10">
+                    </div>
                 </div>
-            </div>
 
-            <div id="pin-error" class="pin-error-msg"></div>
+                <div class="login-field-group">
+                    <label for="rider-login-pin">4-Digit Security PIN</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="rider-login-pin" placeholder="Enter PIN (e.g. 1234)" required maxlength="6" inputmode="numeric">
+                    </div>
+                </div>
 
-            <div class="pin-keypad">
-                <button type="button" class="pin-key" onclick="enterPinDigit('1')">1</button>
-                <button type="button" class="pin-key" onclick="enterPinDigit('2')">2</button>
-                <button type="button" class="pin-key" onclick="enterPinDigit('3')">3</button>
-                <button type="button" class="pin-key" onclick="enterPinDigit('4')">4</button>
-                <button type="button" class="pin-key" onclick="enterPinDigit('5')">5</button>
-                <button type="button" class="pin-key" onclick="enterPinDigit('6')">6</button>
-                <button type="button" class="pin-key" onclick="enterPinDigit('7')">7</button>
-                <button type="button" class="pin-key" onclick="enterPinDigit('8')">8</button>
-                <button type="button" class="pin-key" onclick="enterPinDigit('9')">9</button>
-                <button type="button" class="pin-key clear" onclick="clearPin()">C</button>
-                <button type="button" class="pin-key" onclick="enterPinDigit('0')">0</button>
-                <button type="button" class="pin-key backspace" onclick="backspacePin()">⌫</button>
-            </div>
+                <div id="pin-error" class="pin-error-msg"></div>
 
-            <div class="pin-footer-note">
-                <label class="pin-remember">
-                    <input type="checkbox" id="pin-remember" checked> Keep me logged in
-                </label>
-                <small>Default Rider PIN is <strong>1234</strong></small>
+                <div class="pin-footer-note">
+                    <label class="pin-remember">
+                        <input type="checkbox" id="pin-remember" checked> Keep me logged in
+                    </label>
+                    <small>Default captain PIN is <strong>1234</strong></small>
+                </div>
+
+                <button type="submit" class="rider-login-btn" id="login-submit-btn">
+                    🚀 Login as Captain
+                </button>
+            </form>
+
+            <div class="quick-login-fallback">
+                <button type="button" class="quick-login-btn" onclick="quickTestLogin()">
+                    ⚡ Quick Test Login (Default 1234)
+                </button>
             </div>
 
             <button type="button" class="pin-install-btn" onclick="triggerDeliveryInstall()">
@@ -71,22 +74,39 @@
             <div class="header-left">
                 <img src="logo.png" alt="Logo" class="header-logo">
                 <div>
-                    <h1>Delivery Partner</h1>
-                    <span class="online-indicator"><span class="pulse-dot"></span> On Duty • Online</span>
+                    <h1 id="captain-display-name">Delivery Captain</h1>
+                    <span id="captain-display-phone" class="captain-phone">📱 Mobile</span>
                 </div>
             </div>
             <div class="header-right">
+                <!-- DUTY TOGGLE SWITCH -->
+                <button type="button" class="duty-toggle-btn on" id="duty-toggle-btn" onclick="toggleCaptainDuty()" title="Toggle Duty ON / OFF">
+                    <span class="duty-dot">●</span>
+                    <span class="duty-text" id="duty-text">DUTY ON</span>
+                </button>
                 <button type="button" class="icon-action-btn install-btn" id="install-app-btn" style="display: none;" title="Install App on Phone">
                     <span>📲</span>
                 </button>
                 <button type="button" class="icon-action-btn" id="refresh-btn" onclick="fetchOrders(true)" title="Refresh Orders">
                     <span class="refresh-icon">↻</span>
                 </button>
-                <button type="button" class="icon-action-btn exit" onclick="lockPortal()" title="Lock Screen">
-                    <span>🔒</span>
+                <button type="button" class="icon-action-btn exit" onclick="logoutCaptain()" title="Logout Captain">
+                    <span>🚪</span>
                 </button>
             </div>
         </header>
+
+        <!-- Duty OFF Notice Banner -->
+        <div id="duty-off-banner" class="duty-off-banner" style="display: none;">
+            <div class="duty-banner-content">
+                <span class="duty-banner-icon">⏸️</span>
+                <div>
+                    <strong>Aap abhi Duty OFF par hain (Offline)</strong>
+                    <p>Naye orders receive karne aur deliver karne ke liye upar diye gaye <strong>"DUTY ON"</strong> button par tap karein.</p>
+                </div>
+            </div>
+            <button type="button" class="duty-banner-turn-on-btn" onclick="toggleCaptainDuty('ON')">Turn Duty ON</button>
+        </div>
 
         <!-- KPI Metrics Ribbon -->
         <section class="metrics-grid">
