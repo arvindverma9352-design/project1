@@ -7,6 +7,12 @@
     <title>VEGETABLE MART</title>
     <link rel="stylesheet" href="Af-lo-sin-.css">
     <link rel="icon" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e7a4b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Vegetable Mart">
 </head>
 <script>
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -847,5 +853,6 @@ document.addEventListener("DOMContentLoaded", () => {
   🔒 Store abhi band hai — orders temporarily unavailable
 </div>
 
+<script src="pwa-install.js"></script>
 </body>
 </html>

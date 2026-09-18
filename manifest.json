@@ -1,12 +1,13 @@
 {
-  "name": "Vegetable Mart Delivery Partner",
-  "short_name": "VM Delivery",
-  "description": "Delivery partner dashboard for Vegetable Mart orders",
-  "start_url": "delivery.html",
+  "name": "Vegetable Mart - Fresh Vegetables",
+  "short_name": "Vegetable Mart",
+  "description": "Fresh farm vegetables delivered to your doorstep in minutes",
+  "start_url": "index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f1813",
-  "theme_color": "#1e7545",
+  "theme_color": "#1e7a4b",
   "icons": [
     {
       "src": "logo.png",
@@ -14,6 +15,31 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Shop Vegetables",
+      "short_name": "Shop",
+      "url": "Af-lo-sin-.html",
+      "icons": [{ "src": "logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Cart",
+      "short_name": "Cart",
+      "url": "cart.html",
+      "icons": [{ "src": "logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Wishlist",
+      "short_name": "Wishlist",
+      "url": "wishlist.html",
+      "icons": [{ "src": "logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Delivery Partner",
+      "short_name": "Delivery",
+      "url": "delivery.html",
+      "icons": [{ "src": "logo.png", "sizes": "192x192" }]
+    }
   ]
 }
-
