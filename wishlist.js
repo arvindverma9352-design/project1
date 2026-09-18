@@ -1,6 +1,16 @@
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? `${window.location.protocol}//${window.location.hostname}:${window.location.port || 5000}`
-  : 'https://project1-czw2.onrender.com';
+function getApiBase() {
+  if (window.location.hostname.endsWith('onrender.com')) {
+    return window.location.origin;
+  }
+  if (window.location.port === '5000') {
+    return window.location.origin;
+  }
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://' + window.location.hostname + ':5000';
+  }
+  return 'https://project1-czw2.onrender.com';
+}
+const API_BASE = getApiBase();
 const wishlistItems = document.getElementById("wishlist-items");
 const productLabels = {
     patato: "Potato (आलू)", tomato: "Tomato (टमाटर)", brownonion: "Brown Onion (सफेद प्याज़)", redonion: "Red Onion (लाल प्याज़)",

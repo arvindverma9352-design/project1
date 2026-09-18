@@ -51,9 +51,19 @@ const STORAGE_KEYS = {
   orders: 'vegetable-mart-admin-orders'
 };
 
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? `${window.location.protocol}//${window.location.hostname}:${window.location.port || 5000}`
-  : 'https://project1-czw2.onrender.com';
+function getApiBase() {
+  if (window.location.hostname.endsWith('onrender.com')) {
+    return window.location.origin;
+  }
+  if (window.location.port === '5000') {
+    return window.location.origin;
+  }
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://' + window.location.hostname + ':5000';
+  }
+  return 'https://project1-czw2.onrender.com';
+}
+const API_BASE = getApiBase();
 
 const productForm = document.getElementById('product-form');
 const productList = document.getElementById('product-list');
@@ -152,23 +162,59 @@ async function loadProductsFromBackend() {
 async function syncProductToBackend(product, method = 'POST') {
   if (!product) return;
 
+  const keyOrId = product.key || product.id;
+  const endpoint = method === 'POST' ? '/api/products' : `/api/products/${keyOrId}`;
+  const payload = JSON.stringify(product);
+
+  let synced = false;
+  let lastErr = null;
+
+  // 1. Try configured API_BASE
   try {
-    const keyOrId = product.key || product.id;
-    const endpoint = method === 'POST' ? '/api/products' : `/api/products/${keyOrId}`;
-
-    const options = {
+    const res = await fetch(`${API_BASE}${endpoint}`, {
       method,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      ...(method === 'POST' || method === 'PUT'
-        ? { body: JSON.stringify(product) }
-        : {})
-    };
+      headers: { 'Content-Type': 'application/json' },
+      body: payload
+    });
+    if (res.ok) {
+      synced = true;
+    } else {
+      lastErr = new Error(`Server returned ${res.status}`);
+    }
+  } catch (err) {
+    lastErr = err;
+  }
 
-    await apiRequest(endpoint, options);
-  } catch (error) {
-    console.warn('Unable to sync product with backend:', error.message);
+  // 2. If not synced and API_BASE was local, sync directly to Render cloud backend
+  if (!synced && API_BASE !== 'https://project1-czw2.onrender.com') {
+    try {
+      const cloudRes = await fetch(`https://project1-czw2.onrender.com${endpoint}`, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: payload
+      });
+      if (cloudRes.ok) {
+        synced = true;
+      } else {
+        lastErr = new Error(`Cloud server returned ${cloudRes.status}`);
+      }
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+
+  // 3. If primary was local and succeeded, also push to Render cloud in background to keep both in sync
+  if (synced && (API_BASE.includes('localhost') || API_BASE.includes('127.0.0.1'))) {
+    fetch(`https://project1-czw2.onrender.com${endpoint}`, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: payload
+    }).catch(() => {});
+  }
+
+  if (!synced) {
+    console.warn('Unable to sync product with backend:', lastErr?.message);
+    throw new Error(lastErr?.message || 'Failed to reach backend server');
   }
 }
 
@@ -625,19 +671,26 @@ async function handleSubmit(event) {
     }
   };
 
-  if (existingIndex >= 0) {
-    products[existingIndex] = newProduct;
-    await syncProductToBackend(newProduct, 'PUT');
-  } else {
-    products.unshift(newProduct);
-    await syncProductToBackend(newProduct, 'POST');
+  try {
+    if (existingIndex >= 0) {
+      products[existingIndex] = newProduct;
+      await syncProductToBackend(newProduct, 'PUT');
+    } else {
+      products.unshift(newProduct);
+      await syncProductToBackend(newProduct, 'POST');
+    }
+    saveProducts(products);
+    renderProducts();
+    resetForm();
+    alert(`Product "${title}" successfully saved and updated in cloud store!`);
+    switchDashboardTab('products-section');
+  } catch (error) {
+    saveProducts(products);
+    renderProducts();
+    resetForm();
+    alert(`Product "${title}" saved locally, but cloud sync notice: ${error.message}.`);
+    switchDashboardTab('products-section');
   }
-
-  saveProducts(products);
-  renderProducts();
-  resetForm();
-  alert(`Product "${title}" successfully saved and updated in store!`);
-  switchDashboardTab('products-section');
 }
 
 async function handleProductListClick(event) {

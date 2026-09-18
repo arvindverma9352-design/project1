@@ -31,7 +31,7 @@
   if ('caches' in window) {
     caches.keys().then(function(keys) {
       keys.forEach(function(key) {
-        if (key !== 'vegetable-mart-store-v6') {
+        if (key !== 'vegetable-mart-store-v7') {
           caches.delete(key);
         }
       });
@@ -141,9 +141,19 @@ let product1KgPrices = {
   broccli: 150, capsicum: 130, corn: 110, jackfruit: 170, masroom: 180, peas: 110,   beans: 70,   chotebaingan: 80,   redcarrot: 70,   kachri: 100,   lemon: 120,   motimirch: 80,   oldginger: 160,   starfruit: 140,   taroroot: 90,   tikhimirchi: 100,   torai: 70
 };
 
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || /^192\.168\./.test(window.location.hostname) || /^10\./.test(window.location.hostname))
-  ? `${window.location.protocol}//${window.location.hostname}:${window.location.port || 5000}`
-  : 'https://project1-czw2.onrender.com';
+function getApiBase() {
+  if (window.location.hostname.endsWith('onrender.com')) {
+    return window.location.origin;
+  }
+  if (window.location.port === '5000') {
+    return window.location.origin;
+  }
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://' + window.location.hostname + ':5000';
+  }
+  return 'https://project1-czw2.onrender.com';
+}
+const API_BASE = getApiBase();
 
 function getSavedAdminProducts() {
   try {
@@ -174,33 +184,76 @@ function applySavedPrices(products) {
       product1KgPrices[key] = price;
     }
 
-    const card = document.querySelector(`.product[data-product-key="${key}"]`)
+    // Resilient card finder
+    let card = document.querySelector(`.product[data-product-key="${key}"]`)
       || document.querySelector(`.product[data-key="${key}"]`)
-      || document.querySelector(`.product .${key}`)?.closest('.product')
-      || document.querySelector(`.product button[onclick*="'${key}'"]`)?.closest('.product');
+      || document.querySelector(`.product .${key}`)?.closest('.product');
+
+    if (!card) {
+      const allCards = document.querySelectorAll('.product');
+      for (const c of allCards) {
+        if (c.dataset.productKey === key || c.dataset.key === key) {
+          card = c;
+          break;
+        }
+        if (c.querySelector(`.${key}`)) {
+          card = c;
+          break;
+        }
+        const btn = c.querySelector('button[onclick*="addToCart"]');
+        if (btn) {
+          const m = btn.getAttribute('onclick')?.match(/addToCart\('([^']+)'/);
+          if (m && m[1].toLowerCase().replace(/[^a-z0-9]/g, '') === key) {
+            card = c;
+            break;
+          }
+        }
+      }
+    }
 
     if (card) {
       card.dataset.productKey = key;
 
-      const priceBadge = card.querySelector('.product-price-tag');
+      // 1. Update or create price badge (.product-price-tag)
+      let priceBadge = card.querySelector('.product-price-tag');
+      if (!priceBadge && price && price > 0) {
+        priceBadge = document.createElement('div');
+        priceBadge.className = 'product-price-tag';
+        const buttonsContainer = card.querySelector('.buttons');
+        if (buttonsContainer) {
+          card.insertBefore(priceBadge, buttonsContainer);
+        } else {
+          card.appendChild(priceBadge);
+        }
+      }
       if (priceBadge && price && price > 0) {
         priceBadge.textContent = `₹${price} / 1kg`;
       }
 
+      // 2. Update rate button (second button in .buttons)
       const buttons = card.querySelectorAll('.buttons button');
-      if (buttons && buttons.length >= 2) {
-        if (price && price > 0) {
-          buttons[1].textContent = `₹${price} / 1kg`;
-        }
+      if (buttons && buttons.length >= 2 && price && price > 0) {
+        buttons[1].textContent = `₹${price} / 1kg`;
+        buttons[1].onclick = () => {
+          window.location.href = `product-details.html?product=${key}`;
+        };
       }
 
-      const cartButton = card.querySelector('button[onclick^="addToCart"]');
+      // 3. Update Add To Cart button onclick
+      const cartButton = card.querySelector('button[onclick*="addToCart"]');
       if (cartButton && price && price > 0) {
         const imgEl = card.querySelector('img');
         const imageSrc = imgEl ? (imgEl.getAttribute('src') || '') : (productImages[key] || '');
         cartButton.setAttribute('onclick', `addToCart('${key}', ${price}, '${imageSrc}')`);
       }
 
+      // 4. Update Wishlist button onclick
+      const wishlistBtn = card.querySelector('.wishlist-button');
+      if (wishlistBtn && price && price > 0) {
+        wishlistBtn.onclick = () => addToWishlist(key, price, productImages[key]);
+      }
+
+      // 5. Update Availability
       if (typeof item.available === 'boolean') {
         let badge = card.querySelector('.availability-badge');
         if (!badge) {
@@ -230,22 +283,35 @@ function applySavedPrices(products) {
 }
 
 async function syncProduct1KgPrices() {
-  const localSaved = getSavedAdminProducts();
-  if (localSaved && localSaved.length) {
-    applySavedPrices(localSaved);
-  }
-
+  // 1. Network-first: fetch fresh database prices from backend API
   try {
-    const res = await fetch(`${API_BASE}/api/products?_t=${Date.now()}`, { cache: 'no-store' });
-    if (res.ok) {
+    let res = null;
+    try {
+      res = await fetch(`${API_BASE}/api/products?_t=${Date.now()}`, { cache: 'no-store' });
+    } catch (netErr) {
+      if (API_BASE !== 'https://project1-czw2.onrender.com') {
+        res = await fetch(`https://project1-czw2.onrender.com/api/products?_t=${Date.now()}`, { cache: 'no-store' });
+      }
+    }
+
+    if (res && res.ok) {
       const data = await res.json();
       if (Array.isArray(data.products) && data.products.length > 0) {
         applySavedPrices(data.products);
-        localStorage.setItem('vegetable-mart-admin-products', JSON.stringify(data.products));
+        try {
+          localStorage.setItem('vegetable-mart-admin-products', JSON.stringify(data.products));
+        } catch (e) {}
+        return;
       }
     }
   } catch (e) {
     console.warn('Could not sync products from API:', e);
+  }
+
+  // 2. Offline fallback ONLY if network fetch completely failed
+  const localSaved = getSavedAdminProducts();
+  if (localSaved && localSaved.length) {
+    applySavedPrices(localSaved);
   }
 }
 
@@ -364,8 +430,6 @@ document.addEventListener("DOMContentLoaded", () => {
   })();
   updateCartCount();
 
-  const savedAdminProducts = getSavedAdminProducts();
-
   document.querySelectorAll(".product").forEach(product => {
     const cartButton = product.querySelector("button[onclick^=\"addToCart\"]");
     if (!cartButton) return;
@@ -390,21 +454,7 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     }
 
-    const savedProduct = savedAdminProducts && savedAdminProducts.find((item) => (item.key || item.id) === productKey);
-    let current1Kg = product1KgPrices[productKey] || Number(match[2]);
-    if (savedProduct && savedProduct.prices && typeof savedProduct.prices === 'object') {
-      const p = Number(savedProduct.prices['1kg'] || savedProduct.prices['1KG'] || savedProduct.prices['500g'] || savedProduct.prices['250g']);
-      if (p > 0) {
-        current1Kg = p;
-        product1KgPrices[productKey] = p;
-      }
-    } else if (savedProduct && savedProduct.price) {
-      const p = Number(savedProduct.price);
-      if (p > 0) {
-        current1Kg = p;
-        product1KgPrices[productKey] = p;
-      }
-    }
+    const current1Kg = product1KgPrices[productKey] || Number(match[2]);
 
     cartButton.setAttribute("onclick", `addToCart('${productKey}', ${current1Kg}, '${productImages[productKey] || ''}')`);
 
@@ -425,22 +475,10 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     }
 
-    if (savedProduct && savedProduct.available === false) {
-      const statusBadge = document.createElement('div');
-      statusBadge.className = 'availability-badge not-available';
-      statusBadge.textContent = 'Not available';
-      product.appendChild(statusBadge);
-      if (cartButton) {
-        cartButton.disabled = true;
-        cartButton.style.opacity = '0.5';
-        cartButton.style.cursor = 'not-allowed';
-      }
-    } else {
-      const statusBadge = document.createElement('div');
-      statusBadge.className = 'availability-badge available';
-      statusBadge.textContent = 'Available';
-      product.appendChild(statusBadge);
-    }
+    const statusBadge = document.createElement('div');
+    statusBadge.className = 'availability-badge available';
+    statusBadge.textContent = 'Available';
+    product.appendChild(statusBadge);
 
     const wishlistButton = document.createElement("button");
     wishlistButton.type = "button";
@@ -450,7 +488,7 @@ document.addEventListener("DOMContentLoaded", () => {
     product.querySelector(".buttons").appendChild(wishlistButton);
   });
 
-  // Sync latest prices from backend API
+  // Sync latest prices from backend API immediately
   syncProduct1KgPrices();
 
   // Listen for admin panel price updates in other tabs
@@ -461,6 +499,11 @@ document.addEventListener("DOMContentLoaded", () => {
         applySavedPrices(updated);
       } catch (err) {}
     }
+  });
+
+  // On back-navigation from product-details or another page, re-sync immediately
+  window.addEventListener('pageshow', () => {
+    syncProduct1KgPrices();
   });
 
   const searchInput = document.getElementById("product-search");

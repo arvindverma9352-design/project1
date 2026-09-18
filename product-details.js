@@ -1,6 +1,16 @@
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? `${window.location.protocol}//${window.location.hostname}:${window.location.port || 5000}`
-  : 'https://project1-czw2.onrender.com';
+function getApiBase() {
+  if (window.location.hostname.endsWith('onrender.com')) {
+    return window.location.origin;
+  }
+  if (window.location.port === '5000') {
+    return window.location.origin;
+  }
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://' + window.location.hostname + ':5000';
+  }
+  return 'https://project1-czw2.onrender.com';
+}
+const API_BASE = getApiBase();
 
 const productImages = {
   patato: "images/patato.png",
@@ -425,10 +435,17 @@ function getSavedProducts() {
 
 async function loadProductsFromBackend() {
   try {
-    const response = await fetch(`${API_BASE}/api/products?_t=${Date.now()}`, { cache: 'no-store' });
-    const data = await response.json();
+    let response = null;
+    try {
+      response = await fetch(`${API_BASE}/api/products?_t=${Date.now()}`, { cache: 'no-store' });
+    } catch (netErr) {
+      if (API_BASE !== 'https://project1-czw2.onrender.com') {
+        response = await fetch(`https://project1-czw2.onrender.com/api/products?_t=${Date.now()}`, { cache: 'no-store' });
+      }
+    }
+    const data = response && response.ok ? await response.json() : null;
 
-    if (!response.ok || !Array.isArray(data.products) || data.products.length === 0) {
+    if (!data || !Array.isArray(data.products) || data.products.length === 0) {
       return getSavedProducts();
     }
 
