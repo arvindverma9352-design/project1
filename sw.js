@@ -1,7 +1,7 @@
 // Vegetable Mart & VM Delivery Progressive Web App Service Worker
 // Network-First Strategy ensures all live code updates and admin changes reflect instantly.
 
-const CACHE_NAME = 'vegetable-mart-v2';
+const CACHE_NAME = 'vegetable-mart-v3';
 const PRECACHE_ASSETS = [
   './',
   'index.html',
@@ -11,6 +11,8 @@ const PRECACHE_ASSETS = [
   'profile.html',
   'delivery.html',
   'logo.png',
+  'logo-192.png',
+  'logo-512.png',
   'delivery-icon.png',
   'delivery-icon-192.png',
   'manifest.json',
