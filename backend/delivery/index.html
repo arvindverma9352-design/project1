@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VM Delivery Captain | Vegetable Mart</title>
+    <link rel="icon" href="delivery-icon-192.png">
+    <link rel="apple-touch-icon" href="delivery-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#16a34a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VM Captain">
+    <link rel="stylesheet" href="delivery.css">
+</head>
+<body class="delivery-body">
+
+    <!-- Quick PIN Unlock Overlay -->
+    <div id="pin-lock-overlay" class="pin-overlay">
+        <div class="pin-card">
+            <div class="pin-brand">
+                <img src="logo.png" alt="Vegetable Mart" class="pin-logo">
+                <h2>Vegetable Mart</h2>
+                <p>Delivery Partner Portal</p>
+            </div>
+
+            <div class="pin-prompt">
+                <span>Enter 4-Digit Rider PIN</span>
+                <div class="pin-dots">
+                    <span class="dot" id="dot-1"></span>
+                    <span class="dot" id="dot-2"></span>
+                    <span class="dot" id="dot-3"></span>
+                    <span class="dot" id="dot-4"></span>
+                </div>
+            </div>
+
+            <div id="pin-error" class="pin-error-msg"></div>
+
+            <div class="pin-keypad">
+                <button type="button" class="pin-key" onclick="enterPinDigit('1')">1</button>
+                <button type="button" class="pin-key" onclick="enterPinDigit('2')">2</button>
+                <button type="button" class="pin-key" onclick="enterPinDigit('3')">3</button>
+                <button type="button" class="pin-key" onclick="enterPinDigit('4')">4</button>
+                <button type="button" class="pin-key" onclick="enterPinDigit('5')">5</button>
+                <button type="button" class="pin-key" onclick="enterPinDigit('6')">6</button>
+                <button type="button" class="pin-key" onclick="enterPinDigit('7')">7</button>
+                <button type="button" class="pin-key" onclick="enterPinDigit('8')">8</button>
+                <button type="button" class="pin-key" onclick="enterPinDigit('9')">9</button>
+                <button type="button" class="pin-key clear" onclick="clearPin()">C</button>
+                <button type="button" class="pin-key" onclick="enterPinDigit('0')">0</button>
+                <button type="button" class="pin-key backspace" onclick="backspacePin()">⌫</button>
+            </div>
+
+            <div class="pin-footer-note">
+                <label class="pin-remember">
+                    <input type="checkbox" id="pin-remember" checked> Keep me logged in
+                </label>
+                <small>Default Rider PIN is <strong>1234</strong></small>
+            </div>
+
+            <button type="button" class="pin-install-btn" onclick="triggerDeliveryInstall()">
+                📲 Install VM Captain App on Phone
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Delivery App Shell -->
+    <div id="delivery-app" class="delivery-app-shell" style="display: none;">
+        <!-- Top Sticky Header -->
+        <header class="delivery-header">
+            <div class="header-left">
+                <img src="logo.png" alt="Logo" class="header-logo">
+                <div>
+                    <h1>Delivery Partner</h1>
+                    <span class="online-indicator"><span class="pulse-dot"></span> On Duty • Online</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button type="button" class="icon-action-btn install-btn" id="install-app-btn" style="display: none;" title="Install App on Phone">
+                    <span>📲</span>
+                </button>
+                <button type="button" class="icon-action-btn" id="refresh-btn" onclick="fetchOrders(true)" title="Refresh Orders">
+                    <span class="refresh-icon">↻</span>
+                </button>
+                <button type="button" class="icon-action-btn exit" onclick="lockPortal()" title="Lock Screen">
+                    <span>🔒</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- KPI Metrics Ribbon -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <span class="metric-label">To Pick</span>
+                <strong id="metric-packed" class="metric-value warn">0</strong>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">On The Way</span>
+                <strong id="metric-out" class="metric-value info">0</strong>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Delivered</span>
+                <strong id="metric-delivered" class="metric-value success">0</strong>
+            </div>
+            <div class="metric-card cash-card">
+                <span class="metric-label">Cash To Collect</span>
+                <strong id="metric-cash" class="metric-value cash">₹0</strong>
+            </div>
+        </section>
+
+        <!-- Filter & Search Panel -->
+        <section class="filter-panel">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" placeholder="Search customer, mobile, pincode..." oninput="handleSearch()">
+                <button type="button" id="clear-search" class="clear-search-btn" onclick="clearSearch()" style="display: none;">✕</button>
+            </div>
+
+            <div class="tabs-slider">
+                <button type="button" class="tab-btn active" data-filter="all" onclick="setFilter('all')">
+                    All (<span id="count-all">0</span>)
+                </button>
+                <button type="button" class="tab-btn" data-filter="Packed" onclick="setFilter('Packed')">
+                    📦 To Pick (<span id="count-packed">0</span>)
+                </button>
+                <button type="button" class="tab-btn" data-filter="Out for Delivery" onclick="setFilter('Out for Delivery')">
+                    🚴 On The Way (<span id="count-out">0</span>)
+                </button>
+                <button type="button" class="tab-btn" data-filter="Delivered" onclick="setFilter('Delivered')">
+                    ✅ Completed (<span id="count-delivered">0</span>)
+                </button>
+            </div>
+        </section>
+
+        <!-- Orders Feed -->
+        <main class="orders-feed" id="orders-feed">
+            <div class="orders-loading">
+                <div class="spinner"></div>
+                <p>Fetching active deliveries...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="delivery-toast" class="delivery-toast"></div>
+
+    <script src="delivery.js"></script>
+</body>
+</html>
+

@@ -17,6 +17,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+app.use('/delivery', express.static(path.join(__dirname, 'delivery')));
 app.use(express.static(path.join(__dirname, '..')));
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://arvind:arvind5299@cluster0.wnav3z6.mongodb.net/?appName=Cluster0')
