@@ -1,5 +1,6 @@
 {
-  "name": "Vegetable Mart - Fresh Vegetables",
+  "id": "vegetable-mart-customer-store",
+  "name": "Vegetable Mart - Online Store",
   "short_name": "Vegetable Mart",
   "description": "Fresh farm vegetables delivered to your doorstep in minutes",
   "start_url": "index.html",
@@ -33,12 +34,6 @@
       "name": "My Wishlist",
       "short_name": "Wishlist",
       "url": "wishlist.html",
-      "icons": [{ "src": "logo.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Delivery Partner",
-      "short_name": "Delivery",
-      "url": "delivery.html",
       "icons": [{ "src": "logo.png", "sizes": "192x192" }]
     }
   ]

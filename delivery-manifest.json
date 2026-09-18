@@ -1,17 +1,24 @@
 {
-  "name": "Vegetable Mart Delivery Partner",
+  "id": "vm-delivery-partner-portal",
+  "name": "VM Delivery Partner",
   "short_name": "VM Delivery",
-  "description": "Delivery partner dashboard for Vegetable Mart orders",
+  "description": "Vegetable Mart Delivery Partner Rider App - Navigation & Orders",
   "start_url": "delivery.html",
-  "scope": "./",
+  "scope": "./delivery.html",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0f1813",
-  "theme_color": "#1e7545",
+  "background_color": "#0b1c12",
+  "theme_color": "#16a34a",
   "icons": [
     {
-      "src": "logo.png",
-      "sizes": "192x192 512x512",
+      "src": "delivery-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "delivery-icon.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }

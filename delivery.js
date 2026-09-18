@@ -516,26 +516,148 @@ function escapeHtml(str) {
         .replace(/'/g, '&#039;');
 }
 
-// PWA Install on Mobile
+// ================= DELIVERY PWA INSTALL & OFFLINE SUPPORT =================
 let deferredInstallPrompt = null;
+
+// Register Service Worker for offline and caching support
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('VM Delivery SW registered:', reg.scope))
+            .catch(err => console.warn('VM Delivery SW error:', err));
+    });
+}
+
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
+
+    // Show header icon
     const installBtn = document.getElementById('install-app-btn');
     if (installBtn) {
-        installBtn.style.display = 'flex';
-        installBtn.onclick = async () => {
-            if (deferredInstallPrompt) {
-                deferredInstallPrompt.prompt();
-                const { outcome } = await deferredInstallPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    installBtn.style.display = 'none';
-                    showToast('🎉 App Home Screen par install ho rahi hai!');
-                }
-                deferredInstallPrompt = null;
-            }
+        installBtn.style.display = 'inline-flex';
+        installBtn.onclick = triggerDeliveryInstall;
+    }
+
+    // Check if dismissed recently (2 days)
+    const dismissedUntil = localStorage.getItem('vm_delivery_dismissed_until');
+    if (!dismissedUntil || Date.now() >= Number(dismissedUntil)) {
+        showDeliveryInstallBanner();
+    }
+});
+
+async function triggerDeliveryInstall() {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    const { outcome } = await deferredInstallPrompt.userChoice;
+    if (outcome === 'accepted') {
+        const headerBtn = document.getElementById('install-app-btn');
+        if (headerBtn) headerBtn.style.display = 'none';
+        const banner = document.getElementById('vm-delivery-install-banner');
+        if (banner) banner.remove();
+        showToast('🎉 VM Delivery App Successfully Installed!');
+    }
+    deferredInstallPrompt = null;
+}
+
+function showDeliveryInstallBanner() {
+    if (document.getElementById('vm-delivery-install-banner')) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'vm-delivery-install-banner';
+    banner.innerHTML = `
+        <div class="vm-del-content">
+            <img src="delivery-icon-192.png" alt="VM Delivery" class="vm-del-icon">
+            <div class="vm-del-text">
+                <strong>VM Delivery Partner App</strong>
+                <span>Install for quick orders & live GPS routing</span>
+            </div>
+        </div>
+        <div class="vm-del-actions">
+            <button type="button" id="vm-del-install-btn" class="vm-del-btn">📲 Install</button>
+            <button type="button" id="vm-del-close-btn" class="vm-del-close" title="Dismiss">✕</button>
+        </div>
+    `;
+
+    const style = document.createElement('style');
+    style.textContent = `
+        #vm-delivery-install-banner {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 28px);
+            max-width: 440px;
+            background: rgba(11, 28, 18, 0.97);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            border-radius: 16px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+            z-index: 999999;
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            animation: vmDelSlideUp 0.35s ease;
+        }
+        @keyframes vmDelSlideUp {
+            from { transform: translateX(-50%) translateY(90px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        .vm-del-content { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .vm-del-icon { width: 40px; height: 40px; border-radius: 10px; object-fit: contain; flex-shrink: 0; }
+        .vm-del-text { display: flex; flex-direction: column; min-width: 0; }
+        .vm-del-text strong { color: #f0fdf4; font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .vm-del-text span { color: #86efac; font-size: 11px; margin-top: 1px; }
+        .vm-del-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .vm-del-btn {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(22, 163, 74, 0.4);
+        }
+        .vm-del-btn:active { transform: scale(0.95); }
+        .vm-del-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 15px;
+            padding: 4px 6px;
+            cursor: pointer;
+        }
+    `;
+
+    document.head.appendChild(style);
+    document.body.appendChild(banner);
+
+    const installBtn = document.getElementById('vm-del-install-btn');
+    if (installBtn) {
+        installBtn.onclick = triggerDeliveryInstall;
+    }
+
+    const closeBtn = document.getElementById('vm-del-close-btn');
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            banner.remove();
+            localStorage.setItem('vm_delivery_dismissed_until', String(Date.now() + 2 * 24 * 60 * 60 * 1000));
         };
     }
+}
+
+window.addEventListener('appinstalled', () => {
+    const banner = document.getElementById('vm-delivery-install-banner');
+    if (banner) banner.remove();
+    const headerBtn = document.getElementById('install-app-btn');
+    if (headerBtn) headerBtn.style.display = 'none';
+    showToast('🎉 VM Delivery App Installed Successfully!');
 });
 
 // On page load

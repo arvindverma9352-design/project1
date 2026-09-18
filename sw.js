@@ -1,18 +1,23 @@
-// Vegetable Mart Progressive Web App Service Worker
+// Vegetable Mart & VM Delivery Progressive Web App Service Worker
 // Network-First Strategy ensures all live code updates and admin changes reflect instantly.
 
-const CACHE_NAME = 'vegetable-mart-v1';
+const CACHE_NAME = 'vegetable-mart-v2';
 const PRECACHE_ASSETS = [
   './',
-  'first.html',
+  'index.html',
   'Af-lo-sin-.html',
   'cart.html',
   'wishlist.html',
   'profile.html',
   'delivery.html',
   'logo.png',
+  'delivery-icon.png',
+  'delivery-icon-192.png',
+  'manifest.json',
+  'delivery-manifest.json',
   'Af-lo-sin-.css',
-  'delivery.css'
+  'delivery.css',
+  'pwa-install.js'
 ];
 
 // Install: precache critical assets
@@ -74,7 +79,10 @@ self.addEventListener('fetch', (event) => {
         return caches.match(req).then((cachedRes) => {
           if (cachedRes) return cachedRes;
           if (req.mode === 'navigate') {
-            return caches.match('Af-lo-sin-.html');
+            if (req.url.includes('delivery')) {
+              return caches.match('delivery.html');
+            }
+            return caches.match('index.html') || caches.match('Af-lo-sin-.html');
           }
           return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
         });
