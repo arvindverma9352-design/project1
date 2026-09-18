@@ -244,69 +244,230 @@ function getFilteredProducts() {
   return products;
 }
 
+let currentOrderFilter = 'all';
+let orderSearchQuery = '';
+
+function switchDashboardTab(targetSectionId) {
+  const sections = document.querySelectorAll('.dashboard-section');
+  sections.forEach((sec) => {
+    sec.style.display = 'none';
+  });
+
+  const targetSec = document.getElementById(targetSectionId);
+  if (targetSec) targetSec.style.display = 'block';
+
+  const tabs = document.querySelectorAll('.dash-tab');
+  tabs.forEach((tab) => {
+    tab.classList.toggle('active', tab.dataset.target === targetSectionId);
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setOrderFilter(filter) {
+  currentOrderFilter = filter;
+  document.querySelectorAll('.order-filter-pill').forEach((pill) => {
+    pill.classList.toggle('active', pill.dataset.filter === filter);
+  });
+  renderOrders();
+}
+
+function handleOrderSearch() {
+  const input = document.getElementById('order-search-input');
+  orderSearchQuery = (input?.value || '').trim().toLowerCase();
+  renderOrders();
+}
+
+async function refreshOrdersManual() {
+  await loadOrdersFromBackend();
+  await loadRidersFromBackend();
+  renderOrders();
+}
+
+async function updateOrderStatus(orderId, newStatus) {
+  try {
+    await apiRequest(`/api/orders/${orderId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: newStatus })
+    });
+    await loadOrdersFromBackend();
+    renderOrders();
+  } catch (err) {
+    alert(`Status update failed: ${err.message}`);
+  }
+}
+
+function updateKPICards() {
+  const orders = getSavedOrders();
+  const products = getSavedProducts();
+
+  const totalOrdersEl = document.getElementById('kpi-total-orders');
+  const ordersSubEl = document.getElementById('kpi-orders-sub');
+  if (totalOrdersEl) totalOrdersEl.textContent = orders.length;
+
+  const packedCount = orders.filter((o) => {
+    const s = (o.status || '').toLowerCase();
+    return s === 'packed' || s === 'pending';
+  }).length;
+
+  const outCount = orders.filter((o) => {
+    const s = (o.status || '').toLowerCase();
+    return s.includes('out') || s.includes('dispatch');
+  }).length;
+
+  const deliveredCount = orders.filter((o) => {
+    return (o.status || '').toLowerCase() === 'delivered';
+  }).length;
+
+  if (ordersSubEl) {
+    ordersSubEl.textContent = `Active: ${packedCount + outCount} • Delivered: ${deliveredCount}`;
+  }
+
+  const totalRevenueEl = document.getElementById('kpi-total-revenue');
+  if (totalRevenueEl) {
+    const rev = orders
+      .filter((o) => (o.status || '').toLowerCase() === 'delivered')
+      .reduce((acc, o) => acc + (Number(o.total) || 0), 0);
+    totalRevenueEl.textContent = `₹${rev.toLocaleString('en-IN')}`;
+  }
+
+  const activeRidersEl = document.getElementById('kpi-active-riders');
+  const ridersSubEl = document.getElementById('kpi-riders-sub');
+  if (activeRidersEl) {
+    const onDutyCount = allRiders.filter((r) => r.dutyStatus === 'ON').length;
+    activeRidersEl.textContent = `${onDutyCount} On Duty`;
+    if (ridersSubEl) ridersSubEl.textContent = `${allRiders.length} Total Captains`;
+  }
+
+  const totalProductsEl = document.getElementById('kpi-total-products');
+  if (totalProductsEl) totalProductsEl.textContent = `${products.length} Items`;
+}
+
 function renderProducts() {
   const products = getSavedProducts();
   const filteredProducts = getFilteredProducts();
 
   buildCategoryOptions(products);
-  productCount.textContent = `${filteredProducts.length} / ${products.length} items`;
+  if (productCount) {
+    productCount.textContent = `${filteredProducts.length} / ${products.length} items`;
+  }
 
-  bulkDeleteButton.disabled = selectedProductIds.size === 0;
+  if (bulkDeleteButton) {
+    bulkDeleteButton.disabled = selectedProductIds.size === 0;
+  }
 
   if (!filteredProducts.length) {
     productList.innerHTML = '<div class="empty-state">No matching products found.</div>';
+    updateKPICards();
     return;
   }
 
   productList.innerHTML = filteredProducts.map((product) => `
-    <div class="product-item ${selectedProductIds.has(product.id) ? 'selected' : ''}">
-      <div class="product-thumb-wrap">
+    <div class="product-card ${selectedProductIds.has(product.id) ? 'selected' : ''}">
+      <div class="product-card-top">
         <input
           type="checkbox"
           class="select-checkbox"
           data-id="${product.id}"
           ${selectedProductIds.has(product.id) ? 'checked' : ''}
         />
-        <div class="product-thumb">
-          <img src="${product.image || 'images/vegback.png'}" alt="${product.title}" />
+        <img src="${product.image || 'images/vegback.png'}" alt="${product.title}" class="product-thumb" />
+        <div class="product-info-wrap">
+          <h3>${product.title}</h3>
+          <span class="product-cat-pill">${product.category || 'Vegetables'}</span>
         </div>
       </div>
 
-      <div class="product-meta">
-        <h3>${product.title}</h3>
-        <p>${product.description || 'Fresh product from Vegetable Mart.'}</p>
-        <p class="product-category">Category: ${product.category || 'Vegetables'}</p>
-        <div class="product-status ${product.available === false ? 'not-available' : 'available'}">
-          ${product.available === false ? 'Not available' : 'Available'}
-        </div>
-        <div class="product-prices">
-          <span>250g: ₹${product.prices['250g'] || 0}</span>
-          <span>500g: ₹${product.prices['500g'] || 0}</span>
-          <span>1kg: ₹${product.prices['1kg'] || 0}</span>
-        </div>
+      <p style="font-size: 13px; color: var(--text-muted); line-height: 1.4;">${product.description || 'Fresh vegetable from Vegetable Mart.'}</p>
+
+      <div class="product-prices-pills">
+        <span class="price-weight-tag">250g: ₹${product.prices['250g'] || 0}</span>
+        <span class="price-weight-tag">500g: ₹${product.prices['500g'] || 0}</span>
+        <span class="price-weight-tag">1kg: ₹${product.prices['1kg'] || 0}</span>
       </div>
 
-      <div class="product-actions">
-        <button type="button" class="action-btn" data-action="edit" data-id="${product.id}">Edit</button>
-        <button type="button" class="action-btn delete" data-action="delete" data-id="${product.id}">Delete</button>
+      <div class="product-card-actions">
+        <button type="button" class="edit-btn" data-action="edit" data-id="${product.id}">✏️ Edit</button>
+        <button type="button" class="delete-btn" data-action="delete" data-id="${product.id}">🗑️ Delete</button>
       </div>
     </div>
   `).join('');
+
+  updateKPICards();
 }
 
 function renderOrders() {
   const orders = getSavedOrders();
 
-  if (!orders.length) {
-    orderList.innerHTML = '<div class="empty-state">No orders yet.</div>';
+  // Tab counts
+  const allCount = orders.length;
+  const packedCount = orders.filter((o) => {
+    const s = (o.status || '').toLowerCase();
+    return s === 'packed' || s === 'pending';
+  }).length;
+  const outCount = orders.filter((o) => {
+    const s = (o.status || '').toLowerCase();
+    return s.includes('out') || s.includes('dispatch');
+  }).length;
+  const deliveredCount = orders.filter((o) => {
+    return (o.status || '').toLowerCase() === 'delivered';
+  }).length;
+
+  const tabAll = document.getElementById('tab-count-all');
+  const tabPacked = document.getElementById('tab-count-packed');
+  const tabOut = document.getElementById('tab-count-out');
+  const tabDelivered = document.getElementById('tab-count-delivered');
+
+  if (tabAll) tabAll.textContent = allCount;
+  if (tabPacked) tabPacked.textContent = packedCount;
+  if (tabOut) tabOut.textContent = outCount;
+  if (tabDelivered) tabDelivered.textContent = deliveredCount;
+
+  // Filter orders by tab
+  let filtered = orders.filter((order) => {
+    const s = (order.status || 'Packed').toLowerCase();
+    if (currentOrderFilter === 'all') return true;
+    if (currentOrderFilter === 'Packed') return s === 'packed' || s === 'pending';
+    if (currentOrderFilter === 'Out for Delivery') return s.includes('out') || s.includes('dispatch');
+    if (currentOrderFilter === 'Delivered') return s === 'delivered';
+    return true;
+  });
+
+  // Filter orders by search query
+  if (orderSearchQuery) {
+    filtered = filtered.filter((order) => {
+      const cust = (order.customer || '').toLowerCase();
+      const mob = (order.mobile || '').toLowerCase();
+      const addr = (order.address || '').toLowerCase();
+      const id = (order.id || order._id || '').toLowerCase();
+      return cust.includes(orderSearchQuery) || mob.includes(orderSearchQuery) || addr.includes(orderSearchQuery) || id.includes(orderSearchQuery);
+    });
+  }
+
+  const ordersCountEl = document.getElementById('orders-count');
+  if (ordersCountEl) {
+    ordersCountEl.textContent = `${filtered.length} of ${orders.length} orders`;
+  }
+
+  if (!filtered.length) {
+    orderList.innerHTML = `
+      <div class="empty-state">
+        <h3>Koi Order Nahi Mila</h3>
+        <p>${orderSearchQuery ? 'Aapki search query ke mutabik koi order nahi hai.' : 'Is filter tab me koi order nahi hai.'}</p>
+      </div>
+    `;
+    updateKPICards();
     return;
   }
 
-  orderList.innerHTML = orders.map((order) => {
+  orderList.innerHTML = filtered.map((order) => {
     const orderId = order.id || order._id || order.orderId || 'Unknown';
-    const itemsText = Array.isArray(order.items) && order.items.length
-      ? order.items.map((item) => `${item.name} × ${item.quantity}`).join(', ')
-      : 'No items listed';
+    const status = (order.status || 'Packed').trim();
+    const statusSlug = status.toLowerCase().replace(/\s+/g, '-');
+
+    const itemsPills = Array.isArray(order.items) && order.items.length
+      ? order.items.map((item) => `<span class="item-pill-tag">${item.name} × <strong>${item.quantity}</strong></span>`).join('')
+      : '<span class="item-pill-tag">No items details</span>';
 
     let addressDisplay = order.address || 'Not provided';
     let mapUrl = order.location || '';
@@ -319,14 +480,13 @@ function renderOrders() {
     }
 
     const mapBtnHtml = mapUrl 
-      ? `<br><a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="map-link-btn" style="display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; padding: 5px 12px; background: #1e7a4b; color: #ffffff !important; border-radius: 6px; font-size: 12px; text-decoration: none; font-weight: 600;">📍 Open in Google Maps</a>` 
+      ? `<a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="maps-direction-btn">📍 Open in Google Maps</a>` 
       : '';
 
-    // Delivery Boy Assignment UI
     const isAssigned = Boolean(order.deliveryBoyName || order.deliveryBoyId);
     const assignedRiderText = isAssigned
-      ? `🛵 Assigned to: <strong>${order.deliveryBoyName}</strong> (${order.deliveryBoyPhone || 'No phone'})`
-      : `⚠️ <strong>Not Assigned Yet</strong> (Select delivery boy below)`;
+      ? `🛵 Assigned: <strong>${order.deliveryBoyName}</strong> (${order.deliveryBoyPhone || ''})`
+      : `⚠️ <strong>Not Assigned</strong>`;
 
     const riderOptionsHtml = allRiders.map((rider) => {
       const riderId = rider.id || rider._id;
@@ -337,46 +497,77 @@ function renderOrders() {
       return `<option value="${riderId}" ${isSelected ? 'selected' : ''}>${dutyIcon} ${rider.name} (${rider.phone}) — [${dutyText}]</option>`;
     }).join('');
 
-    return `
-      <div class="order-item">
-        <div class="order-meta">
-          <h3>${orderId}</h3>
-          <p><strong>Customer:</strong> ${order.customer || 'Guest Customer'}</p>
-          <p><strong>Mobile:</strong> ${order.mobile || 'Not provided'}</p>
-          <p><strong>Address:</strong> ${addressDisplay}${mapBtnHtml}</p>
-          <p><strong>Items:</strong> ${itemsText}</p>
-          <small>Total: ₹${order.total || 0}</small>
+    const formattedTime = order.createdAt ? new Date(order.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 'Recently';
 
-          <div class="order-assignment-card">
-            <div class="assignment-header">
-              <span>${assignedRiderText}</span>
-              <span class="assigned-badge ${isAssigned ? 'assigned' : 'unassigned'}">
-                ${isAssigned ? '✓ Assigned' : '⏳ Pending'}
-              </span>
+    return `
+      <div class="order-card-modern">
+        <div class="order-card-main">
+          <div class="order-card-header">
+            <div>
+              <span class="order-id-badge">#${orderId}</span>
+              <span class="order-time">• ${formattedTime}</span>
             </div>
-            <div class="assignment-controls-row">
-              <select id="rider-select-${orderId}" class="assign-select">
-                <option value="">-- Select Delivery Boy --</option>
-                ${riderOptionsHtml}
-              </select>
-              <button type="button" class="assign-action-btn" onclick="assignOrderToRider('${orderId}')">
-                ${isAssigned ? 'Reassign' : 'Assign'}
-              </button>
+            <span class="order-status-badge status-${statusSlug}">${status}</span>
+          </div>
+
+          <div class="order-info-grid">
+            <div class="info-block">
+              <label>Customer Details</label>
+              <p><strong>${order.customer || 'Guest Customer'}</strong></p>
+              <p>${order.mobile ? `<a href="tel:${order.mobile}" class="customer-phone-link">📞 ${order.mobile}</a>` : 'No mobile'}</p>
+            </div>
+
+            <div class="info-block">
+              <label>Delivery Address</label>
+              <p class="address-text">${addressDisplay}</p>
+              ${mapBtnHtml}
+            </div>
+          </div>
+
+          <div class="order-items-summary">
+            <label>Ordered Items</label>
+            <div class="order-items-pills">
+              ${itemsPills}
             </div>
           </div>
         </div>
 
-        <div class="order-side">
-          <span class="order-status ${order.status ? order.status.toLowerCase().replace(/\s+/g, '-') : 'packed'}">${order.status || 'Packed'}</span>
+        <div class="order-card-side">
+          <div class="bill-amount-row">
+            <span class="bill-label">Bill Amount</span>
+            <span class="bill-val">₹${order.total || 0}</span>
+          </div>
+
+          <div class="dispatch-control-box">
+            <div class="dispatch-header">
+              <span class="captain-assigned-info">${assignedRiderText}</span>
+              <span class="assigned-badge ${isAssigned ? 'assigned' : 'unassigned'}">
+                ${isAssigned ? '✓ Assigned' : '⏳ Pending'}
+              </span>
+            </div>
+            <div class="dispatch-assign-row">
+              <select id="rider-select-${orderId}" class="dispatch-select">
+                <option value="">-- Choose Captain --</option>
+                ${riderOptionsHtml}
+              </select>
+              <button type="button" class="assign-btn-modern" onclick="assignOrderToRider('${orderId}')">
+                ${isAssigned ? 'Reassign' : 'Assign'}
+              </button>
+            </div>
+          </div>
+
+          <div class="status-changer-row">
+            <label>Status:</label>
+            <button type="button" class="status-pill-btn ${status === 'Packed' ? 'active' : ''}" onclick="updateOrderStatus('${orderId}', 'Packed')">Packed</button>
+            <button type="button" class="status-pill-btn ${status.includes('Out') ? 'active' : ''}" onclick="updateOrderStatus('${orderId}', 'Out for Delivery')">Out for Delivery</button>
+            <button type="button" class="status-pill-btn ${status === 'Delivered' ? 'active' : ''}" onclick="updateOrderStatus('${orderId}', 'Delivered')">Delivered</button>
+          </div>
         </div>
       </div>
     `;
   }).join('');
 
-  const ordersCountEl = document.getElementById('orders-count');
-  if (ordersCountEl) {
-    ordersCountEl.textContent = `${orders.length} orders`;
-  }
+  updateKPICards();
 }
 
 function populateForm(product) {
@@ -751,6 +942,7 @@ async function initializeAdminPage() {
   renderProducts();
   renderRiders();
   renderOrders();
+  updateKPICards();
 }
 
 initializeAdminPage();
