@@ -22,9 +22,9 @@ export default function Cart() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(null);
 
-  const deliveryFee = cartTotal >= 200 || cartTotal === 0 ? 0 : 30;
-  const platformFee = cartTotal > 0 ? 5 : 0;
-  const grandTotal = cartTotal + deliveryFee + platformFee;
+  const deliveryFee = cartTotal > 0 ? 10 : 0;
+  const platformFee = 0;
+  const grandTotal = cartTotal + deliveryFee;
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
@@ -274,10 +274,6 @@ export default function Cart() {
                     <span style={{ color: deliveryFee === 0 ? '#2e7d32' : 'inherit' }}>
                       {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
                     </span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '14px' }}>
-                    <span>Platform Fee:</span>
-                    <span>₹{platformFee}</span>
                   </div>
                   <hr style={{ border: 'none', borderTop: '1px dashed #ccc', margin: '10px 0' }} />
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '17px', color: '#1e7a4b' }}>
