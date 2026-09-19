@@ -36,7 +36,18 @@ router.get('/', verifyToken, async (req, res) => {
   }
 });
 
-router.post('/', verifyToken, async (req, res) => {
+const optionalAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    try {
+      req.user = require('jsonwebtoken').verify(token, process.env.JWT_SECRET);
+    } catch (err) {}
+  }
+  next();
+};
+
+router.post('/', optionalAuth, async (req, res) => {
   try {
     // Check store status — block orders if store is closed
     const storeSetting = await Setting.findOne({ key: 'store_status' });
@@ -47,7 +58,7 @@ router.post('/', verifyToken, async (req, res) => {
       });
     }
 
-    const { customer, mobile, address, location, email, items } = req.body;
+    const { customer, mobile, phone, address, location, email, items } = req.body;
 
     if (!customer || !items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ success: false, message: 'Customer details and items are required.' });
@@ -55,14 +66,11 @@ router.post('/', verifyToken, async (req, res) => {
 
     let calculatedSubtotal = 0;
     const validatedItems = [];
-
-    // Import Product model inside if needed, or require at top. (Will require at top)
     const Product = require('../models/Product');
 
     for (const item of items) {
-      // Find product in DB to get real price
       const product = await Product.findOne({ key: item.name });
-      if (!product) continue; // Skip invalid products
+      if (!product) continue; 
 
       let realPrice = 0;
       if (item.weight === '250g') realPrice = product.prices?.['250g'] || 0;
@@ -86,9 +94,9 @@ router.post('/', verifyToken, async (req, res) => {
     const calculatedTotal = calculatedSubtotal + deliveryFee;
 
     const newOrder = new Order({
-      userId: req.user.id,
+      userId: req.user ? req.user.id : (req.body.userId || null),
       customer,
-      mobile: mobile || '',
+      mobile: mobile || phone || '',
       address: address || '',
       location: location || '',
       email: email || '',

@@ -35,3 +35,4 @@ const verifyRiderOrAdmin = (req, res, next) => {
 };
 
 module.exports = { verifyToken, verifyAdmin, verifyRiderOrAdmin };
+
