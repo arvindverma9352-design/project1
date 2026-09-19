@@ -1,56 +1,51 @@
 # Vegetable Mart
 
-A simple vegetable shopping website built with HTML, CSS, and JavaScript.
+A modern farm-fresh vegetable shopping platform. Upgraded from vanilla HTML/JS/CSS to a full-stack **React + Node.js (Express) + MongoDB** architecture.
 
 ## Project Overview
-This project includes:
-- Home page
-- Login and signup pages
-- Product listing and product details
-- Cart and wishlist pages
-- Admin dashboard for managing products and orders
-- User profile page
+This project is a complete e-commerce solution including:
+- **Frontend App**: Built with React and Vite (React Router, Context API).
+- **Backend API**: Built with Node.js and Express.
+- **Database**: MongoDB for storing products, users, riders, and orders.
 
-## Features
-- Product browsing
-- Add items to cart and wishlist
-- User authentication using browser local storage
-- Admin product management
-- Order overview in admin panel
+## Key Features
+- **Customer Portal**: Browse products, add to cart, wishlist, and place orders.
+- **Admin Dashboard**: Manage products (add/edit/delete), assign delivery boys, track live orders, and toggle store availability.
+- **Delivery Rider Portal**: A dedicated app/portal for delivery boys to accept orders, manage their duty status, and mark orders as delivered.
+- **Secure Authentication**: Passwords hashed with bcrypt, protecting user data.
+- **Responsive UI**: Works smoothly on mobile and desktop devices.
 
-## Project Files
-- `first.html` — landing page
-- `formlogin.html` — login page
-- `formsignup.html` — signup page
-- `Af-lo-sin-.html` — product/shop page
-- `product-details.html` — product details page
-- `cart.html` — cart page
-- `wishlist.html` — wishlist page
-- `profile.html` — user profile page
-- `admin.html` — admin dashboard
-- `admin.js` — admin logic
-- `cart.js` — cart logic
-- `wishlist.js` — wishlist logic
-- `product-details.js` — product details logic
+## Project Structure
+- `/frontend`: Contains the React Vite SPA.
+- `/backend`: Contains the Express server, Mongoose models, and REST API routes.
+- `package.json`: A unified configuration for simple deployment and dependency installation.
 
-## How to Run
+## How to Run Locally
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) installed.
+- MongoDB running locally or a MongoDB Atlas connection string.
+
+### Steps
 1. Open the project folder in VS Code.
-2. Start a local web server if needed.
-3. Open `first.html` in your browser.
-
-Example using VS Code Live Server:
-- Install the Live Server extension
-- Right-click `first.html`
-- Select "Open with Live Server"
-
-## Notes
-This project currently stores user, cart, wishlist, and admin data in `localStorage`, so it is best suited for frontend/demo purposes.
-
-## Future Improvements
-- Add a real backend with Node.js and Express
-- Use MongoDB for products, users, and orders
-- Add secure authentication with JWT
-- Connect frontend to REST APIs
+2. Install dependencies for both frontend and backend:
+   ```bash
+   npm install --prefix backend
+   npm install --prefix frontend
+   ```
+3. Start the Backend API (runs on `http://localhost:5000`):
+   ```bash
+   cd backend
+   node server.js
+   ```
+4. Start the Frontend App (runs on `http://localhost:5173`):
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+5. Open `http://localhost:5173` in your browser.
+   - For Admin Panel: Go to `http://localhost:5173/admin`
+   - For Delivery Boy Portal: Go to `http://localhost:5173/delivery`
 
 ## Author
 Vegetable Mart Project
