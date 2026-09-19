@@ -34,8 +34,8 @@ const frontendDist = path.join(__dirname, '../frontend/dist');
 if (fs.existsSync(frontendDist)) {
   app.use(express.static(frontendDist));
 }
-app.use('/delivery', express.static(path.join(__dirname, 'delivery')));
-app.use(express.static(path.join(__dirname, '..')));
+app.use('/delivery', express.static(path.join(__dirname, 'delivery'), { index: false }));
+app.use(express.static(path.join(__dirname, '..'), { index: false }));
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://arvind:arvind5299@cluster0.wnav3z6.mongodb.net/?appName=Cluster0')
   .then(() => console.log('MongoDB connected'))

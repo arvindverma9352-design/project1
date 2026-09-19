@@ -97,3 +97,4 @@ export function WishlistProvider({ children }) {
 export function useWishlist() {
   return useContext(WishlistContext);
 }
+

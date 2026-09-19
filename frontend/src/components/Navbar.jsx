@@ -1,12 +1,11 @@
 import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar({ searchTerm, onSearchChange, activeCategory, onCategoryChange }) {
   const { cartCount } = useCart();
   const { currentUser, isAdmin } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
 
   const isHomePage = location.pathname === '/' || location.pathname === '/home';
@@ -90,3 +89,4 @@ export default function Navbar({ searchTerm, onSearchChange, activeCategory, onC
     </nav>
   );
 }
+

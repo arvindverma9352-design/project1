@@ -215,3 +215,4 @@ export const productListOrder = [
   "motimirch", "oldginger", "starfruit", "taroroot", "tikhimirchi",
   "torai"
 ];
+

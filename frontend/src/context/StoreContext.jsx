@@ -88,3 +88,4 @@ export function StoreProvider({ children }) {
 export function useStore() {
   return useContext(StoreContext);
 }
+

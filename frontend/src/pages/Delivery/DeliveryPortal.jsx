@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
@@ -15,7 +15,7 @@ export default function DeliveryPortal() {
 
   const riderId = currentRider?.id || currentRider?._id;
 
-  const loadRiderOrders = async () => {
+  const loadRiderOrders = useCallback(async () => {
     if (!riderId) return;
     try {
       const data = await api.getOrders(`?riderId=${riderId}`);
@@ -25,7 +25,7 @@ export default function DeliveryPortal() {
     } catch (err) {
       console.warn('Could not load rider orders:', err);
     }
-  };
+  }, [riderId]);
 
   useEffect(() => {
     if (riderId) {
@@ -33,7 +33,7 @@ export default function DeliveryPortal() {
       const interval = setInterval(loadRiderOrders, 10000); // 10s live poll for new orders
       return () => clearInterval(interval);
     }
-  }, [riderId]);
+  }, [riderId, loadRiderOrders]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -324,3 +324,4 @@ export default function DeliveryPortal() {
     </div>
   );
 }
+

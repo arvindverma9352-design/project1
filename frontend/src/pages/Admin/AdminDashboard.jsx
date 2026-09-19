@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import { api } from '../../services/api';
-import { productLabels, productImages, productListOrder } from '../../constants/products';
+import { productLabels, productImages } from '../../constants/products';
 
 export default function AdminDashboard() {
-  const navigate = useNavigate();
-  const { currentUser, isAdmin } = useAuth();
   const { isStoreOpen, refreshStoreStatus, refreshProducts } = useStore();
 
   const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [riders, setRiders] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState('');
 
   // Edit Product Form State
@@ -588,3 +584,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+

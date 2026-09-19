@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Toast from '../components/Toast';
 import { useCart } from '../context/CartContext';
@@ -9,8 +9,7 @@ import { productLabels } from '../constants/products';
 import { api } from '../services/api';
 
 export default function Cart() {
-  const navigate = useNavigate();
-  const { cart, updateQuantity, removeFromCart, clearCart, cartTotal, showToast } = useCart();
+  const { cart, updateQuantity, removeFromCart, clearCart, cartTotal } = useCart();
   const { currentUser } = useAuth();
   const { isStoreOpen } = useStore();
 
@@ -311,3 +310,4 @@ export default function Cart() {
     </>
   );
 }
+

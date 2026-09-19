@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useMemo } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Toast from '../components/Toast';
 import { useCart } from '../context/CartContext';
@@ -8,9 +8,8 @@ import { productLabels, productImages, productListOrder } from '../constants/pro
 
 export default function ProductDetail() {
   const { key } = useParams();
-  const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { products, refreshProducts } = useStore();
+  const { products } = useStore();
 
   const productKey = (key || 'patato').toLowerCase().replace(/[^a-z0-9]/g, '');
   const title = productLabels[productKey] || productKey;
@@ -126,3 +125,4 @@ export default function ProductDetail() {
     </>
   );
 }
+

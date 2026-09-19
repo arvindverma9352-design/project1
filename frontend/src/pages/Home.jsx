@@ -12,7 +12,7 @@ import {
 } from '../constants/products';
 
 export default function Home() {
-  const { prices1Kg, products: backendProducts, loading } = useStore();
+  const { prices1Kg, products: backendProducts } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
 
@@ -112,3 +112,4 @@ export default function Home() {
     </>
   );
 }
+

@@ -2,4 +2,5 @@ backend/.env
 .env
 node_modules/
 backend/node_modules/
-dist/   
+dist/
+!frontend/dist/
