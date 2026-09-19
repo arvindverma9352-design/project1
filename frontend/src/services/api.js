@@ -92,7 +92,7 @@ export const api = {
   },
   async setStoreStatus(isOpen) {
     const res = await fetchWithFallback('/api/settings/store-status', {
-      method: 'POST',
+      method: 'PUT',
       body: JSON.stringify({ isOpen })
     });
     return res.json();
