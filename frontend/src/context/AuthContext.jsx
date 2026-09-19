@@ -23,10 +23,10 @@ export function AuthProvider({ children }) {
 
   const loginUser = (user, remember = true) => {
     setCurrentUser(user);
-    if (remember) {
-      localStorage.setItem('vegetable-mart-current-user', JSON.stringify(user));
-    } else {
-      sessionStorage.setItem('vegetable-mart-current-user', JSON.stringify(user));
+    const storage = remember ? localStorage : sessionStorage;
+    storage.setItem('vegetable-mart-current-user', JSON.stringify(user));
+    if (user.token) {
+      storage.setItem('vegetable-mart-token', user.token);
     }
   };
 
@@ -34,16 +34,22 @@ export function AuthProvider({ children }) {
     setCurrentUser(null);
     localStorage.removeItem('vegetable-mart-current-user');
     sessionStorage.removeItem('vegetable-mart-current-user');
+    localStorage.removeItem('vegetable-mart-token');
+    sessionStorage.removeItem('vegetable-mart-token');
   };
 
   const loginRider = (rider) => {
     setCurrentRider(rider);
     localStorage.setItem('vegetable-mart-rider-session', JSON.stringify(rider));
+    if (rider.token) {
+      localStorage.setItem('vegetable-mart-rider-token', rider.token);
+    }
   };
 
   const logoutRider = () => {
     setCurrentRider(null);
     localStorage.removeItem('vegetable-mart-rider-session');
+    localStorage.removeItem('vegetable-mart-rider-token');
   };
 
   return (

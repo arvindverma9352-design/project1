@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Product = require('../models/Product');
+const { verifyAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', verifyAdmin, async (req, res) => {
   try {
     const { title, description, image, category, available, prices, key } = req.body;
 
@@ -59,7 +60,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyAdmin, async (req, res) => {
   try {
     const idOrKey = req.params.id;
     const isObjectId = mongoose.Types.ObjectId.isValid(idOrKey) && idOrKey.length === 24;
@@ -82,7 +83,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyAdmin, async (req, res) => {
   try {
     const idOrKey = req.params.id;
     const isObjectId = mongoose.Types.ObjectId.isValid(idOrKey) && idOrKey.length === 24;

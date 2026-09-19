@@ -1,5 +1,6 @@
 const express = require('express');
 const Setting = require('../models/Setting');
+const { verifyAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ router.get('/store-status', async (req, res) => {
 });
 
 // PUT /api/settings/store-status
-router.put('/store-status', async (req, res) => {
+router.put('/store-status', verifyAdmin, async (req, res) => {
   try {
     const { isOpen } = req.body;
     const setting = await Setting.findOneAndUpdate(

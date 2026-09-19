@@ -1,6 +1,8 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const Rider = require('../models/Rider');
 const Order = require('../models/Order');
+const { verifyAdmin, verifyRiderOrAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -37,8 +39,15 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Galat Phone Number ya PIN. Kripya check karke dobara try karein.' });
     }
 
+    const token = jwt.sign(
+      { id: rider._id, role: 'rider' },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
     return res.json({
       success: true,
+      token,
       rider: {
         id: rider._id,
         name: rider.name,
@@ -53,7 +62,7 @@ router.post('/login', async (req, res) => {
 });
 
 // 2. Get All Delivery Boys (Admin Panel)
-router.get('/', async (req, res) => {
+router.get('/', verifyAdmin, async (req, res) => {
   try {
     const riders = await Rider.find({ isActive: true }).sort({ createdAt: -1 }).lean();
 
@@ -77,7 +86,7 @@ router.get('/', async (req, res) => {
 });
 
 // 3. Add New Delivery Boy (Admin Panel)
-router.post('/', async (req, res) => {
+router.post('/', verifyAdmin, async (req, res) => {
   try {
     const { name, phone, pin } = req.body;
 
@@ -127,9 +136,12 @@ router.post('/', async (req, res) => {
 });
 
 // 4. Update Duty Status (ON / OFF)
-router.patch('/:id/duty', async (req, res) => {
+router.put('/:id/duty', verifyRiderOrAdmin, async (req, res) => {
   try {
-    const { dutyStatus } = req.body;
+    if (req.user.role === 'rider' && req.user.id !== req.params.id) {
+      return res.status(403).json({ success: false, message: 'Forbidden' });
+    }
+    const dutyStatus = req.body.onDuty === true ? 'ON' : (req.body.onDuty === false ? 'OFF' : req.body.dutyStatus);
 
     if (!['ON', 'OFF'].includes(dutyStatus)) {
       return res.status(400).json({ success: false, message: 'dutyStatus must be ON or OFF.' });
@@ -161,7 +173,7 @@ router.patch('/:id/duty', async (req, res) => {
 });
 
 // 5. Delete Delivery Boy (Soft delete)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyAdmin, async (req, res) => {
   try {
     const rider = await Rider.findByIdAndUpdate(req.params.id, { isActive: false }, { new: true });
     if (!rider) {

@@ -1,10 +1,19 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 const User = require('../models/User');
+const { verifyToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.post('/signup', async (req, res) => {
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Limit each IP to 20 requests per windowMs
+  message: { success: false, message: 'Too many requests from this IP, please try again after 15 minutes' }
+});
+
+router.post('/signup', authLimiter, async (req, res) => {
   try {
     const { name, email, mobile, password, address, role } = req.body;
 
@@ -44,7 +53,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, mobile, identifier, password } = req.body;
 
@@ -88,8 +97,15 @@ router.post('/login', async (req, res) => {
       await user.save();
     }
 
+    const token = jwt.sign(
+      { id: user._id, role: user.role || 'customer' },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
     return res.json({
       success: true,
+      token,
       user: {
         id: user._id,
         name: user.name,
@@ -104,8 +120,12 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.get('/wishlist/:userId', async (req, res) => {
+router.get('/wishlist/:userId', verifyToken, async (req, res) => {
   try {
+    if (req.user.id !== req.params.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Forbidden' });
+    }
+
     const user = await User.findById(req.params.userId).select('wishlist');
 
     if (!user) {
@@ -121,8 +141,12 @@ router.get('/wishlist/:userId', async (req, res) => {
   }
 });
 
-router.put('/wishlist/:userId', async (req, res) => {
+router.put('/wishlist/:userId', verifyToken, async (req, res) => {
   try {
+    if (req.user.id !== req.params.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Forbidden' });
+    }
+
     const { wishlist } = req.body;
 
     if (!Array.isArray(wishlist)) {

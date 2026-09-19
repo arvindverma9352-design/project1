@@ -21,11 +21,23 @@ export async function fetchWithFallback(endpoint, options = {}) {
   let response = null;
   let lastError = null;
 
+  // Retrieve token
+  const token = 
+    (typeof localStorage !== 'undefined' && localStorage.getItem('vegetable-mart-token')) || 
+    (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('vegetable-mart-token')) ||
+    (typeof localStorage !== 'undefined' && localStorage.getItem('vegetable-mart-rider-token')) ||
+    '';
+
+  const defaultHeaders = {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+  };
+
   try {
     response = await fetch(`${base}${endpoint}`, {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
+        ...defaultHeaders,
         ...(options.headers || {})
       }
     });
@@ -39,7 +51,7 @@ export async function fetchWithFallback(endpoint, options = {}) {
       const cloudRes = await fetch(`https://project1-czw2.onrender.com${endpoint}`, {
         ...options,
         headers: {
-          'Content-Type': 'application/json',
+          ...defaultHeaders,
           ...(options.headers || {})
         }
       });
