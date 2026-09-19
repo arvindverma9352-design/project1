@@ -127,7 +127,7 @@ export const api = {
     return res.json();
   },
   async register(userData) {
-    const res = await fetchWithFallback('/api/auth/register', {
+    const res = await fetchWithFallback('/api/auth/signup', {
       method: 'POST',
       body: JSON.stringify(userData)
     });

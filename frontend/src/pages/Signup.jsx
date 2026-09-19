@@ -25,7 +25,7 @@ export default function Signup() {
       const data = await api.register({
         name: name.trim(),
         email: email.trim(),
-        phone: phone.trim(),
+        mobile: phone.trim(),
         password
       });
 
