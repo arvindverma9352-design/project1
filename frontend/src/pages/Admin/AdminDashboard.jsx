@@ -388,6 +388,7 @@ export default function AdminDashboard() {
                         </div>
                       </div>
 
+                    <div style={{ display: 'flex', gap: '8px' }}>
                       <button
                         type="button"
                         onClick={() => handleSelectProductToEdit(p)}
@@ -403,13 +404,40 @@ export default function AdminDashboard() {
                       >
                         Edit
                       </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (window.confirm(`Are you sure you want to delete ${p.title || key}?`)) {
+                            try {
+                              await api.deleteProduct(key);
+                              showNotification(`Deleted product: ${p.title || key}`);
+                              loadAllData();
+                              refreshProducts();
+                            } catch (err) {
+                              alert('Error deleting product: ' + err.message);
+                            }
+                          }
+                        }}
+                        style={{
+                          padding: '6px 14px',
+                          background: '#ffebee',
+                          color: '#c62828',
+                          border: '1px solid #ffcdd2',
+                          borderRadius: '6px',
+                          fontWeight: 'bold',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Delete
+                      </button>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        )}
+        </div>
+      )}
 
         {/* TAB 2: ORDERS & DELIVERY BOY ASSIGNMENT */}
         {activeTab === 'orders' && (
@@ -566,18 +594,45 @@ export default function AdminDashboard() {
                       <strong>{r.name}</strong>
                       <div style={{ fontSize: '13px', color: '#666' }}>📱 {r.phone}</div>
                     </div>
-                    <span
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: '12px',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        background: r.onDuty ? '#e8f5e9' : '#f5f5f5',
-                        color: r.onDuty ? '#2e7d32' : '#757575'
-                      }}
-                    >
-                      {r.onDuty ? '🟢 On Duty' : '⚪ Off Duty'}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span
+                        style={{
+                          padding: '4px 10px',
+                          borderRadius: '12px',
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          background: r.onDuty ? '#e8f5e9' : '#f5f5f5',
+                          color: r.onDuty ? '#2e7d32' : '#757575'
+                        }}
+                      >
+                        {r.onDuty ? '🟢 On Duty' : '⚪ Off Duty'}
+                      </span>
+                      <button
+                        onClick={async () => {
+                          if (window.confirm(`Are you sure you want to remove delivery boy ${r.name}?`)) {
+                            try {
+                              await api.deleteRider(r.id || r._id);
+                              showNotification(`Removed delivery boy: ${r.name}`);
+                              loadAllData();
+                            } catch (err) {
+                              alert('Error removing rider: ' + err.message);
+                            }
+                          }
+                        }}
+                        style={{
+                          padding: '4px 8px',
+                          background: '#ffebee',
+                          color: '#c62828',
+                          border: '1px solid #ffcdd2',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

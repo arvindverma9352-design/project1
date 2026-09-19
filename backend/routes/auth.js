@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
 const router = express.Router();
@@ -19,11 +20,15 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ success: false, message: 'User already exists.' });
     }
 
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const newUser = new User({
       name,
       email: email.toLowerCase(),
       mobile,
-      password,
+      password: hashedPassword,
       address: address || '',
       role: role || 'customer'
     });
@@ -63,13 +68,24 @@ router.post('/login', async (req, res) => {
     if (loginEmail) queryConditions.push({ email: loginEmail });
     if (loginMobile) queryConditions.push({ mobile: loginMobile });
 
-    const user = await User.findOne({
-      $or: queryConditions,
-      password
-    });
+    const user = await User.findOne({ $or: queryConditions });
 
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid email/mobile or password.' });
+    }
+
+    // Compare password (support both old plain text and new hashed passwords for migration)
+    const isMatch = await bcrypt.compare(password, user.password).catch(() => false);
+    
+    if (!isMatch && password !== user.password) {
+      return res.status(401).json({ success: false, message: 'Invalid email/mobile or password.' });
+    }
+
+    // If it was a plain text match, hash it and save it for next time
+    if (password === user.password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+      await user.save();
     }
 
     return res.json({
@@ -153,15 +169,15 @@ router.post('/forgot-password', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Passwords do not match.' });
     }
 
-    const updatedUser = await User.findOneAndUpdate(
-      { email: email.toLowerCase(), mobile },
-      { password: newPassword },
-      { new: true }
-    );
+    const user = await User.findOne({ email: email.toLowerCase(), mobile });
 
-    if (!updatedUser) {
+    if (!user) {
       return res.status(404).json({ success: false, message: 'No account found with this email and mobile number.' });
     }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
 
     return res.json({
       success: true,

@@ -170,6 +170,12 @@ export const api = {
       body: JSON.stringify(riderData)
     });
     return res.json();
+  },
+  async deleteRider(riderId) {
+    const res = await fetchWithFallback(`/api/riders/${riderId}`, {
+      method: 'DELETE'
+    });
+    return res.json();
   }
 };
 
