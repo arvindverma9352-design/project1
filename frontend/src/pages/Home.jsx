@@ -32,10 +32,17 @@ export default function Home() {
   const visibleProductKeys = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
 
-    return productListOrder.filter((key) => {
-      const title = (productLabels[key] || key).toLowerCase();
+    // Get all keys from backend AND hardcoded order
+    const allKeys = [...new Set([
+      ...productListOrder,
+      ...backendProducts.map(p => (p.key || p.id || '').toLowerCase().replace(/[^a-z0-9]/g, ''))
+    ])].filter(Boolean);
+
+    return allKeys.filter((key) => {
+      const backendProd = backendProducts.find(p => (p.key || '').toLowerCase() === key);
+      const title = (backendProd?.title || productLabels[key] || key).toLowerCase();
       const hinglish = (productHinglish[key] || '').toLowerCase();
-      const category = productCategories[key] || 'hari-sabzi';
+      const category = backendProd?.category || productCategories[key] || 'hari-sabzi';
 
       const matchesSearch = !term || title.includes(term) || hinglish.includes(term);
       const matchesCategory = activeCategory === 'all' || category === activeCategory;

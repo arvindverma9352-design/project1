@@ -1,17 +1,23 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useStore } from '../context/StoreContext';
 import { productLabels, productImages, productCategories } from '../constants/products';
 
 export default function ProductCard({ productKey, livePrice, available = true }) {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { products } = useStore();
 
-  const title = productLabels[productKey] || productKey;
-  const image = productImages[productKey] || '/images/vegback.png';
-  const category = productCategories[productKey] || 'hari-sabzi';
+  const backendProduct = useMemo(() => {
+    return products.find(p => (p.key || p.id || '').toLowerCase() === productKey.toLowerCase());
+  }, [products, productKey]);
+
+  const title = backendProduct?.title || productLabels[productKey] || productKey;
+  const image = backendProduct?.image || productImages[productKey] || '/images/vegback.png';
+  const category = backendProduct?.category || productCategories[productKey] || 'hari-sabzi';
   const price = Number(livePrice) || 0;
   const isWishlisted = isInWishlist(productKey);
 
