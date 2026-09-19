@@ -39,8 +39,8 @@ export default function Cart() {
       return;
     }
 
-    if (!customerName.trim() || !customerPhone.trim() || !customerAddress.trim()) {
-      alert('Kripya apna naam, mobile number aur poora address bharein.');
+    if (!customerName.trim() || !customerPhone.trim() || !customerAddress.trim() || !customerPincode.trim()) {
+      alert('Kripya apna naam, mobile number, address aur pincode (compulsory) bharein.');
       return;
     }
 
@@ -227,9 +227,10 @@ export default function Cart() {
                 </div>
 
                 <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '4px' }}>Pincode (Optional)</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '4px' }}>Pincode *</label>
                   <input
                     type="text"
+                    required
                     value={customerPincode}
                     onChange={(e) => setCustomerPincode(e.target.value)}
                     placeholder="e.g. 302020"
