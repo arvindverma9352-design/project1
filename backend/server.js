@@ -34,6 +34,8 @@ const frontendDist = path.join(__dirname, '../frontend/dist');
 if (fs.existsSync(frontendDist)) {
   app.use(express.static(frontendDist));
 }
+app.use('/delivery', express.static(path.join(__dirname, 'delivery')));
+app.use(express.static(path.join(__dirname, '..')));
 app.use('/delivery', express.static(path.join(__dirname, 'delivery'), { index: false }));
 app.use(express.static(path.join(__dirname, '..'), { index: false }));
 

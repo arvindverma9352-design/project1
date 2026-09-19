@@ -15,7 +15,7 @@ import Signup from './pages/Signup';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import DeliveryPortal from './pages/Delivery/DeliveryPortal';
 
-// Import all preserved CSS stylesheets
+// Preserved stylesheets
 import './styles/Af-lo-sin-.css';
 import './styles/product-details.css';
 import './styles/admin.css';
