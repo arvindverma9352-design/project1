@@ -1,0 +1,11 @@
+{
+  "name": "vegetable-mart",
+  "version": "1.0.0",
+  "description": "Vegetable Mart - Farm Fresh Vegetables Store (React + Node.js)",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "server": "node backend/server.js",
+    "start": "node backend/server.js"
+  }
+}

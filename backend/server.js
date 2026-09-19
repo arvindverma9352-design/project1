@@ -10,6 +10,7 @@ const settingsRoutes = require('./routes/settings');
 const ridersRoutes = require('./routes/riders');
 
 const path = require('path');
+const fs = require('fs');
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
-// Vegetable Mart Backend - Live Price Sync Engine v7.1
+// Vegetable Mart Backend - React SPA Engine v8.0
 app.use(express.json());
 app.use((req, res, next) => {
   const p = req.path.toLowerCase();
@@ -29,6 +30,10 @@ app.use((req, res, next) => {
   next();
 });
 
+const frontendDist = path.join(__dirname, '../frontend/dist');
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+}
 app.use('/delivery', express.static(path.join(__dirname, 'delivery')));
 app.use(express.static(path.join(__dirname, '..')));
 
@@ -50,6 +55,18 @@ app.use('/api/products', productsRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/riders', ridersRoutes);
+
+// SPA client-side routing fallback for React
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/') || req.path.includes('.')) {
+    return next();
+  }
+  const reactIndex = path.resolve(__dirname, '../frontend/dist/index.html');
+  if (fs.existsSync(reactIndex)) {
+    return res.sendFile(reactIndex);
+  }
+  next();
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
