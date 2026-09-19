@@ -35,6 +35,7 @@ export default function Login() {
       // 2. Normal customer API login
       const data = await api.login({ email, password });
       if (data && data.user) {
+        if (data.token) data.user.token = data.token;
         loginUser(data.user, true);
         if (data.user.role === 'admin') {
           navigate('/admin');

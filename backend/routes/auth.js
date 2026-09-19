@@ -44,9 +44,24 @@ router.post('/signup', authLimiter, async (req, res) => {
 
     await newUser.save();
 
+    const token = jwt.sign(
+      { id: newUser._id, role: newUser.role || 'customer' },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
     return res.status(201).json({
       success: true,
-      message: 'Signup successful.'
+      message: 'Signup successful.',
+      token,
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        mobile: newUser.mobile,
+        address: newUser.address || '',
+        role: newUser.role || 'customer'
+      }
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

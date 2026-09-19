@@ -43,6 +43,7 @@ export default function DeliveryPortal() {
     try {
       const data = await api.riderLogin({ phone: phone.trim(), pin: pin.trim() });
       if (data && data.rider) {
+        if (data.token) data.rider.token = data.token;
         loginRider(data.rider);
       } else {
         throw new Error(data?.message || 'Invalid mobile number or PIN');

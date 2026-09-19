@@ -30,6 +30,7 @@ export default function Signup() {
       });
 
       if (data && data.user) {
+        if (data.token) data.user.token = data.token;
         loginUser(data.user, true);
         navigate('/');
       } else {
