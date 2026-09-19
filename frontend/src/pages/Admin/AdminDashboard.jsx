@@ -139,8 +139,9 @@ export default function AdminDashboard() {
     const selectedRider = riders.find((r) => r.id === riderId || r._id === riderId);
     try {
       await api.updateOrderStatus(orderId, {
-        riderId,
-        riderName: selectedRider ? selectedRider.name : '',
+        deliveryBoyId: riderId,
+        deliveryBoyName: selectedRider ? selectedRider.name : '',
+        deliveryBoyPhone: selectedRider ? selectedRider.phone : '',
         status: 'Out for delivery'
       });
       showNotification(`Order assigned to ${selectedRider ? selectedRider.name : 'Rider'}!`);
@@ -492,7 +493,7 @@ export default function AdminDashboard() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span style={{ fontSize: '13px', fontWeight: 'bold' }}>🛵 Delivery Boy:</span>
                           <select
-                            value={ord.riderId || ''}
+                            value={ord.deliveryBoyId || ''}
                             onChange={(e) => handleAssignRider(id, e.target.value)}
                             style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #1e7a4b', background: '#f5fbf3', fontWeight: '600' }}
                           >
