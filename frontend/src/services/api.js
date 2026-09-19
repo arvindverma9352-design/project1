@@ -7,8 +7,13 @@ export function getApiBase() {
   if (window.location.port === '5000') {
     return window.location.origin;
   }
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    // In Vite dev mode (port 5173), request proxy or direct port 5000
+  // Allow localhost, 127.0.0.1, and local network IPs like 192.168.*.* for phone testing
+  if (
+    window.location.hostname === 'localhost' || 
+    window.location.hostname === '127.0.0.1' || 
+    window.location.hostname.startsWith('192.168.') ||
+    window.location.hostname.startsWith('10.')
+  ) {
     return 'http://' + window.location.hostname + ':5000';
   }
   return 'https://project1-czw2.onrender.com';
