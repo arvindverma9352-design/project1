@@ -20,19 +20,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // 1. Admin shortcut check
-      if ((email.toLowerCase() === 'admin' || email.toLowerCase() === 'admin@vegetablemart.shop') && password === 'admin123') {
-        const adminUser = {
-          name: 'Admin',
-          email: 'admin@vegetablemart.shop',
-          role: 'admin'
-        };
-        loginUser(adminUser, true);
-        navigate('/admin');
-        return;
-      }
-
-      // 2. Normal customer API login
+      // Normal API login (handles both customers and admin)
       const data = await api.login({ email, password });
       if (data && data.user) {
         if (data.token) data.user.token = data.token;
