@@ -1,6 +1,6 @@
 export function getApiBase() {
   // Use environment variable if available, otherwise fallback to local/render
-  return import.meta.env.VITE_API_URL || 'https://project1-czw2.onrender.com';
+  return import.meta.env.VITE_API_URL
 }
 
 export const API_BASE = getApiBase();
