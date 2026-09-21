@@ -1,6 +1,6 @@
 export function getApiBase() {
-  // Always connect to the live Render backend
-  return 'https://project1-czw2.onrender.com';
+  // Use environment variable if available, otherwise fallback to local/render
+  return import.meta.env.VITE_API_URL || 'https://project1-czw2.onrender.com';
 }
 
 export const API_BASE = getApiBase();
