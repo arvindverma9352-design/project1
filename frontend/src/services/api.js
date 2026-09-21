@@ -1,6 +1,23 @@
 export function getApiBase() {
-  // Use environment variable if available, otherwise fallback to local/render
-  return import.meta.env.VITE_API_URL
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && envUrl.trim() !== '') {
+    return envUrl;
+  }
+
+  if (typeof window === 'undefined') return 'https://project1-czw2.onrender.com';
+  if (window.location.hostname.endsWith('onrender.com')) return window.location.origin;
+  
+  // Smart local resolution for phone testing on the same Wi-Fi
+  if (
+    window.location.hostname === 'localhost' || 
+    window.location.hostname === '127.0.0.1' || 
+    window.location.hostname.startsWith('192.168.') ||
+    window.location.hostname.startsWith('10.')
+  ) {
+    return 'http://' + window.location.hostname + ':5000';
+  }
+  
+  return 'https://project1-czw2.onrender.com';
 }
 
 export const API_BASE = getApiBase();
