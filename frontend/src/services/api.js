@@ -1,21 +1,5 @@
 export function getApiBase() {
-  if (typeof window === 'undefined') return 'https://project1-czw2.onrender.com';
-  
-  if (window.location.hostname.endsWith('onrender.com')) {
-    return window.location.origin;
-  }
-  if (window.location.port === '5000') {
-    return window.location.origin;
-  }
-  // Allow localhost, 127.0.0.1, and local network IPs like 192.168.*.* for phone testing
-  if (
-    window.location.hostname === 'localhost' || 
-    window.location.hostname === '127.0.0.1' || 
-    window.location.hostname.startsWith('192.168.') ||
-    window.location.hostname.startsWith('10.')
-  ) {
-    return 'http://' + window.location.hostname + ':5000';
-  }
+  // Always connect to the live Render backend
   return 'https://project1-czw2.onrender.com';
 }
 
