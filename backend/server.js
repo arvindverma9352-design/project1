@@ -22,18 +22,27 @@ app.use(helmet({
   contentSecurityPolicy: false, // Don't break React frontend
   crossOriginEmbedderPolicy: false
 }));
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'https://project1-czw2.onrender.com'
-];
+// Allowed Origins handled dynamically below
 
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith('http://192.168.') || origin.startsWith('http://10.')) {
+    
+    const isAllowed = 
+      origin === 'http://localhost:5173' || 
+      origin === 'http://localhost:5174' || 
+      origin.endsWith('.onrender.com') ||
+      origin.endsWith('.vercel.app') ||
+      origin.endsWith('.netlify.app') ||
+      origin.includes('vegetablemart.shop') ||
+      origin.startsWith('http://192.168.') || 
+      origin.startsWith('http://10.') ||
+      (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL);
+
+    if (isAllowed) {
       callback(null, true);
     } else {
+      console.warn(`[CORS Blocked] Origin not allowed: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
