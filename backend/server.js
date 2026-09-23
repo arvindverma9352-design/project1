@@ -22,8 +22,6 @@ app.use(helmet({
   contentSecurityPolicy: false, // Don't break React frontend
   crossOriginEmbedderPolicy: false
 }));
-// Allowed Origins handled dynamically below
-
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
