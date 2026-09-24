@@ -3,7 +3,7 @@
   "name": "Vegetable Mart",
   "short_name": "Vegetable Mart",
   "description": "Order fresh farm vegetables online with fast doorstep delivery",
-  "start_url": "index.html",
+  "start_url": "/",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -33,19 +33,19 @@
     {
       "name": "Shop Vegetables",
       "short_name": "Shop",
-      "url": "Af-lo-sin-.html",
+      "url": "/",
       "icons": [{ "src": "logo-192.png", "sizes": "192x192" }]
     },
     {
       "name": "My Cart",
       "short_name": "Cart",
-      "url": "cart.html",
+      "url": "/cart",
       "icons": [{ "src": "logo-192.png", "sizes": "192x192" }]
     },
     {
       "name": "My Wishlist",
       "short_name": "Wishlist",
-      "url": "wishlist.html",
+      "url": "/wishlist",
       "icons": [{ "src": "logo-192.png", "sizes": "192x192" }]
     }
   ]
