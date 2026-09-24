@@ -44,6 +44,11 @@ export default function Cart() {
       return;
     }
 
+    if (customerPincode.trim() !== '301001') {
+      alert('Sorry, abhi hum sirf 301001 pincode par hi delivery karte hain.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     const orderPayload = {
@@ -78,6 +83,25 @@ export default function Cart() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Aapka browser location support nahi karta.');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const mapsLink = `https://maps.google.com/?q=${latitude},${longitude}`;
+        setCustomerAddress(prev => 
+          prev ? `${prev}\n\nLive Location: ${mapsLink}` : `Live Location: ${mapsLink}\n\n(Please add your house number manually)`
+        );
+      },
+      (error) => {
+        alert('Location access deny ho gaya. Kripya apna address manually type karein.');
+      }
+    );
   };
 
   return (
@@ -215,7 +239,16 @@ export default function Cart() {
                 </div>
 
                 <div style={{ marginBottom: '12px' }}>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '4px' }}>Delivery Address (House/Street/Area) *</label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <label style={{ fontSize: '13px', fontWeight: '600' }}>Delivery Address (House/Street/Area) *</label>
+                    <button 
+                      type="button" 
+                      onClick={handleGetLocation}
+                      style={{ fontSize: '11px', padding: '4px 8px', background: '#e8f5e9', color: '#1e7a4b', border: '1px solid #c8e6c9', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      📍 Get Live Location
+                    </button>
+                  </div>
                   <textarea
                     required
                     rows="3"
@@ -246,19 +279,10 @@ export default function Cart() {
                       <input
                         type="radio"
                         name="payment"
-                        checked={paymentMethod === 'COD'}
+                        checked={true}
                         onChange={() => setPaymentMethod('COD')}
                       />
                       Cash on Delivery (COD)
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                      <input
-                        type="radio"
-                        name="payment"
-                        checked={paymentMethod === 'Online'}
-                        onChange={() => setPaymentMethod('Online')}
-                      />
-                      UPI / Online
                     </label>
                   </div>
                 </div>

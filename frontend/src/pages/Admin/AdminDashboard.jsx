@@ -109,6 +109,14 @@ export default function AdminDashboard() {
       showNotification(`✅ Product "${payload.title}" saved & synced to cloud database!`);
       loadAllData();
       refreshProducts();
+      const data = await api.updateProduct(payload.key, payload);
+      if (data && data.success !== false) {
+        showNotification(`✅ Product "${payload.title}" saved & synced to cloud database!`);
+        loadAllData();
+        refreshProducts();
+      } else {
+        alert('Update failed: ' + (data?.message || 'Unauthorized'));
+      }
     } catch (err) {
       alert('Error updating product: ' + err.message);
     }
@@ -120,6 +128,13 @@ export default function AdminDashboard() {
       await api.setStoreStatus(newStatus);
       await refreshStoreStatus();
       showNotification(`Store status updated: ${newStatus ? 'OPEN' : 'CLOSED'}`);
+      const data = await api.setStoreStatus(newStatus);
+      if (data && data.success !== false) {
+        await refreshStoreStatus();
+        showNotification(`Store status updated: ${newStatus ? 'OPEN' : 'CLOSED'}`);
+      } else {
+        alert('Store status update failed: ' + (data?.message || 'Unauthorized'));
+      }
     } catch (err) {
       alert('Store status update failed: ' + err.message);
     }
