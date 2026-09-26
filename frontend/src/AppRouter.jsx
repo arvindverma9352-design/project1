@@ -19,7 +19,6 @@ import DeliveryPortal from './pages/Delivery/DeliveryPortal';
 import './styles/Af-lo-sin-.css';
 import './styles/product-details.css';
 import './styles/admin.css';
-import './styles/delivery.css';
 import './styles/profile.css';
 import './styles/wishlist.css';
 

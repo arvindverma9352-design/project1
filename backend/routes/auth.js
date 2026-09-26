@@ -13,7 +13,9 @@ const authLimiter = rateLimit({
   message: { success: false, message: 'Too many requests from this IP, please try again after 15 minutes' }
 });
 
-router.post('/signup', authLimiter, async (req, res) => {
+const otpStore = new Map(); // Key: mobile, Value: { otp, expiresAt, userData }
+
+router.post('/send-otp', authLimiter, async (req, res) => {
   try {
     const { name, email, mobile, password, address, role } = req.body;
 
@@ -26,10 +28,88 @@ router.post('/signup', authLimiter, async (req, res) => {
     });
 
     if (existingUser) {
+      return res.status(400).json({ success: false, message: 'User already exists with this email or mobile.' });
+    }
+
+    // Generate 4-digit OTP
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 mins
+
+    otpStore.set(mobile, {
+      otp,
+      expiresAt,
+      userData: { name, email, mobile, password, address, role }
+    });
+
+    // Call Fast2SMS API
+    if (process.env.FAST2SMS_API_KEY) {
+      try {
+        const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+          method: 'POST',
+          headers: {
+            'authorization': process.env.FAST2SMS_API_KEY,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            route: 'q',
+            message: `Welcome to Vegetable Mart! Your verification OTP is ${otp}. Valid for 5 minutes.`,
+            language: 'english',
+            flash: 0,
+            numbers: mobile
+          })
+        });
+        const data = await response.json();
+        console.log('Fast2SMS response:', data);
+        if (data.return === false) {
+           console.warn('Fast2SMS returned false:', data.message);
+        }
+      } catch (smsError) {
+        console.error('Failed to send SMS:', smsError.message);
+      }
+    } else {
+      console.log(`[MOCK SMS] OTP for ${mobile} is ${otp}`);
+    }
+
+    return res.json({ success: true, message: `OTP sent successfully to ${mobile}` });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+router.post('/verify-otp-and-signup', authLimiter, async (req, res) => {
+  try {
+    const { mobile, otp } = req.body;
+    
+    if (!mobile || !otp) {
+      return res.status(400).json({ success: false, message: 'Mobile and OTP are required.' });
+    }
+
+    const record = otpStore.get(mobile);
+    if (!record) {
+      return res.status(400).json({ success: false, message: 'No active OTP session found. Please sign up again.' });
+    }
+
+    if (Date.now() > record.expiresAt) {
+      otpStore.delete(mobile);
+      return res.status(400).json({ success: false, message: 'OTP has expired.' });
+    }
+
+    if (record.otp !== String(otp).trim()) {
+      return res.status(400).json({ success: false, message: 'Invalid OTP.' });
+    }
+
+    // OTP matched! Create the user.
+    const { name, email, password, address, role } = record.userData;
+
+    const existingUser = await User.findOne({
+      $or: [{ email: email.toLowerCase() }, { mobile }]
+    });
+
+    if (existingUser) {
+      otpStore.delete(mobile);
       return res.status(400).json({ success: false, message: 'User already exists.' });
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -43,6 +123,7 @@ router.post('/signup', authLimiter, async (req, res) => {
     });
 
     await newUser.save();
+    otpStore.delete(mobile);
 
     const token = jwt.sign(
       { id: newUser._id, role: newUser.role || 'customer' },
@@ -63,6 +144,7 @@ router.post('/signup', authLimiter, async (req, res) => {
         role: newUser.role || 'customer'
       }
     });
+
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -94,16 +176,6 @@ router.post('/login', authLimiter, async (req, res) => {
 
     let user = await User.findOne({ $or: queryConditions });
 
-    // Handle hardcoded admin shortcut for migration
-    if (!user && (loginEmail === 'admin' || loginEmail === 'admin@vegetablemart.shop') && password === 'admin123') {
-      user = {
-        _id: 'admin_id_shortcut_123',
-        name: 'Admin',
-        email: 'admin@vegetablemart.shop',
-        mobile: '0000000000',
-        role: 'admin',
-        password: 'admin123' // Fake password to pass the compare logic below if needed, wait, I can just bypass it
-      };
     // Force admin shortcut or override role for the main admin email
     if (loginEmail === 'admin' || loginEmail === 'admin@vegetablemart.shop') {
       if (password !== 'admin123' && (!user || !(await bcrypt.compare(password, user.password).catch(() => false)))) {
@@ -113,7 +185,6 @@ router.post('/login', authLimiter, async (req, res) => {
       const adminId = user ? user._id : 'admin_id_shortcut_123';
       
       const token = jwt.sign(
-        { id: user._id, role: 'admin' },
         { id: adminId, role: 'admin' },
         process.env.JWT_SECRET,
         { expiresIn: '7d' }
@@ -123,11 +194,6 @@ router.post('/login', authLimiter, async (req, res) => {
         success: true,
         token,
         user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          mobile: user.mobile,
-          address: '',
           id: adminId,
           name: user ? user.name : 'Admin',
           email: 'admin@vegetablemart.shop',
@@ -142,7 +208,6 @@ router.post('/login', authLimiter, async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid email/mobile or password.' });
     }
 
-    // Compare password (support both old plain text and new hashed passwords for migration)
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password).catch(() => false);
     

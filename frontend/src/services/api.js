@@ -144,6 +144,20 @@ export const api = {
     });
     return res.json();
   },
+  async sendOtp(userData) {
+    const res = await fetchWithFallback('/api/auth/send-otp', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+    return res.json();
+  },
+  async verifyOtpAndSignup(mobile, otp) {
+    const res = await fetchWithFallback('/api/auth/verify-otp-and-signup', {
+      method: 'POST',
+      body: JSON.stringify({ mobile, otp })
+    });
+    return res.json();
+  },
   async register(userData) {
     const res = await fetchWithFallback('/api/auth/signup', {
       method: 'POST',

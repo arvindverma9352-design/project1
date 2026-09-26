@@ -22,7 +22,7 @@ export default function Cart() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(null);
 
-  const deliveryFee = cartTotal > 0 ? 10 : 0;
+  const deliveryFee = 0;
   const platformFee = 0;
   const grandTotal = cartTotal + deliveryFee;
 

@@ -257,7 +257,7 @@ export default function AdminDashboard() {
             color: activeTab === 'orders' ? '#fff' : '#333'
           }}
         >
-          📦 Orders & Delivery ({orders.length})
+          📦 Orders & Delivery ({orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length})
         </button>
 
         <button
@@ -458,13 +458,13 @@ export default function AdminDashboard() {
         {/* TAB 2: ORDERS & DELIVERY BOY ASSIGNMENT */}
         {activeTab === 'orders' && (
           <div style={{ background: '#fff', padding: '24px', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-            <h3 style={{ margin: '0 0 16px', color: '#1e7a4b' }}>Live Orders Management ({orders.length})</h3>
+            <h3 style={{ margin: '0 0 16px', color: '#1e7a4b' }}>Live Orders Management ({orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length})</h3>
 
-            {orders.length === 0 ? (
+            {orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length === 0 ? (
               <p>Koi orders nahi mile.</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {orders.map((ord) => {
+                {orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').map((ord) => {
                   const id = ord.id || ord._id;
 
                   return (

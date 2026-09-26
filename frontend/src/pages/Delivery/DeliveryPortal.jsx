@@ -203,7 +203,7 @@ export default function DeliveryPortal() {
       </div>
 
       {/* Orders List */}
-      <h3 style={{ color: '#1e7a4b', margin: '0 0 12px 6px' }}>Assigned Deliveries ({orders.length})</h3>
+      <h3 style={{ color: '#1e7a4b', margin: '0 0 12px 6px' }}>Assigned Deliveries ({orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length})</h3>
 
       {!isOnDuty ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', background: '#fff', borderRadius: '16px', color: '#666' }}>
@@ -211,7 +211,7 @@ export default function DeliveryPortal() {
           <h4>Aap abhi Off Duty hain</h4>
           <p style={{ fontSize: '13px' }}>Orders receive karne ke liye 'DUTY ON' karein.</p>
         </div>
-      ) : orders.length === 0 ? (
+      ) : orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', background: '#fff', borderRadius: '16px', color: '#666' }}>
           <p style={{ fontSize: '2rem', margin: 0 }}>📦</p>
           <h4>Koi active order nahi hai</h4>
@@ -219,7 +219,7 @@ export default function DeliveryPortal() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {orders.map((ord) => {
+          {orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').map((ord) => {
             const id = ord.id || ord._id;
             const isDelivered = ord.status === 'Delivered';
 
