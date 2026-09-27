@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Toast from '../components/Toast';
@@ -9,6 +9,7 @@ import { productLabels, productImages, productListOrder } from '../constants/pro
 export default function ProductDetail() {
   const { key } = useParams();
   const { addToCart } = useCart();
+  useEffect(() => { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }, [key]);
   const { products } = useStore();
 
   const productKey = (key || 'patato').toLowerCase().replace(/[^a-z0-9]/g, '');

@@ -35,6 +35,38 @@ export default function DeliveryPortal() {
     }
   }, [riderId, loadRiderOrders]);
 
+  const activeOrdersRef = React.useRef([]);
+  useEffect(() => {
+    activeOrdersRef.current = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
+  }, [orders]);
+
+  useEffect(() => {
+    if (currentRider?.dutyStatus !== 'ON' || !riderId) return;
+    
+    let watchId;
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const locationPayload = { riderLocation: { lat: latitude, lng: longitude } };
+          
+          activeOrdersRef.current.forEach(order => {
+            const id = order.id || order._id;
+            // Update location only if it's Out for delivery to save API calls
+            if (order.status === 'Out for delivery') {
+                api.updateOrderStatus(id, locationPayload).catch(() => {});
+            }
+          });
+        },
+        (err) => console.warn('Location tracking error', err),
+        { enableHighAccuracy: true, maximumAge: 15000, timeout: 10000 }
+      );
+    }
+    return () => {
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+    };
+  }, [currentRider?.dutyStatus, riderId]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
@@ -58,11 +90,11 @@ export default function DeliveryPortal() {
   const handleToggleDuty = async () => {
     if (!riderId) return;
     setDutyLoading(true);
-    const newDuty = !currentRider.onDuty;
+    const newDuty = currentRider.dutyStatus !== 'ON';
 
     try {
       await api.toggleRiderDuty(riderId, newDuty);
-      loginRider({ ...currentRider, onDuty: newDuty });
+      loginRider({ ...currentRider, dutyStatus: newDuty ? 'ON' : 'OFF' });
     } catch (err) {
       alert('Could not change duty status: ' + err.message);
     } finally {
@@ -153,7 +185,7 @@ export default function DeliveryPortal() {
   }
 
   // DASHBOARD SCREEN
-  const isOnDuty = currentRider.onDuty;
+  const isOnDuty = currentRider.dutyStatus === 'ON';
 
   return (
     <div style={{ minHeight: '100vh', background: '#f5f7f5', padding: '16px', maxWidth: '600px', margin: '0 auto' }}>

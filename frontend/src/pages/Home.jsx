@@ -49,16 +49,14 @@ export default function Home() {
 
       return matchesSearch && matchesCategory;
     });
-  }, [searchTerm, activeCategory]);
+  }, [searchTerm, activeCategory, backendProducts]);
 
   return (
     <>
       <Toast />
-      <Navbar
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
+      <Navbar 
+        searchTerm={searchTerm} 
+        onSearchChange={setSearchTerm} 
       />
 
       <StoreBanner />
@@ -85,11 +83,41 @@ export default function Home() {
         </section>
 
         {/* Section Heading & Counter */}
-        <div className="products-heading">
+        <div className="products-heading" style={{ flexWrap: 'wrap', gap: '15px' }}>
           <div>
             <p className="section-kicker">From our farm to you</p>
             <h2>Shop fresh picks</h2>
           </div>
+          
+          <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '5px' }}>
+            {[
+              { id: 'all', label: '🛒 Sabhi' },
+              { id: 'hari-sabzi', label: '🥬 Hari Sabzi' },
+              { id: 'jad', label: '🥔 Jad Sabjhi' },
+              { id: 'fruits', label: '🍅 Fal-Sabzi' },
+              { id: 'masale', label: '🌶️ Masale & Herbs' }
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`cat-btn ${activeCategory === cat.id ? 'active' : ''}`}
+                onClick={() => setActiveCategory(cat.id)}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '20px',
+                  border: 'none',
+                  background: activeCategory === cat.id ? '#1e7a4b' : '#f0f5f1',
+                  color: activeCategory === cat.id ? '#fff' : '#1e7a4b',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
           <span className="product-count">
             {visibleProductKeys.length} fresh choice{visibleProductKeys.length === 1 ? '' : 's'}
           </span>

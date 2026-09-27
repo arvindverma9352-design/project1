@@ -99,6 +99,7 @@ router.post('/', optionalAuth, async (req, res) => {
       mobile: mobile || phone || '',
       address: address || '',
       location: location || '',
+      customerLocation: req.body.customerLocation || null,
       email: email || '',
       total: calculatedTotal,
       subtotal: calculatedSubtotal,
@@ -125,9 +126,15 @@ router.patch('/:id', verifyRiderOrAdmin, async (req, res) => {
       if (!order || String(order.deliveryBoyId) !== String(req.user.id)) {
          return res.status(403).json({ success: false, message: 'Forbidden: Order not assigned to you' });
       }
-      // Rider can only update status
-      if (updateData.status) {
-         await Order.findByIdAndUpdate(req.params.id, { status: updateData.status });
+      // Rider can update status and location
+      let riderUpdates = {};
+      if (updateData.status) riderUpdates.status = updateData.status;
+      if (updateData.riderLocation) {
+         riderUpdates.riderLocation = updateData.riderLocation;
+         riderUpdates.riderLocation.updatedAt = new Date();
+      }
+      if (Object.keys(riderUpdates).length > 0) {
+         await Order.findByIdAndUpdate(req.params.id, riderUpdates);
          return res.json({ success: true });
       }
       return res.status(400).json({ success: false });

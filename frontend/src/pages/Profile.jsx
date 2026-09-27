@@ -4,6 +4,27 @@ import Navbar from '../components/Navbar';
 import Toast from '../components/Toast';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+const bikeIcon = new L.Icon({
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/3198/3198336.png',
+  iconSize: [40, 40],
+  iconAnchor: [20, 20]
+});
+const homeIcon = new L.Icon({
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/1946/1946436.png',
+  iconSize: [40, 40],
+  iconAnchor: [20, 40]
+});
 
 export default function Profile() {
   const navigate = useNavigate();

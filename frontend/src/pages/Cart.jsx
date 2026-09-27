@@ -208,6 +208,17 @@ export default function Cart() {
 
             {/* Right: Address & Checkout Form */}
             <div>
+              {!currentUser ? (
+                <div style={{ background: '#fff', borderRadius: '16px', padding: '36px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', textAlign: 'center' }}>
+                  <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</div>
+                  <h3 style={{ margin: '0 0 16px', color: '#1e7a4b', fontSize: '20px' }}>Login to Place Order</h3>
+                  <p style={{ color: '#666', marginBottom: '28px', fontSize: '14px', lineHeight: '1.6' }}>
+                    Order place karne ke liye kripya apne account me login karein ya naya account banayein.
+                  </p>
+                  <Link to="/login" style={{ display: 'block', width: '100%', padding: '14px', background: '#1e7a4b', color: '#fff', textDecoration: 'none', borderRadius: '10px', fontSize: '16px', fontWeight: 'bold', marginBottom: '12px' }}>Login Now</Link>
+                  <Link to="/signup" style={{ display: 'block', width: '100%', padding: '14px', background: '#fff', color: '#1e7a4b', border: '1px solid #1e7a4b', textDecoration: 'none', borderRadius: '10px', fontSize: '16px', fontWeight: 'bold' }}>Create New Account</Link>
+                </div>
+              ) : (
               <form
                 onSubmit={handlePlaceOrder}
                 style={{ background: '#fff', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
@@ -325,6 +336,7 @@ export default function Cart() {
                   {isSubmitting ? 'Placing Order...' : `Place Order (₹${grandTotal}) ➔`}
                 </button>
               </form>
+              )}
             </div>
           </div>
         )}

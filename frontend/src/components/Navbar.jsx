@@ -74,17 +74,7 @@ export default function Navbar({ searchTerm, onSearchChange, activeCategory, onC
           🛵 Captain
         </Link>
 
-        {/* Category filters shown on Home */}
-        {isHomePage && categories.map((cat) => (
-          <button
-            key={cat.id}
-            type="button"
-            className={`cat-btn ${activeCategory === cat.id ? 'active' : ''}`}
-            onClick={() => onCategoryChange && onCategoryChange(cat.id)}
-          >
-            {cat.label}
-          </button>
-        ))}
+
       </div>
     </nav>
   );

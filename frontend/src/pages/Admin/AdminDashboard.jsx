@@ -515,7 +515,7 @@ export default function AdminDashboard() {
                             <option value="">-- Assign Delivery Boy --</option>
                             {riders.map((r) => (
                               <option key={r.id || r._id} value={r.id || r._id}>
-                                {r.name} ({r.onDuty ? '🟢 On Duty' : '⚪ Off Duty'})
+                                {r.name} ({r.dutyStatus === 'ON' ? '🟢 On Duty' : '⚪ Off Duty'})
                               </option>
                             ))}
                           </select>
@@ -617,11 +617,11 @@ export default function AdminDashboard() {
                           borderRadius: '12px',
                           fontSize: '12px',
                           fontWeight: 'bold',
-                          background: r.onDuty ? '#e8f5e9' : '#f5f5f5',
-                          color: r.onDuty ? '#2e7d32' : '#757575'
+                          background: r.dutyStatus === 'ON' ? '#e8f5e9' : '#f5f5f5',
+                          color: r.dutyStatus === 'ON' ? '#2e7d32' : '#757575'
                         }}
                       >
-                        {r.onDuty ? '🟢 On Duty' : '⚪ Off Duty'}
+                        {r.dutyStatus === 'ON' ? '🟢 On Duty' : '⚪ Off Duty'}
                       </span>
                       <button
                         onClick={async () => {
